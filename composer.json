@@ -1,16 +1,16 @@
 {
-    "name": "spatie/:package_name",
-    "description": ":package_description",
+    "name": "spatie/laravel-settings",
+    "description": "Store your application settings",
     "keywords": [
         "spatie",
-        ":package_name"
+        "laravel-settings"
     ],
-    "homepage": "https://github.com/spatie/:package_name",
+    "homepage": "https://github.com/spatie/laravel-settings",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
+            "name": "Ruben Van Assche",
+            "email": "ruben@spatie.be",
             "homepage": "https://spatie.be",
             "role": "Developer"
         }
