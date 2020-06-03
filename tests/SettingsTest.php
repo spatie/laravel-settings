@@ -2,12 +2,12 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Exception;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\SettingsBlueprint;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
-use Exception;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 

@@ -2,10 +2,10 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\LaravelSettings\SettingsProperty;
-use PHPUnit\Framework\Assert as PHPUnit;
-use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {

@@ -2,11 +2,11 @@
 
 namespace Spatie\LaravelSettings;
 
+use Closure;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
-use Closure;
 
 class SettingsMigrator
 {

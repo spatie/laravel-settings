@@ -2,11 +2,11 @@
 
 namespace Spatie\LaravelSettings;
 
-use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
-use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 use Exception;
 use ReflectionClass;
 use ReflectionProperty;
+use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 
 class SettingsMapper
 {
