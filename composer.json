@@ -16,7 +16,10 @@
         }
     ],
     "require": {
-        "php": "^7.4"
+        "php": "^7.4",
+        "illuminate/database" : "^7.0",
+        "spatie/data-transfer-object" : "^2.0",
+        "ext-json" : "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
@@ -27,12 +30,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Spatie\\Skeleton\\": "src"
+            "Spatie\\LaravelSettings\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Spatie\\Skeleton\\Tests\\": "tests"
+            "Spatie\\LaravelSettings\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -47,11 +50,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Spatie\\Skeleton\\SkeletonServiceProvider"
-            ],
-            "aliases": {
-                "Skeleton": "Spatie\\Skeleton\\SkeletonFacade"
-            }
+                "Spatie\\LaravelSettings\\LaravelSettingsServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",

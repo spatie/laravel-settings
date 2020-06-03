@@ -1,13 +1,35 @@
 <?php
 
-namespace Tests\Support\Settings;
+namespace Spatie\LaravelSettings\Tests;
 
-use App\Support\Settings\SettingsProperty;
+use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
+use Spatie\LaravelSettings\SettingsProperty;
 use PHPUnit\Framework\Assert as PHPUnit;
-use Tests\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
+    protected function getPackageProviders($app)
+    {
+        return [
+            LaravelSettingsServiceProvider::class,
+        ];
+    }
+
+    public function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+
+        include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
+        (new \CreateSettingsTable())->up();
+    }
+
     protected function assertDatabaseHasSetting(string $property, $value): void
     {
         [$group, $name] = explode('.', $property);

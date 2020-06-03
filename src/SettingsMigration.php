@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
 use Illuminate\Database\Migrations\Migration;
 

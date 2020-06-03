@@ -1,32 +1,32 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
-use App\Support\Settings\Exceptions\MissingSettingsException;
-use App\Support\Settings\SettingsConnection\SettingsConnection;
+use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 
 class SettingsMapper
 {
-    private SettingsConnection $connection;
+    private SettingsRepository $repository;
 
-    public function __construct(SettingsConnection $settingsConnection)
+    public function __construct(SettingsRepository $settingsConnection)
     {
-        $this->connection = $settingsConnection;
+        $this->repository = $settingsConnection;
     }
 
-    public function connection(string $name): self
+    public function repository(string $name): self
     {
-        $this->connection = SettingsConnectionFactory::create($name);
+        $this->repository = SettingsRepositoryFactory::create($name);
 
         return $this;
     }
 
     public function save(Settings $settings): Settings
     {
-        $properties = $this->connection->getPropertiesInGroup($settings::group());
+        $properties = $this->repository->getPropertiesInGroup($settings::group());
 
         $missingSettings = array_diff(
             $this->getRequiredSettings($settings),
@@ -38,7 +38,7 @@ class SettingsMapper
         }
 
         foreach ($settings->all() as $name => $payload) {
-            $this->connection->updatePropertyPayload(
+            $this->repository->updatePropertyPayload(
                 $settings::group(),
                 $name,
                 $payload
@@ -54,7 +54,7 @@ class SettingsMapper
             throw new Exception("Tried loading {$settingsClass} which is not a Settings DTO");
         }
 
-        $properties = $this->connection->getPropertiesInGroup($settingsClass::group());
+        $properties = $this->repository->getPropertiesInGroup($settingsClass::group());
 
         $missingProperties = array_diff(
             $this->getRequiredSettings($settingsClass),
@@ -69,7 +69,7 @@ class SettingsMapper
     }
 
     /**
-     * @param string|\App\Support\Settings\Settings $settingsClass
+     * @param string|\Spatie\LaravelSettings\Settings $settingsClass
      *
      * @return array
      * @throws \ReflectionException

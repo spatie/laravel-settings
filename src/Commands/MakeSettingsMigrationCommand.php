@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Settings\Commands;
+namespace Spatie\LaravelSettings\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -26,7 +26,7 @@ class MakeSettingsMigrationCommand extends Command
     {
         $name = trim($this->input->getArgument('name'));
 
-        $path = database_path('settings');
+        $path = config('settings.migrations_path');
 
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
@@ -41,7 +41,7 @@ class MakeSettingsMigrationCommand extends Command
         return <<<EOT
 <?php
 
-use App\Support\Settings\SettingsMigration;
+use Spatie\LaravelSettings\SettingsMigration;
 
 class {{ class }} extends SettingsMigration
 {

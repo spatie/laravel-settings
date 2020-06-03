@@ -1,26 +1,25 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
-use App\Support\Settings\Exceptions\InvalidSettingName;
-use App\Support\Settings\Exceptions\InvalidSplittingConfig;
-use App\Support\Settings\Exceptions\SettingAlreadyExists;
-use App\Support\Settings\Exceptions\SettingDoesNotExist;
-use App\Support\Settings\SettingsConnection\SettingsConnection;
+use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
+use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
+use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
+use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 use Closure;
 
 class SettingsMigrator
 {
-    private SettingsConnection $connection;
+    private SettingsRepository $repository;
 
-    public function __construct(SettingsConnection $connection)
+    public function __construct(SettingsRepository $connection)
     {
-        $this->connection = $connection;
+        $this->repository = $connection;
     }
 
-    public function connection(string $name): self
+    public function repository(string $name): self
     {
-        $this->connection = SettingsConnectionFactory::create($name);
+        $this->repository = SettingsRepositoryFactory::create($name);
 
         return $this;
     }
@@ -52,13 +51,6 @@ class SettingsMigrator
         return $this->createProperty($property, $value);
     }
 
-    public function addMany(string $group, array $values): void
-    {
-        foreach ($values as $name => $value) {
-            $this->add("{$group}.{$name}", $value);
-        }
-    }
-
     public function delete(string $property): void
     {
         if (! $this->checkIfPropertyExists($property)) {
@@ -78,59 +70,6 @@ class SettingsMigrator
             $property,
             $closure($this->getPropertyPayload($property))
         );
-    }
-
-    public function merge(array $from, string $to, Closure $closure): void
-    {
-        if ($this->checkIfPropertyExists($to)) {
-            throw SettingAlreadyExists::whenMerging($to);
-        }
-
-        $values = array_map(
-            function (string $property) {
-                if (! $this->checkIfPropertyExists($property)) {
-                    throw SettingDoesNotExist::whenMerging($property);
-                }
-
-                return $this->getPropertyPayload($property);
-            },
-            $from
-        );
-
-        $this->createProperty(
-            $to,
-            $closure(...$values)
-        );
-
-        foreach ($from as $fromProperty) {
-            $this->deleteProperty($fromProperty);
-        }
-    }
-
-    public function split(string $from, array $to, Closure ...$closures): void
-    {
-        if (! $this->checkIfPropertyExists($from)) {
-            throw SettingDoesNotExist::whenSplitting($from);
-        }
-
-        if (count($to) !== count($closures)) {
-            throw InvalidSplittingConfig::create(count($to), count($closures));
-        }
-
-        $value = $this->getPropertyPayload($from);
-
-        foreach (array_values($to) as $i => $property) {
-            if ($this->checkIfPropertyExists($property)) {
-                throw SettingAlreadyExists::whenSplitting($property);
-            }
-
-            $this->createProperty(
-                $property,
-                $closures[$i]($value)
-            );
-        }
-
-        $this->deleteProperty($from);
     }
 
     public function inGroup(string $group, Closure $closure): void
@@ -153,34 +92,34 @@ class SettingsMigrator
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        return $this->connection->checkIfPropertyExists($group, $name);
+        return $this->repository->checkIfPropertyExists($group, $name);
     }
 
     private function getPropertyPayload(string $property)
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        return $this->connection->getPropertyPayload($group, $name);
+        return $this->repository->getPropertyPayload($group, $name);
     }
 
     private function createProperty(string $property, $payload): SettingsProperty
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        return $this->connection->createProperty($group, $name, $payload);
+        return $this->repository->createProperty($group, $name, $payload);
     }
 
     private function updatePropertyPayload(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        $this->connection->updatePropertyPayload($group, $name, $payload);
+        $this->repository->updatePropertyPayload($group, $name, $payload);
     }
 
     private function deleteProperty(string $property): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        $this->connection->deleteProperty($group, $name);
+        $this->repository->deleteProperty($group, $name);
     }
 }

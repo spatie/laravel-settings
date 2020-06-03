@@ -1,21 +1,11 @@
 <?php
 
-namespace App\Support\Settings\Exceptions;
+namespace Spatie\LaravelSettings\Exceptions;
 
 use Exception;
 
 class SettingAlreadyExists extends Exception
 {
-    public static function whenSplitting(string $property): self
-    {
-        throw new self("Could not split to setting {$property} because it already exists");
-    }
-
-    public static function whenMerging(string $property): self
-    {
-        throw new self("Could not merge to setting {$property} because it already exists");
-    }
-
     public static function whenAdding(string $property): self
     {
         throw new self("Could not create setting {$property} because it already exists");

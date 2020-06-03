@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -8,10 +8,11 @@ class SettingsProperty extends Model
 {
     protected $table = 'settings';
 
+    protected $guarded = [];
+
     public static function get(string $property)
     {
         [$group, $name] = explode('.', $property);
-
 
         $setting = self::query()
             ->where('group', $group)

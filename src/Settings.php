@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
 use Spatie\DataTransferObject\DataTransferObject;
 
@@ -21,7 +21,7 @@ abstract class Settings extends DataTransferObject
     {
         $mapper = $connection === null
             ? resolve(SettingsMapper::class)
-            : resolve(SettingsMapper::class)->connection($connection);
+            : resolve(SettingsMapper::class)->repository($connection);
 
         $mapper->save($this);
     }

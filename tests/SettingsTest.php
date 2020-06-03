@@ -1,14 +1,15 @@
 <?php
 
-namespace Tests\Support\Settings;
+namespace Spatie\LaravelSettings\Tests;
 
-use App\Support\Settings\Exceptions\MissingSettingsException;
-use App\Support\Settings\SettingsConnection\DatabaseSettingsConnection;
-use App\Support\Settings\SettingsMapper;
-use App\Support\Settings\SettingsMigrator;
+use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\SettingsBlueprint;
+use Spatie\LaravelSettings\SettingsMapper;
+use Spatie\LaravelSettings\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
 use Exception;
-use Tests\TestClasses\Settings\DummyDto;
-use Tests\TestClasses\Settings\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 
 class SettingsTest extends TestCase
 {
@@ -23,28 +24,28 @@ class SettingsTest extends TestCase
         $this->migrator = resolve(SettingsMigrator::class);
 
         $this->mapper = new SettingsMapper(
-            new DatabaseSettingsConnection()
+            new DatabaseSettingsRepository()
         );
     }
 
     /** @test */
     public function it_will_handle_loading_settings_correctly(): void
     {
-        $this->migrator->addMany('dummy', [
-            'string' => 'Ruben',
-            'bool' => false,
-            'int' => 42,
-            'array' => ['John', 'Ringo', 'Paul', 'George'],
-            'nullable_string' => null,
-            'default_string' => null,
-            'dto' => ['name' => 'Freek'],
-            'dto_collection' => [
+        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('string', 'Ruben');
+            $blueprint->add('bool', false);
+            $blueprint->add('int', 42);
+            $blueprint->add('array', ['John', 'Ringo', 'Paul', 'George']);
+            $blueprint->add('nullable_string', null);
+            $blueprint->add('default_string', null);
+            $blueprint->add('dto', ['name' => 'Freek']);
+            $blueprint->add('dto_collection', [
                 ['name' => 'Seb'],
                 ['name' => 'Adriaan'],
-            ],
-        ]);
+            ]);
+        });
 
-        /** @var \Tests\TestClasses\Settings\DummySettings $settings */
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
         $settings = $this->mapper->load(DummySettings::class);
 
         $this->assertEquals('Ruben', $settings->string);
@@ -80,21 +81,21 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_save_settings(): void
     {
-        $this->migrator->addMany('dummy', [
-            'string' => 'Ruben',
-            'bool' => false,
-            'int' => 42,
-            'array' => ['John', 'Ringo', 'Paul', 'George'],
-            'nullable_string' => null,
-            'default_string' => null,
-            'dto' => ['name' => 'Freek'],
-            'dto_collection' => [
+        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('string', 'Ruben');
+            $blueprint->add('bool', false);
+            $blueprint->add('int', 42);
+            $blueprint->add('array', ['John', 'Ringo', 'Paul', 'George']);
+            $blueprint->add('nullable_string', null);
+            $blueprint->add('default_string', null);
+            $blueprint->add('dto', ['name' => 'Freek']);
+            $blueprint->add('dto_collection', [
                 ['name' => 'Seb'],
                 ['name' => 'Adriaan'],
-            ],
-        ]);
+            ]);
+        });
 
-        /** @var \Tests\TestClasses\Settings\DummySettings $settings */
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
         $settings = $this->mapper->load(DummySettings::class);
 
         $settings->fill([

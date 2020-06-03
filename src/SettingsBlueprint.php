@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Support\Settings;
+namespace Spatie\LaravelSettings;
 
 use Closure;
-use Illuminate\Support\Str;
 
 class SettingsBlueprint
 {
@@ -40,28 +39,8 @@ class SettingsBlueprint
         $this->migrator->update($this->prependWithGroup($name), $closure);
     }
 
-    public function merge(array $from, string $to, Closure $closure): void
-    {
-        $this->migrator->merge(
-            array_map(fn (string $name) => $this->prependWithGroup($name), $from),
-            $this->prependWithGroup($to),
-            $closure
-        );
-    }
-
-    public function split(string $from, array $to, Closure ...$closures): void
-    {
-        $this->migrator->split(
-            $this->prependWithGroup($from),
-            array_map(fn (string $name) => $this->prependWithGroup($name), $to),
-            ...$closures
-        );
-    }
-
     private function prependWithGroup(string $name): string
     {
-        return Str::contains($name, '.')
-            ? $name
-            : "{$this->group}.{$name}";
+        return "{$this->group}.{$name}";
     }
 }

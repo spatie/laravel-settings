@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Support\Settings;
+namespace Spatie\LaravelSettings\Tests;
 
-use App\Support\Settings\SettingsBlueprint;
-use App\Support\Settings\SettingsConnection\DatabaseSettingsConnection;
-use App\Support\Settings\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsBlueprint;
+use Spatie\LaravelSettings\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
 
 class SettingsBlueprintTest extends TestCase
 {
@@ -17,68 +17,48 @@ class SettingsBlueprintTest extends TestCase
         parent::setUp();
 
         $this->migrator = new SettingsMigrator(
-            new DatabaseSettingsConnection()
+            new DatabaseSettingsRepository()
         );
 
         $this->blueprint = new SettingsBlueprint('test', $this->migrator);
     }
 
-    /**
-     * @test
-     * @dataProvider renameProvider
-     */
-    public function it_can_rename_properties(string $from, string $to, string $expected): void
+    /** @test */
+    public function it_can_rename_properties(): void
     {
         $this->migrator->add('test.property', 'payload');
 
-        $this->blueprint->rename($from, $to);
+        $this->blueprint->rename('property', 'otherProperty');
 
-        $this->assertDatabaseHasSetting($expected, 'payload');
+        $this->assertDatabaseHasSetting('test.otherProperty', 'payload');
+        $this->assertDatabaseDoesNotHaveSetting('test.property');
     }
 
     /** @test */
     public function it_can_add_properties(): void
     {
-        $this->blueprint->add('test.property', 'payload');
-        $this->blueprint->add('otherProperty', 'payload');
+        $this->blueprint->add('property', 'payload');
 
         $this->assertDatabaseHasSetting('test.property', 'payload');
-        $this->assertDatabaseHasSetting('test.otherProperty', 'payload');
     }
 
     /** @test */
     public function it_can_delete_properties(): void
     {
         $this->migrator->add('test.property', 'payload');
-        $this->migrator->add('test.otherProperty', 'payload');
 
-        $this->blueprint->delete('test.property');
-        $this->blueprint->delete('otherProperty');
+        $this->blueprint->delete('property');
 
         $this->assertDatabaseDoesNotHaveSetting('test.property');
-        $this->assertDatabaseDoesNotHaveSetting('test.otherProperty');
     }
 
     /** @test */
     public function it_can_update_properties(): void
     {
         $this->migrator->add('test.property', 'payload');
-        $this->migrator->add('test.otherProperty', 'payload');
 
-        $this->blueprint->update('test.property', fn () => 'otherPayload');
-        $this->blueprint->update('otherProperty', fn () => 'otherPayload');
+        $this->blueprint->update('property', fn () => 'otherPayload');
 
         $this->assertDatabaseHasSetting('test.property', 'otherPayload');
-        $this->assertDatabaseHasSetting('test.otherProperty', 'otherPayload');
-    }
-
-    public function renameProvider(): array
-    {
-        return [
-            ['test.property', 'other.property', 'other.property'],
-            ['property', 'other.property', 'other.property'],
-            ['test.property', 'otherProperty', 'test.otherProperty'],
-            ['property', 'otherProperty', 'test.otherProperty'],
-        ];
     }
 }

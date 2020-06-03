@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Support\Settings\SettingsConnection;
+namespace Spatie\LaravelSettings\SettingsRepository;
 
-use App\Support\Settings\SettingsProperty;
+use Spatie\LaravelSettings\SettingsProperty;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 
-class DatabaseSettingsConnection implements SettingsConnection
+class DatabaseSettingsRepository implements SettingsRepository
 {
     public function getPropertiesInGroup(string $group): array
     {

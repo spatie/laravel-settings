@@ -1,11 +1,11 @@
 <?php
 
 
-namespace App\Support\Settings\SettingsConnection;
+namespace Spatie\LaravelSettings\SettingsRepository;
 
-use App\Support\Settings\SettingsProperty;
+use Spatie\LaravelSettings\SettingsProperty;
 
-interface SettingsConnection
+interface SettingsRepository
 {
     public function getPropertiesInGroup(string $group): array;
 
