@@ -10,6 +10,7 @@ use Spatie\LaravelSettings\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class SettingsTest extends TestCase
 {
@@ -147,5 +148,23 @@ class SettingsTest extends TestCase
         ]);
 
         $settings->save();
+    }
+
+    /** @test */
+    public function it_can_fake_settings()
+    {
+        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('name', 'Rick Astley');
+            $blueprint->add('description', 'Never gonna give you up!');
+        });
+
+        DummySimpleSettings::fake([
+            'description' => 'Together forever',
+        ]);
+
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertEquals('Rick Astley', $settings->name);
+        $this->assertEquals('Together forever', $settings->description);
     }
 }
