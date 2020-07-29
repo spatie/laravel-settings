@@ -22,7 +22,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->where('group', $group)
             ->select(['name', 'payload'])
             ->get()
-            ->mapWithKeys(fn($object) => [$object->name => json_decode($object->payload, true)])
+            ->mapWithKeys(fn ($object) => [$object->name => json_decode($object->payload, true)])
             ->toArray();
 
         /** @var \Spatie\LaravelSettings\SettingsProperty $temp */
