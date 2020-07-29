@@ -7,7 +7,16 @@ use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 
 abstract class Settings extends DataTransferObject
 {
+    private ?string $repository = null;
+
     abstract public static function group(): string;
+
+    public function repository(?string $repository): self
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
 
     public function fill(array $properties): self
     {
@@ -18,13 +27,23 @@ abstract class Settings extends DataTransferObject
         return $this;
     }
 
-    public function save(?string $connection = null): void
+    public function save(?string $repository = null): void
     {
-        $mapper = $connection === null
+        $mapper = $repository === null
             ? resolve(SettingsMapper::class)
-            : resolve(SettingsMapper::class)->repository($connection);
+            : resolve(SettingsMapper::class)->repository($repository);
 
         $mapper->save($this);
+    }
+
+    public function lock(string ...$properties)
+    {
+        $this->resolveRepository()->lockProperties(static::group(), $properties);
+    }
+
+    public function unlock(string ...$properties)
+    {
+        $this->resolveRepository()->unlockProperties(static::group(), $properties);
     }
 
     public static function fake(array $values): self
@@ -34,5 +53,10 @@ abstract class Settings extends DataTransferObject
         return app()->instance(static::class, new static(
             array_merge($defaultProperties, $values)
         ));
+    }
+
+    private function resolveRepository(): SettingsRepository
+    {
+        return SettingsRepositoryFactory::create($this->repository);
     }
 }

@@ -18,7 +18,7 @@ class SettingsMigratorTest extends TestCase
         parent::setUp();
 
         $this->settingsMigrator = new SettingsMigrator(
-            new DatabaseSettingsRepository()
+            new DatabaseSettingsRepository(config('settings.repositories.database'))
         );
     }
 

@@ -41,11 +41,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
     private function initiateConnection(): void
     {
-        if (config('settings.default_repository') !== 'database') {
-            throw new Exception('Unknown settings repository');
-        }
-
-        $this->app->instance(SettingsRepository::class, new DatabaseSettingsRepository());
+        $this->app->instance(SettingsRepository::class, SettingsRepositoryFactory::create());
     }
 
     private function registerSettingBinding(): void

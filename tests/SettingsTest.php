@@ -7,6 +7,7 @@ use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\SettingsBlueprint;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
@@ -25,7 +26,7 @@ class SettingsTest extends TestCase
         $this->migrator = resolve(SettingsMigrator::class);
 
         $this->mapper = new SettingsMapper(
-            new DatabaseSettingsRepository()
+            new DatabaseSettingsRepository(config('settings.repositories.database'))
         );
     }
 
@@ -166,5 +167,26 @@ class SettingsTest extends TestCase
 
         $this->assertEquals('Rick Astley', $settings->name);
         $this->assertEquals('Together forever', $settings->description);
+    }
+
+    /** @test */
+    public function it_can_lock_settings()
+    {
+        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('name', 'Louis Armstrong');
+            $blueprint->add('description', 'Hello Dolly');
+        });
+
+        $settings = $this->mapper->load(DummySimpleSettings::class);
+
+        $settings->lock('description');
+
+        $settings->name = 'Nina Simone';
+        $settings->description = 'Sinnerman';
+
+        $settings->save();
+
+        $this->assertEquals('Nina Simone', $settings->name);
+        $this->assertEquals('Hello Dolly', $settings->description);
     }
 }

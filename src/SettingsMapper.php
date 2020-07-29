@@ -37,7 +37,7 @@ class SettingsMapper
             throw MissingSettingsException::whenSaving($settings::group(), $missingSettings);
         }
 
-        foreach ($settings->all() as $name => $payload) {
+        foreach ($this->resolveSaveableProperties($settings) as $name => $payload) {
             $this->repository->updatePropertyPayload(
                 $settings::group(),
                 $name,
@@ -45,7 +45,7 @@ class SettingsMapper
             );
         }
 
-        return $settings;
+        return $this->refresh($settings);
     }
 
     public function load(string $settingsClass): Settings
@@ -68,6 +68,13 @@ class SettingsMapper
         return new $settingsClass($properties);
     }
 
+    public function refresh(Settings $settings): Settings
+    {
+        return $settings->fill(
+            $this->repository->getPropertiesInGroup($settings::group())
+        );
+    }
+
     /**
      * @param string|\Spatie\LaravelSettings\Settings $settingsClass
      *
@@ -79,8 +86,19 @@ class SettingsMapper
         $reflection = new ReflectionClass($settingsClass);
 
         return array_map(
-            fn (ReflectionProperty $property) => $property->getName(),
+            fn(ReflectionProperty $property) => $property->getName(),
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC)
+        );
+    }
+
+    private function resolveSaveableProperties(Settings $settings): array
+    {
+        $lockedProperties = $this->repository->getLockedProperties($settings::group());
+
+        return array_filter(
+            $settings->all(),
+            fn(string $property) => ! in_array($property, $lockedProperties),
+            ARRAY_FILTER_USE_KEY
         );
     }
 }
