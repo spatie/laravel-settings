@@ -86,7 +86,7 @@ class SettingsMapper
         $reflection = new ReflectionClass($settingsClass);
 
         return array_map(
-            fn(ReflectionProperty $property) => $property->getName(),
+            fn (ReflectionProperty $property) => $property->getName(),
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC)
         );
     }
@@ -97,7 +97,7 @@ class SettingsMapper
 
         return array_filter(
             $settings->all(),
-            fn(string $property) => ! in_array($property, $lockedProperties),
+            fn (string $property) => ! in_array($property, $lockedProperties),
             ARRAY_FILTER_USE_KEY
         );
     }

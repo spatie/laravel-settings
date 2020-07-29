@@ -57,7 +57,7 @@ class SettingsBlueprintTest extends TestCase
     {
         $this->migrator->add('test.property', 'payload');
 
-        $this->blueprint->update('property', fn() => 'otherPayload');
+        $this->blueprint->update('property', fn () => 'otherPayload');
 
         $this->assertDatabaseHasSetting('test.property', 'otherPayload');
     }

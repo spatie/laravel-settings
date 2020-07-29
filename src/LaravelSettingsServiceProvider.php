@@ -2,10 +2,8 @@
 
 namespace Spatie\LaravelSettings;
 
-use Exception;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Commands\MakeSettingsMigrationCommand;
-use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 
 class LaravelSettingsServiceProvider extends ServiceProvider
