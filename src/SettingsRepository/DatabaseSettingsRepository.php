@@ -18,7 +18,11 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function getPropertiesInGroup(string $group): array
     {
-        return DB::table($this->propertyModel::getTableName())
+        /** @var \Spatie\LaravelSettings\SettingsProperty $temp */
+        $temp = new $this->propertyModel;
+
+        return DB::connection($temp->getConnectionName())
+            ->table($temp->getTable())
             ->where('group', $group)
             ->get(['name', 'payload'])
             ->mapWithKeys(function ($object) {

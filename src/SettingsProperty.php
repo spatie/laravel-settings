@@ -14,11 +14,6 @@ class SettingsProperty extends Model
         'locked' => 'boolean',
     ];
 
-    public static function getTableName()
-    {
-        return (new self())->getTable();
-    }
-
     public static function get(string $property)
     {
         [$group, $name] = explode('.', $property);
