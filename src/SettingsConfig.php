@@ -12,7 +12,7 @@ class SettingsConfig
     public function getCasts(): array
     {
         return self::$casts ??= array_map(
-            fn(string $castsSettings) => new $castsSettings,
+            fn (string $castsSettings) => new $castsSettings,
             config('settings.casts')
         );
     }

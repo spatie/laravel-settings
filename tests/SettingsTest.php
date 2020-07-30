@@ -3,12 +3,10 @@
 namespace Spatie\LaravelSettings\Tests;
 
 use Carbon\Carbon;
-use DateTime;
 use DateTimeImmutable;
 use Exception;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\SettingCasts\CarbonCast;
-use Spatie\LaravelSettings\SettingCasts\DateTimeCast;
 use Spatie\LaravelSettings\SettingCasts\DateTimeImmutableCast;
 use Spatie\LaravelSettings\SettingsBlueprint;
 use Spatie\LaravelSettings\SettingsConfig;

@@ -19,8 +19,7 @@ class CouldNotCastSetting extends Exception
         string $settingsClass,
         string $property,
         ReflectionProperty $reflection
-    ): self
-    {
+    ): self {
         return new self("Could not cast `{$settingsClass}::{$property}` from type {$reflection->getType()->getName()}");
     }
 }

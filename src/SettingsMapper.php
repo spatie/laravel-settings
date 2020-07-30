@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings;
 
-use DateTimeImmutable;
 use Exception;
 use ReflectionClass;
 use ReflectionProperty;
@@ -84,7 +83,7 @@ class SettingsMapper
         }
 
         return collect($properties)->map(
-            fn($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
+            fn ($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
         )->toArray();
     }
 
@@ -99,7 +98,7 @@ class SettingsMapper
         $reflection = new ReflectionClass($settingsClass);
 
         return array_map(
-            fn(ReflectionProperty $property) => $property->getName(),
+            fn (ReflectionProperty $property) => $property->getName(),
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC)
         );
     }
@@ -110,7 +109,7 @@ class SettingsMapper
 
         return array_filter(
             $settings->all(),
-            fn(string $property) => ! in_array($property, $lockedProperties),
+            fn (string $property) => ! in_array($property, $lockedProperties),
             ARRAY_FILTER_USE_KEY
         );
     }

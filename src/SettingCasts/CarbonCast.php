@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\SettingCasts;
 
 use Carbon\Carbon;
-use DateTime;
 
 class CarbonCast implements SettingsCast
 {

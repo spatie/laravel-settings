@@ -2,9 +2,7 @@
 
 namespace Spatie\LaravelSettings\SettingCasts;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use DateTime;
 
 class CarbonImmutableCast implements SettingsCast
 {

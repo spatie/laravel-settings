@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\SettingCasts;
 
-use DateTime;
 use DateTimeImmutable;
 
 class DateTimeImmutableCast implements SettingsCast
