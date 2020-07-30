@@ -2,9 +2,16 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Carbon\Carbon;
+use DateTime;
+use DateTimeImmutable;
 use Exception;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\SettingCasts\CarbonCast;
+use Spatie\LaravelSettings\SettingCasts\DateTimeCast;
+use Spatie\LaravelSettings\SettingCasts\DateTimeImmutableCast;
 use Spatie\LaravelSettings\SettingsBlueprint;
+use Spatie\LaravelSettings\SettingsConfig;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
@@ -25,14 +32,18 @@ class SettingsTest extends TestCase
         $this->migrator = resolve(SettingsMigrator::class);
 
         $this->mapper = new SettingsMapper(
-            new DatabaseSettingsRepository(config('settings.repositories.database'))
+            new DatabaseSettingsRepository(config('settings.repositories.database')),
+            new SettingsConfig(),
         );
     }
 
     /** @test */
     public function it_will_handle_loading_settings_correctly(): void
     {
-        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint): void {
+        $dateTime = new DateTimeImmutable('16-05-1994 12:00:00');
+        $carbon = new Carbon('16-05-1994 12:00:00');
+
+        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime): void {
             $blueprint->add('string', 'Ruben');
             $blueprint->add('bool', false);
             $blueprint->add('int', 42);
@@ -44,6 +55,8 @@ class SettingsTest extends TestCase
                 ['name' => 'Seb'],
                 ['name' => 'Adriaan'],
             ]);
+            $blueprint->add('date_time', (new DateTimeImmutableCast())->set($dateTime));
+            $blueprint->add('carbon', (new CarbonCast())->set($carbon));
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
@@ -60,6 +73,8 @@ class SettingsTest extends TestCase
             new DummyDto(['name' => 'Seb']),
             new DummyDto(['name' => 'Adriaan']),
         ], $settings->dto_collection);
+        $this->assertEquals($dateTime, $settings->date_time);
+        $this->assertEquals($carbon, $settings->carbon);
     }
 
     /** @test */
@@ -82,7 +97,10 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_save_settings(): void
     {
-        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint): void {
+        $dateTime = new DateTimeImmutable('16-05-1994 12:00:00');
+        $carbon = new Carbon('16-05-1994 12:00:00');
+
+        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime): void {
             $blueprint->add('string', 'Ruben');
             $blueprint->add('bool', false);
             $blueprint->add('int', 42);
@@ -94,6 +112,8 @@ class SettingsTest extends TestCase
                 ['name' => 'Seb'],
                 ['name' => 'Adriaan'],
             ]);
+            $blueprint->add('date_time', (new DateTimeImmutableCast())->set($dateTime));
+            $blueprint->add('carbon', (new CarbonCast())->set($carbon));
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
@@ -126,6 +146,8 @@ class SettingsTest extends TestCase
             ['name' => 'Wouter'],
             ['name' => 'Jef'],
         ]);
+        $this->assertEquals($dateTime, $settings->date_time);
+        $this->assertEquals($carbon, $settings->carbon);
     }
 
     /** @test */
@@ -145,6 +167,8 @@ class SettingsTest extends TestCase
                 ['name' => 'Wouter'],
                 ['name' => 'Jef'],
             ],
+            'date_time' => new DateTimeImmutable(),
+            'carbon' => Carbon::now(),
         ]);
 
         $settings->save();

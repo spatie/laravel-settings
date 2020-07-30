@@ -1,5 +1,8 @@
 <?php
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+
 return [
     'settings' => [
 
@@ -15,5 +18,12 @@ return [
             'model' => Spatie\LaravelSettings\SettingsProperty::class,
             'connection' => null,
         ],
+    ],
+
+    'casts' => [
+        DateTime::class => Spatie\LaravelSettings\SettingCasts\DateTimeCast::class,
+        DateTimeImmutable::class => Spatie\LaravelSettings\SettingCasts\DateTimeImmutableCast::class,
+        Carbon::class => Spatie\LaravelSettings\SettingCasts\CarbonCast::class,
+        CarbonImmutable::class => Spatie\LaravelSettings\SettingCasts\CarbonImmutableCast::class,
     ],
 ];

@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelSettings\Tests\TestClasses;
 
+use Carbon\Carbon;
+use DateTimeImmutable;
 use Spatie\LaravelSettings\Settings;
 
 class DummySettings extends Settings
@@ -22,6 +24,10 @@ class DummySettings extends Settings
 
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
     public array $dto_collection;
+
+    public DateTimeImmutable $date_time;
+
+    public Carbon $carbon;
 
     public static function group(): string
     {

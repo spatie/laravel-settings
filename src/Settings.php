@@ -5,7 +5,7 @@ namespace Spatie\LaravelSettings;
 use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
 
-abstract class Settings extends DataTransferObject
+abstract class Settings extends TempDto
 {
     private ?string $repository = null;
 
@@ -20,9 +20,7 @@ abstract class Settings extends DataTransferObject
 
     public function fill(array $properties): self
     {
-        foreach ($properties as $name => $value) {
-            $this->$name = $value;
-        }
+        $this->replaceProperties($properties);
 
         return $this;
     }
