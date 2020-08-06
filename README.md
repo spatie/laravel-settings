@@ -6,7 +6,42 @@
 
 **Under development, do not use!**
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+So you've got an application with some settings, these settings are stored within your database, a redis instance or something else and you want to have access to them through your whole application. Wouldn't it be cool if these settings were typed objects your ide understands that you could inject everywhere?
+
+In this package you can create a settings DTO:
+
+```php
+class GlobalSettings extends Settings
+{
+    public string $timezone;
+
+	 public bool $enable_submissions;
+
+    public static function group(): string
+    {
+        return 'global';
+    }
+}
+```
+
+Now wherever you can inject something in your Laravel application (for example in the controller):
+
+```php
+public function currentTime(GlobalSettings $settings){
+	return Carbon::now()->withTimezone($settings->timezone);
+}
+```
+
+Saving settings can be done as such:
+
+```php
+public function updateTimezone(GlobalSettings $settings, Request $request){
+	$settings->timezone = $request->input('timezone');
+	$settings->save();
+	
+	return redirect()->back();
+}
+```
 
 ## Support us
 
@@ -23,34 +58,116 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 You can install the package via composer:
 
 ```bash
-composer require spatie/package-skeleton-laravel
+composer require spatie/laravel-settings
 ```
 
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --provider="Spatie\Skeleton\SkeletonServiceProvider" --tag="migrations"
+php artisan vendor:publish --provider="Spatie\LaravelSettings\LaravelSettingsServiceProvider" --tag="migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 ```bash
-php artisan vendor:publish --provider="Spatie\Skeleton\SkeletonServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Spatie\LaravelSettings\LaravelSettingsServiceProvider" --tag="config"
 ```
 
 This is the contents of the published config file:
 
 ```php
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Settings
+    |--------------------------------------------------------------------------
+    |
+    | You can register all the settings dto's here
+    |
+    */
+    'settings' => [
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Migrations path
+    |--------------------------------------------------------------------------
+    |
+    | When creating new setting migrations, the files will be stored in this
+    | directory
+    |
+    */
+    'migrations_path' => database_path('settings'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default repository
+    |--------------------------------------------------------------------------
+    |
+    | When no repository explicitly was given to a settings dto this
+    | repository will be used for loading and saving settings.
+    |
+    */
+    'default_repository' => 'database',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Repositories
+    |--------------------------------------------------------------------------
+    |
+    | In these repositories you can store you own settings, types of
+    | repositories include database and redis, or you can create
+    | your own repository types.
+    |
+    */
+    'repositories' => [
+        'database' => [
+            'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
+            'model' => Spatie\LaravelSettings\SettingsProperty::class,
+            'connection' => null,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Repositories
+    |--------------------------------------------------------------------------
+    |
+    | Types other than the primitive PHP types can be converted from and to
+    | repositories by these casts.
+    |
+    */
+    'casts' => [
+        DateTime::class => Spatie\LaravelSettings\SettingsCasts\DateTimeCast::class,
+        DateTimeImmutable::class => Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast::class,
+        Carbon::class => Spatie\LaravelSettings\SettingsCasts\CarbonCast::class,
+        CarbonImmutable::class => Spatie\LaravelSettings\SettingsCasts\CarbonImmutableCast::class,
+    ],
 ];
 ```
 
 ## Usage
 
-``` php
-$skeleton = new Spatie\Skeleton();
-echo $skeleton->echoPhrase('Hello, Spatie!');
+Let's get started by creating a Settings DTO, this is actually a data-transfer-object from our [package](https://github.com/spatie/data-transfer-object) under the hood. A Settings DTO is a class that extends `Settings` and has a function `group` that's a string describing to which group of settings it belongs. 
+
+```php
+class GlobalSettings extends Settings
+{
+	public string $timezone;
+
+ 	public bool $enable_submissions;
+
+    public static function group(): string
+    {
+        return 'global';
+    }
+}
 ```
+
+You can create multiple groups of settings each with their own DTO, you could for example have `GlobalSettings`with the `global` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+
+You should add this settings DTO to your config file in the `settings` section, so it can be injected into the application when needed.
 
 ## Testing
 

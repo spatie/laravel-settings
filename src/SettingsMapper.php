@@ -8,7 +8,7 @@ use ReflectionProperty;
 use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\LaravelSettings\Exceptions\CouldNotCastSetting;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
-use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class SettingsMapper
 {
@@ -123,7 +123,7 @@ class SettingsMapper
         }
 
         foreach ($this->config->getCasts() as $type => $cast) {
-            /** @var \Spatie\LaravelSettings\SettingCasts\SettingsCast $cast */
+            /** @var \Spatie\LaravelSettings\SettingsCasts\SettingsCast $cast */
             if ($reflection->getType()->getName() === $type) {
                 return $cast->get($payload);
             }
@@ -141,7 +141,7 @@ class SettingsMapper
         $reflection = new ReflectionProperty($settingsClass, $property);
 
         foreach ($this->config->getCasts() as $type => $cast) {
-            /** @var \Spatie\LaravelSettings\SettingCasts\SettingsCast $cast */
+            /** @var \Spatie\LaravelSettings\SettingsCasts\SettingsCast $cast */
             if ($reflection->getType()->getName() === $type) {
                 return $cast->set($payload);
             }

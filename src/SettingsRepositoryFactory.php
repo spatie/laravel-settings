@@ -3,8 +3,8 @@
 namespace Spatie\LaravelSettings;
 
 use Exception;
-use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
-use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class SettingsRepositoryFactory
 {

@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use Spatie\LaravelSettings\SettingsBlueprint;
-use Spatie\LaravelSettings\SettingsMigrator;
-use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
+use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
+use Spatie\LaravelSettings\Migrations\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 
 class SettingsBlueprintTest extends TestCase
 {

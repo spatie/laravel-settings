@@ -3,8 +3,12 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Support\ServiceProvider;
-use Spatie\LaravelSettings\Commands\MakeSettingsMigrationCommand;
-use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
+use Spatie\LaravelSettings\Console\CacheSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearSettingsCacheCommand;
+use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\Support\Composer;
+use Spatie\LaravelSettings\Support\DiscoverSettings;
 
 class LaravelSettingsServiceProvider extends ServiceProvider
 {
@@ -12,7 +16,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/settings.php' => config_path('settings.php'),
+                __DIR__ . '/../config/settings.php' => config_path('settings.php'),
             ], 'settings');
 
             if (! class_exists('CreateSettingsTable')) {
@@ -23,6 +27,8 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
             $this->commands([
                 MakeSettingsMigrationCommand::class,
+                CacheSettingsCommand::class,
+                ClearSettingsCacheCommand::class
             ]);
         }
 
@@ -31,27 +37,10 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/settings.php', 'settings');
+        $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->initiateConnection();
-        $this->registerSettingBinding();
-    }
-
-    private function initiateConnection(): void
-    {
         $this->app->instance(SettingsRepository::class, SettingsRepositoryFactory::create());
-    }
 
-    private function registerSettingBinding(): void
-    {
-        /** @var \Spatie\LaravelSettings\Settings[] $settings */
-        $settings = config('settings.settings');
-
-        foreach ($settings as $setting) {
-            $this->app->bind(
-                $setting,
-                fn () => $this->app->make(SettingsMapper::class)->load($setting)
-            );
-        }
+//        resolve(SettingsContainer::class)->registerBindings();
     }
 }

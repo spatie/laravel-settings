@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelSettings\SettingsRepository;
+namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use DB;
 use Illuminate\Database\Eloquent\Collection;

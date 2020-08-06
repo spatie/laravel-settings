@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelSettings\Commands;
+namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;

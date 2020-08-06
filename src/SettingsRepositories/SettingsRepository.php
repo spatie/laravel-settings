@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Spatie\LaravelSettings\SettingsRepository;
+namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Spatie\LaravelSettings\SettingsProperty;
 

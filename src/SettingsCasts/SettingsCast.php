@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelSettings\SettingCasts;
+namespace Spatie\LaravelSettings\SettingsCasts;
 
 interface SettingsCast
 {

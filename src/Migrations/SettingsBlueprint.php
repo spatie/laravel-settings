@@ -1,8 +1,9 @@
 <?php
 
-namespace Spatie\LaravelSettings;
+namespace Spatie\LaravelSettings\Migrations;
 
 use Closure;
+use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 class SettingsBlueprint
 {

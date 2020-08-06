@@ -1,12 +1,15 @@
 <?php
 
-namespace Spatie\LaravelSettings;
+namespace Spatie\LaravelSettings\Migrations;
 
 use Closure;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
-use Spatie\LaravelSettings\SettingsRepository\SettingsRepository;
+use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
+use Spatie\LaravelSettings\SettingsProperty;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositoryFactory;
 
 class SettingsMigrator
 {

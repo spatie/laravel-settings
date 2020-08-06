@@ -3,7 +3,7 @@
 namespace Spatie\LaravelSettings\Tests\SettingsRepository;
 
 use Spatie\LaravelSettings\SettingsProperty;
-use Spatie\LaravelSettings\SettingsRepository\DatabaseSettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestCase;
 
 class DatabaseSettingsRepositoryTest extends TestCase
