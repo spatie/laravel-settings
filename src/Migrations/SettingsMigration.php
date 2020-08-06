@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\Migrations;
 
 use Illuminate\Database\Migrations\Migration;
-use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 abstract class SettingsMigration extends Migration
 {

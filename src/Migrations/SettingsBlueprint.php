@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\Migrations;
 
 use Closure;
-use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 class SettingsBlueprint
 {

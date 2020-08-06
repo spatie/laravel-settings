@@ -7,8 +7,6 @@ use Spatie\LaravelSettings\Console\CacheSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearSettingsCacheCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
-use Spatie\LaravelSettings\Support\Composer;
-use Spatie\LaravelSettings\Support\DiscoverSettings;
 
 class LaravelSettingsServiceProvider extends ServiceProvider
 {
@@ -28,7 +26,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             $this->commands([
                 MakeSettingsMigrationCommand::class,
                 CacheSettingsCommand::class,
-                ClearSettingsCacheCommand::class
+                ClearSettingsCacheCommand::class,
             ]);
         }
 

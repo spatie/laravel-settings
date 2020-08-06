@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Support;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\LaravelSettings\Settings;
 use SplFileInfo;
@@ -60,9 +59,9 @@ class DiscoverSettings
         $files = (new Finder())->files()->in($this->directories);
 
         return collect($files)
-            ->reject(fn(SplFileInfo $file) => in_array($file->getPathname(), $this->ignoredFiles))
-            ->map(fn(SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
-            ->filter(fn(string $settingsClass) => is_subclass_of($settingsClass, Settings::class))
+            ->reject(fn (SplFileInfo $file) => in_array($file->getPathname(), $this->ignoredFiles))
+            ->map(fn (SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
+            ->filter(fn (string $settingsClass) => is_subclass_of($settingsClass, Settings::class))
             ->flatten()
             ->toArray();
     }

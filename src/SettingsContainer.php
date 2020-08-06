@@ -19,9 +19,9 @@ class SettingsContainer
     public function registerBindings(): void
     {
         $this->getSettingClasses()->each(
-            fn(string $settingClass) => $this->app->bind(
+            fn (string $settingClass) => $this->app->bind(
                 $settingClass,
-                fn() => $this->app->make(SettingsMapper::class)->load($settingClass)
+                fn () => $this->app->make(SettingsMapper::class)->load($settingClass)
             )
         );
     }

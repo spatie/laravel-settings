@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings;
 
-use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 abstract class Settings extends TempDto

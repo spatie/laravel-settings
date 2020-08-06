@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests\Console;
 
-
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
@@ -18,7 +17,7 @@ class ClearSettingsCacheCommandTest extends TestCase
 
         $this->app['config']->set('settings.settings', [
             DummySettings::class,
-            DummySimpleSettings::class
+            DummySimpleSettings::class,
         ]);
 
         $this->settingsContainer = app(SettingsContainer::class);

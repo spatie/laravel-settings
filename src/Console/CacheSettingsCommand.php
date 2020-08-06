@@ -7,7 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\SettingsContainer;
 
-class CacheSettingsCommand  extends Command
+class CacheSettingsCommand extends Command
 {
     protected $signature = 'settings:cache';
 
