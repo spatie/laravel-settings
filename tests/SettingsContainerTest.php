@@ -18,7 +18,7 @@ class SettingsContainerTest extends TestCase
         parent::setUp();
 
         config()->set('settings.settings', [
-            DummySimpleSettings::class
+            DummySimpleSettings::class,
         ]);
 
         $this->migrator = resolve(SettingsMigrator::class);

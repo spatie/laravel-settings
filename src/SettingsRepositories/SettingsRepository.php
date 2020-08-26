@@ -3,8 +3,6 @@
 
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
-use Spatie\LaravelSettings\SettingsProperty;
-
 interface SettingsRepository
 {
     public function __construct(array $config);

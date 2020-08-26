@@ -2,10 +2,7 @@
 
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
-use Illuminate\Redis\Connections\Connection;
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Facades\Redis;
-use Spatie\LaravelSettings\SettingsProperty;
 
 class RedisSettingsRepository implements SettingsRepository
 {
@@ -76,12 +73,10 @@ class RedisSettingsRepository implements SettingsRepository
 
     public function import(array $data)
     {
-
     }
 
     public function export(): array
     {
-
     }
 
     private function getLocksSetKey(string $group): string

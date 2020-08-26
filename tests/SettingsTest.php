@@ -11,7 +11,6 @@ use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsCasts\CarbonCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast;
 use Spatie\LaravelSettings\SettingsConfig;
-use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
