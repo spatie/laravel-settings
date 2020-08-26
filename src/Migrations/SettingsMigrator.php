@@ -44,13 +44,13 @@ class SettingsMigrator
         $this->deleteProperty($from);
     }
 
-    public function add(string $property, $value): SettingsProperty
+    public function add(string $property, $value): void
     {
         if ($this->checkIfPropertyExists($property)) {
             throw SettingAlreadyExists::whenAdding($property);
         }
 
-        return $this->createProperty($property, $value);
+        $this->createProperty($property, $value);
     }
 
     public function delete(string $property): void
@@ -104,11 +104,11 @@ class SettingsMigrator
         return $this->repository->getPropertyPayload($group, $name);
     }
 
-    private function createProperty(string $property, $payload): SettingsProperty
+    private function createProperty(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        return $this->repository->createProperty($group, $name, $payload);
+        $this->repository->createProperty($group, $name, $payload);
     }
 
     private function updatePropertyPayload(string $property, $payload): void

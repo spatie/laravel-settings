@@ -19,18 +19,23 @@ abstract class Settings extends TempDto
 
     public function fill(array $properties): self
     {
-        $this->replaceProperties($properties);
+        $newProperties = array_merge(
+            $this->resolveMapper($this->repository)->getSettings(
+                static::class
+            ),
+            $properties
+        );
+
+        $this->replaceProperties($newProperties);
 
         return $this;
     }
 
-    public function save(?string $repository = null): void
+    public function save(?string $repository = null): self
     {
-        $mapper = $repository === null
-            ? resolve(SettingsMapper::class)
-            : resolve(SettingsMapper::class)->repository($repository);
+        $this->resolveMapper($repository)->save($this);
 
-        $mapper->save($this);
+        return $this;
     }
 
     public function lock(string ...$properties)
@@ -55,5 +60,14 @@ abstract class Settings extends TempDto
     private function resolveRepository(): SettingsRepository
     {
         return SettingsRepositoryFactory::create($this->repository);
+    }
+
+    private function resolveMapper(?string $repository): SettingsMapper
+    {
+        $repository = $this->repository ?? $repository;
+
+        return $repository === null
+            ? resolve(SettingsMapper::class)
+            : resolve(SettingsMapper::class)->repository($repository);
     }
 }

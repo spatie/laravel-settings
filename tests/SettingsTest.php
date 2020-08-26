@@ -11,6 +11,7 @@ use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsCasts\CarbonCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast;
 use Spatie\LaravelSettings\SettingsConfig;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
@@ -76,7 +77,7 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
-    public function it_will_fails_loading_when_settings_are_missing(): void
+    public function it_will_fail_loading_when_settings_are_missing(): void
     {
         $this->expectException(MissingSettingsException::class);
 
@@ -204,6 +205,26 @@ class SettingsTest extends TestCase
 
         $settings->name = 'Nina Simone';
         $settings->description = 'Sinnerman';
+
+        $settings->save();
+
+        $this->assertEquals('Nina Simone', $settings->name);
+        $this->assertEquals('Hello Dolly', $settings->description);
+    }
+
+    /** @test */
+    public function it_can_fill_settings()
+    {
+        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('name', 'Louis Armstrong');
+            $blueprint->add('description', 'Hello Dolly');
+        });
+
+        $settings = $this->mapper->load(DummySimpleSettings::class);
+
+        $settings->fill([
+            'name' => 'Nina Simone',
+        ]);
 
         $settings->save();
 

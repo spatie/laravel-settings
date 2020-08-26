@@ -69,7 +69,7 @@ class SettingsMapper
      *
      * @return array
      */
-    private function getSettings(string $settingsClass): array
+    public function getSettings(string $settingsClass): array
     {
         $properties = $this->repository->getPropertiesInGroup($settingsClass::group());
 

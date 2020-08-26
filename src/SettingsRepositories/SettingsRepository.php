@@ -15,7 +15,7 @@ interface SettingsRepository
 
     public function getPropertyPayload(string $group, string $name);
 
-    public function createProperty(string $group, string $name, $payload): SettingsProperty;
+    public function createProperty(string $group, string $name, $payload): void;
 
     public function updatePropertyPayload(string $group, string $name, $value): void;
 
