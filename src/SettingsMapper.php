@@ -78,7 +78,7 @@ class SettingsMapper
         $this->ensureNoMissingSettings($settingsClass, $properties, 'loading');
 
         return collect($properties)->map(
-            fn($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
+            fn ($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
         )->toArray();
     }
 
@@ -87,7 +87,7 @@ class SettingsMapper
         $reflection = new ReflectionClass($settingsClass);
 
         $requiredProperties = array_map(
-            fn(ReflectionProperty $property) => $property->getName(),
+            fn (ReflectionProperty $property) => $property->getName(),
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC)
         );
 
@@ -106,7 +106,7 @@ class SettingsMapper
         $lockedProperties = $this->repository->getLockedProperties($settings::group());
 
         return collect($settings->all())->filter(
-            fn($value, string $property) => ! in_array($property, $lockedProperties)
+            fn ($value, string $property) => ! in_array($property, $lockedProperties)
         );
     }
 

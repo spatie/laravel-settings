@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use DB;
-use Illuminate\Database\Eloquent\Collection;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository

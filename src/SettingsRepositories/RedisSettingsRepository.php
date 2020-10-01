@@ -3,8 +3,6 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Facades\Redis;
-use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class RedisSettingsRepository implements SettingsRepository
 {

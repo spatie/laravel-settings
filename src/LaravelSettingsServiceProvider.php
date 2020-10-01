@@ -6,10 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
-use Spatie\LaravelSettings\Factories\SettingsCacheFactory;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
-use Spatie\LaravelSettings\SettingsCaches\NullSettingsCache;
-use Spatie\LaravelSettings\SettingsCaches\SettingsCache;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class LaravelSettingsServiceProvider extends ServiceProvider
@@ -41,7 +38,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->app->singleton(SettingsRepository::class, fn() => SettingsRepositoryFactory::create());
+        $this->app->singleton(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
 
         resolve(SettingsContainer::class)->registerBindings();
     }

@@ -3,9 +3,6 @@
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Facades\Redis;
-use Spatie\LaravelSettings\Models\SettingsProperty;
-use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestCase;
 

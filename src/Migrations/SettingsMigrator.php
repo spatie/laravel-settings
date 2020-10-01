@@ -6,9 +6,8 @@ use Closure;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
-use Spatie\LaravelSettings\Models\SettingsProperty;
-use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class SettingsMigrator
 {
