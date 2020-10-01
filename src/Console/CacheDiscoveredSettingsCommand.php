@@ -7,9 +7,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\SettingsContainer;
 
-class CacheSettingsCommand extends Command
+class CacheDiscoveredSettingsCommand extends Command
 {
-    protected $signature = 'settings:cache';
+    protected $signature = 'settings:discover';
 
     protected $description = 'Cache all auto discovered settings';
 

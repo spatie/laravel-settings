@@ -3,6 +3,8 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Facades\Redis;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class RedisSettingsRepository implements SettingsRepository
 {
@@ -22,13 +24,21 @@ class RedisSettingsRepository implements SettingsRepository
             : '';
     }
 
+    public function updateOrCreatePropertiesInGroup(string $group, array $properties): void
+    {
+        $properties = collect($properties)->mapWithKeys(function ($payload, string $name) {
+            return [$name => json_encode($payload)];
+        })->toArray();
+
+        $this->connection->hMSet($this->prefix . $group, $properties);
+    }
+
     public function getPropertiesInGroup(string $group): array
     {
         return collect($this->connection->hGetAll($this->prefix . $group))
             ->mapWithKeys(function ($payload, string $name) {
                 return [$name => json_decode($payload, true)];
-            })
-            ->toArray();
+            })->toArray();
     }
 
     public function checkIfPropertyExists(string $group, string $name): bool
@@ -58,25 +68,17 @@ class RedisSettingsRepository implements SettingsRepository
 
     public function lockProperties(string $group, array $properties)
     {
-        $this->connection->sAdd($this->getLocksSetKey($group), $properties);
+        $this->connection->sAdd($this->getLocksSetKey($group), ...$properties);
     }
 
     public function unlockProperties(string $group, array $properties)
     {
-        $this->connection->sRem($this->getLocksSetKey($group), $properties);
+        $this->connection->sRem($this->getLocksSetKey($group), ...$properties);
     }
 
     public function getLockedProperties(string $group): array
     {
         return $this->connection->sMembers($this->getLocksSetKey($group));
-    }
-
-    public function import(array $data)
-    {
-    }
-
-    public function export(): array
-    {
     }
 
     private function getLocksSetKey(string $group): string

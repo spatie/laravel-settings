@@ -9,6 +9,8 @@ interface SettingsRepository
 
     public function getPropertiesInGroup(string $group): array;
 
+    public function updateOrCreatePropertiesInGroup(string $group, array $properties): void;
+
     public function checkIfPropertyExists(string $group, string $name): bool;
 
     public function getPropertyPayload(string $group, string $name);
@@ -24,8 +26,4 @@ interface SettingsRepository
     public function unlockProperties(string $group, array $properties);
 
     public function getLockedProperties(string $group): array;
-
-    public function import(array $data);
-
-    public function export(): array;
 }

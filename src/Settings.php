@@ -2,27 +2,35 @@
 
 namespace Spatie\LaravelSettings;
 
+use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\Support\TempDto;
 
 abstract class Settings extends TempDto
 {
-    private ?string $repository = null;
+    protected array $casts = [];
 
     abstract public static function group(): string;
 
-    public function repository(?string $repository): self
+    public static function repository(): ?string
     {
-        $this->repository = $repository;
+        return null;
+    }
 
-        return $this;
+    public function casts(): array
+    {
+        return [];
+    }
+
+    public static function getRepositoryName()
+    {
+        return self::repository() ?? config('settings.default_repository');
     }
 
     public function fill(array $properties): self
     {
         $newProperties = array_merge(
-            $this->resolveMapper($this->repository)->getSettings(
-                static::class
-            ),
+            $this->resolveMapper()->getSettings(static::class),
             $properties
         );
 
@@ -31,9 +39,9 @@ abstract class Settings extends TempDto
         return $this;
     }
 
-    public function save(?string $repository = null): self
+    public function save(): self
     {
-        $this->resolveMapper($repository)->save($this);
+        $this->resolveMapper()->save($this);
 
         return $this;
     }
@@ -48,26 +56,30 @@ abstract class Settings extends TempDto
         $this->resolveRepository()->unlockProperties(static::group(), $properties);
     }
 
+    public function getCasts(): array
+    {
+        return array_merge($this->casts, $this->casts());
+    }
+
     public static function fake(array $values): self
     {
-        $defaultProperties = app(SettingsRepository::class)->getPropertiesInGroup(static::group());
+        $realProperties = app(SettingsRepository::class)->getPropertiesInGroup(static::group());
 
         return app()->instance(static::class, new static(
-            array_merge($defaultProperties, $values)
+            array_merge($realProperties, $values)
         ));
     }
 
     private function resolveRepository(): SettingsRepository
     {
-        return SettingsRepositoryFactory::create($this->repository);
+        return SettingsRepositoryFactory::create(self::getRepositoryName());
     }
 
-    private function resolveMapper(?string $repository): SettingsMapper
+    private function resolveMapper(): SettingsMapper
     {
-        $repository = $this->repository ?? $repository;
-
-        return $repository === null
-            ? resolve(SettingsMapper::class)
-            : resolve(SettingsMapper::class)->repository($repository);
+        return new SettingsMapper(
+            $this->resolveRepository(),
+            resolve(SettingsConfig::class)
+        );
     }
 }

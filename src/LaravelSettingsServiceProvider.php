@@ -3,9 +3,13 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Support\ServiceProvider;
-use Spatie\LaravelSettings\Console\CacheSettingsCommand;
-use Spatie\LaravelSettings\Console\ClearSettingsCacheCommand;
+use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
+use Spatie\LaravelSettings\Factories\SettingsCacheFactory;
+use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
+use Spatie\LaravelSettings\SettingsCaches\NullSettingsCache;
+use Spatie\LaravelSettings\SettingsCaches\SettingsCache;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class LaravelSettingsServiceProvider extends ServiceProvider
@@ -25,8 +29,8 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
             $this->commands([
                 MakeSettingsMigrationCommand::class,
-                CacheSettingsCommand::class,
-                ClearSettingsCacheCommand::class,
+                CacheDiscoveredSettingsCommand::class,
+                ClearDiscoveredSettingsCacheCommand::class,
             ]);
         }
 
@@ -37,7 +41,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->app->instance(SettingsRepository::class, SettingsRepositoryFactory::create());
+        $this->app->singleton(SettingsRepository::class, fn() => SettingsRepositoryFactory::create());
 
         resolve(SettingsContainer::class)->registerBindings();
     }

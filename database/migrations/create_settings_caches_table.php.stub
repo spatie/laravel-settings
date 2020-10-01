@@ -1,0 +1,20 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateSettingsCachesTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('settings_caches', function (Blueprint $table): void {
+            $table->id();
+
+            $table->string('group')->index();
+            $table->text('serialized');
+
+            $table->timestamps();
+        });
+    }
+}

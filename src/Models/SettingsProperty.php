@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelSettings;
+namespace Spatie\LaravelSettings\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

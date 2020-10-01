@@ -5,7 +5,7 @@ namespace Spatie\LaravelSettings\Tests;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
-use Spatie\LaravelSettings\SettingsProperty;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class TestCase extends BaseTestCase
 {
@@ -27,7 +27,9 @@ class TestCase extends BaseTestCase
 
 
         include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
+        include_once __DIR__ . '/../database/migrations/create_settings_caches_table.php.stub';
         (new \CreateSettingsTable())->up();
+        (new \CreateSettingsCachesTable())->up();
     }
 
     protected function assertDatabaseHasSetting(string $property, $value): void

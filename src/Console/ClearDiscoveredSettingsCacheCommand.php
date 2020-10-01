@@ -5,11 +5,11 @@ namespace Spatie\LaravelSettings\Console;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ClearSettingsCacheCommand extends Command
+class ClearDiscoveredSettingsCacheCommand extends Command
 {
-    protected $signature = 'settings:clear';
+    protected $signature = 'settings:clear-discovered';
 
-    protected $description = 'Clear cached registered settings';
+    protected $description = 'Clear cached auto discovered registered settings classes';
 
     public function handle(Filesystem $files): void
     {

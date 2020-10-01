@@ -3,9 +3,13 @@
 namespace Spatie\LaravelSettings;
 
 use Exception;
+use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionProperty;
 use Spatie\DataTransferObject\DataTransferObject;
+use Spatie\LaravelSettings\Events\LoadedSettings;
+use Spatie\LaravelSettings\Events\SavedSettings;
+use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Exceptions\CouldNotCastSetting;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
@@ -17,42 +21,36 @@ class SettingsMapper
     private SettingsConfig $config;
 
     public function __construct(
-        SettingsRepository $settingsConnection,
+        SettingsRepository $repository,
         SettingsConfig $config
     ) {
-        $this->repository = $settingsConnection;
+        $this->repository = $repository;
         $this->config = $config;
-    }
-
-    public function repository(string $name): self
-    {
-        $this->repository = SettingsRepositoryFactory::create($name);
-
-        return $this;
     }
 
     public function save(Settings $settings): Settings
     {
+        event(new SavingSettings($settings));
+
         $properties = $this->repository->getPropertiesInGroup($settings::group());
 
-        $missingSettings = array_diff(
-            $this->getRequiredSettings($settings),
-            array_keys($properties)
-        );
+        $settingsClass = get_class($settings);
 
-        if (! empty($missingSettings)) {
-            throw MissingSettingsException::whenSaving($settings::group(), $missingSettings);
-        }
+        $this->ensureNoMissingSettings($settingsClass, $properties, 'saving');
 
-        foreach ($this->resolveSaveableProperties($settings) as $name => $payload) {
+        $this->getWritableProperties($settings)->each(function ($payload, string $name) use ($settings) {
             $this->repository->updatePropertyPayload(
                 $settings::group(),
                 $name,
                 $this->castToRepository($payload, $name, get_class($settings))
             );
-        }
+        });
 
-        return $settings->fill($this->getSettings(get_class($settings)));
+        $settings->fill($this->getSettings($settingsClass));
+
+        event(new SavedSettings($settings));
+
+        return $settings;
     }
 
     public function load(string $settingsClass): Settings
@@ -61,7 +59,11 @@ class SettingsMapper
             throw new Exception("Tried loading {$settingsClass} which is not a Settings DTO");
         }
 
-        return new $settingsClass($this->getSettings($settingsClass));
+        $settings = new $settingsClass($this->getSettings($settingsClass));
+
+        event(new LoadedSettings($settings));
+
+        return $settings;
     }
 
     /**
@@ -73,44 +75,38 @@ class SettingsMapper
     {
         $properties = $this->repository->getPropertiesInGroup($settingsClass::group());
 
-        $missingProperties = array_diff(
-            $this->getRequiredSettings($settingsClass),
-            array_keys($properties)
-        );
-
-        if (! empty($missingProperties)) {
-            throw MissingSettingsException::whenLoading($settingsClass::group(), $missingProperties);
-        }
+        $this->ensureNoMissingSettings($settingsClass, $properties, 'loading');
 
         return collect($properties)->map(
-            fn ($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
+            fn($value, string $property) => $this->castFromRepository($value, $property, $settingsClass),
         )->toArray();
     }
 
-    /**
-     * @param string|\Spatie\LaravelSettings\Settings $settingsClass
-     *
-     * @return array
-     * @throws \ReflectionException
-     */
-    private function getRequiredSettings($settingsClass): array
+    private function ensureNoMissingSettings(string $settingsClass, array $properties, string $operation): void
     {
         $reflection = new ReflectionClass($settingsClass);
 
-        return array_map(
-            fn (ReflectionProperty $property) => $property->getName(),
+        $requiredProperties = array_map(
+            fn(ReflectionProperty $property) => $property->getName(),
             $reflection->getProperties(ReflectionProperty::IS_PUBLIC)
         );
+
+        $missingSettings = array_diff(
+            $requiredProperties,
+            array_keys($properties)
+        );
+
+        if (! empty($missingSettings)) {
+            throw MissingSettingsException::create($settingsClass, $missingSettings, $operation);
+        }
     }
 
-    private function resolveSaveableProperties(Settings $settings): array
+    private function getWritableProperties(Settings $settings): Collection
     {
         $lockedProperties = $this->repository->getLockedProperties($settings::group());
 
-        return array_filter(
-            $settings->all(),
-            fn (string $property) => ! in_array($property, $lockedProperties),
-            ARRAY_FILTER_USE_KEY
+        return collect($settings->all())->filter(
+            fn($value, string $property) => ! in_array($property, $lockedProperties)
         );
     }
 
@@ -134,7 +130,7 @@ class SettingsMapper
 
     private function castToRepository($payload, string $property, string $settingsClass)
     {
-        if ($this->skipCastingToRepository($payload)) {
+        if ($this->skipCasting($payload)) {
             return $payload;
         }
 
@@ -150,7 +146,7 @@ class SettingsMapper
         throw CouldNotCastSetting::toRepository($settingsClass, $property, $reflection);
     }
 
-    private function skipCastingToRepository($payload): bool
+    private function skipCasting($payload): bool
     {
         return is_array($payload)
             || is_scalar($payload)

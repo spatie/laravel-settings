@@ -6,7 +6,7 @@
 
 **Under development, do not use!**
 
-So you've got an application with some settings, these settings are stored within your database, a redis instance or something else and you want to have access to them through your whole application. Wouldn't it be cool if these settings were typed objects your ide understands that you could inject everywhere?
+So you've got an application with some settings, these settings are stored within your database, a redis instance or something else and you want to have access to them through your whole application. Wouldn't it be cool if these settings were typed objects that you could inject everywhere in your application? With as an added bonus that your ide can typehint these settings?
 
 In this package you can create a settings DTO:
 
@@ -24,7 +24,7 @@ class GlobalSettings extends Settings
 }
 ```
 
-Now wherever you can inject something in your Laravel application (for example in the controller):
+Now wherever you can inject something in your Laravel application (for example in the controller) and get values from the settings:
 
 ```php
 public function currentTime(GlobalSettings $settings){
@@ -124,7 +124,7 @@ return [
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
-            'model' => Spatie\LaravelSettings\SettingsProperty::class,
+            'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
             'connection' => null,
         ],
     ],
@@ -149,7 +149,7 @@ return [
 
 ## Usage
 
-Let's get started by creating a Settings DTO, this is actually a data-transfer-object from our [package](https://github.com/spatie/data-transfer-object) under the hood. A Settings DTO is a class that extends `Settings` and has a function `group` that's a string describing to which group of settings it belongs. 
+Let's get started by creating a Settings Dto, under the hood this is actually a data-transfer-object from our [data-transfer-object](https://github.com/spatie/data-transfer-object) package. A Settings Dto is a class that extends `Settings` and has a static function `group`, that's a string describing to which group of settings it belongs. 
 
 ```php
 class GlobalSettings extends Settings
@@ -165,9 +165,15 @@ class GlobalSettings extends Settings
 }
 ```
 
-You can create multiple groups of settings each with their own DTO, you could for example have `GlobalSettings`with the `global` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+You can create multiple groups of settings each with their own Dto, you could for example have `GlobalSettings`with the `global` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
 
-You should add this settings DTO to your config file in the `settings` section, so it can be injected into the application when needed.
+Although it is possible to use the same group for different Dto's we don't recommand using a group identifier more than once.
+
+You can add this settings DTO to your config file in the `settings` section, so it can be injected into the application when needed. Or let the package autodiscover settings, more on that later.
+
+
+
+
 
 ## Testing
 

@@ -4,7 +4,7 @@ namespace Spatie\LaravelSettings;
 
 class SettingsConfig
 {
-    private static ?array  $casts = null;
+    private static ?array $casts = null;
 
     /**
      * @return array<string, \Illuminate\Contracts\Database\Eloquent\CastsAttributes>

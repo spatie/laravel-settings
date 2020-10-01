@@ -4,21 +4,21 @@ namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use DB;
 use Illuminate\Database\Eloquent\Collection;
-use Spatie\LaravelSettings\SettingsProperty;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
-    /** @var \Spatie\LaravelSettings\SettingsProperty|string */
+    /** @var \Spatie\LaravelSettings\Models\SettingsProperty|string */
     private string $propertyModel;
 
     public function __construct(array $config)
     {
-        $this->propertyModel = $config['model'];
+        $this->propertyModel = $config['model'] ?? SettingsProperty::class;
     }
 
     public function getPropertiesInGroup(string $group): array
     {
-        /** @var \Spatie\LaravelSettings\SettingsProperty $temp */
+        /** @var \Spatie\LaravelSettings\Models\SettingsProperty $temp */
         $temp = new $this->propertyModel;
 
         return DB::connection($temp->getConnectionName())
@@ -29,6 +29,19 @@ class DatabaseSettingsRepository implements SettingsRepository
                 return [$object->name => json_decode($object->payload, true)];
             })
             ->toArray();
+    }
+
+    public function updateOrCreatePropertiesInGroup(string $group, array $properties): void
+    {
+        foreach ($properties as $name => $value) {
+            $this->propertyModel::updateOrCreate([
+                'group' => $group,
+                'name' => $name,
+                'locked' => false,
+            ], [
+                'payload' => json_encode($value),
+            ]);
+        }
     }
 
     public function checkIfPropertyExists(string $group, string $name): bool
@@ -100,33 +113,6 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->where('group', $group)
             ->where('locked', true)
             ->pluck('name')
-            ->toArray();
-    }
-
-    public function import(array $data): void
-    {
-        foreach ($data as $group => $properties) {
-            foreach ($properties as $name => $value) {
-                $this->propertyModel::updateOrCreate([
-                    'group' => $group,
-                    'name' => $name,
-                    'locked' => false,
-                ], [
-                    'payload' => json_encode($value),
-                ]);
-            }
-        }
-    }
-
-    public function export(): array
-    {
-        return $this->propertyModel::all()
-            ->groupBy('group')
-            ->map(function (Collection $properties) {
-                return $properties->mapWithKeys(function (SettingsProperty $property) {
-                    return [$property->name => json_decode($property->payload)];
-                });
-            })
             ->toArray();
     }
 }

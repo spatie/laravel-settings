@@ -6,10 +6,13 @@ use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
+use Spatie\Snapshots\MatchesSnapshots;
 
-class ClearSettingsCacheCommandTest extends TestCase
+class CacheDiscoveredSettingsCommandTest extends TestCase
 {
-    private SettingsContainer $settingsContainer;
+    use MatchesSnapshots;
+
+    private SettingsContainer $container;
 
     public function setUp(): void
     {
@@ -20,18 +23,14 @@ class ClearSettingsCacheCommandTest extends TestCase
             DummySimpleSettings::class,
         ]);
 
-        $this->settingsContainer = app(SettingsContainer::class);
+        $this->container = app(SettingsContainer::class);
     }
 
     /** @test */
-    public function it_can_clear_the_registered_projectors()
+    public function it_can_cache_the_registered_projectors()
     {
-        $this->artisan('settings:cache')->assertExitCode(0);
+        $this->artisan('settings:discover')->assertExitCode(0);
 
-        $this->assertFileExists(config('settings.cache_path').'/settings.php');
-
-        $this->artisan('settings:clear')->assertExitCode(0);
-
-        $this->assertFileDoesNotExist(config('settings.cache_path').'/settings.php');
+        $this->assertMatchesSnapshot(file_get_contents(config('settings.cache_path').'/settings.php'));
     }
 }

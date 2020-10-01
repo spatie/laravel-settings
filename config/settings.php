@@ -51,10 +51,17 @@ return [
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
-            'model' => Spatie\LaravelSettings\SettingsProperty::class,
+            'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
             'connection' => null,
         ],
+        'redis' => [
+            'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
+            'connection' => null,
+            'prefix' => null,
+        ]
     ],
+
+    'enable_cache' => false,
 
     /*
     |--------------------------------------------------------------------------

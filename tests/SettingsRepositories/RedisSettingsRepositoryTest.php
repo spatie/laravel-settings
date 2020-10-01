@@ -1,20 +1,30 @@
 <?php
 
-namespace Spatie\LaravelSettings\Tests\SettingsRepository;
+namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
-use Spatie\LaravelSettings\SettingsProperty;
+use Illuminate\Redis\RedisManager;
+use Illuminate\Support\Facades\Redis;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
+use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestCase;
 
-class DatabaseSettingsRepositoryTest extends TestCase
+class RedisSettingsRepositoryTest extends TestCase
 {
-    private DatabaseSettingsRepository $repository;
+    private RedisSettingsRepository $repository;
+
+    /** @var mixed|\Redis */
+    private $client;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repository = new DatabaseSettingsRepository(config('settings.repositories.database'));
+        $this->client = resolve(RedisManager::class)->client();
+
+        $this->client->flushAll();
+
+        $this->repository = new RedisSettingsRepository([]);
     }
 
     /** @test */
@@ -52,39 +62,12 @@ class DatabaseSettingsRepositoryTest extends TestCase
     /** @test */
     public function it_can_get_the_property_payload(): void
     {
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'a',
-            'payload' => json_encode('Alpha'),
-            'locked' => false,
-        ]);
-
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'b',
-            'payload' => json_encode(true),
-            'locked' => false,
-        ]);
-
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'c',
-            'payload' => json_encode(['night', 'day']),
-            'locked' => false,
-        ]);
-
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'd',
-            'payload' => json_encode(null),
-            'locked' => false,
-        ]);
-
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'e',
-            'payload' => json_encode(42),
-            'locked' => false,
+        $this->client->hMSet('test', [
+            'a' => json_encode('Alpha'),
+            'b' => json_encode(true),
+            'c' => json_encode(['night', 'day']),
+            'd' => json_encode(null),
+            'e' => json_encode(42),
         ]);
 
         $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
@@ -103,29 +86,25 @@ class DatabaseSettingsRepositoryTest extends TestCase
         $this->repository->createProperty('test', 'd', null);
         $this->repository->createProperty('test', 'e', 42);
 
-        $properties = SettingsProperty::all();
+        $this->assertEquals(5, $this->client->hLen('test'));
 
-        $this->assertCount(5, $properties);
+        $values = $this->client->hVals('test');
+        $keys = $this->client->hKeys('test');
 
-        $this->assertEquals('test', $properties[0]->group);
-        $this->assertEquals('a', $properties[0]->name);
-        $this->assertEquals('Alpha', json_decode($properties[0]->payload));
+        $this->assertEquals('a', $keys[0]);
+        $this->assertEquals('Alpha', json_decode($values[0]));
 
-        $this->assertEquals('test', $properties[1]->group);
-        $this->assertEquals('b', $properties[1]->name);
-        $this->assertEquals(true, json_decode($properties[1]->payload));
+        $this->assertEquals('b', $keys[1]);
+        $this->assertEquals(true, json_decode($values[1]));
 
-        $this->assertEquals('test', $properties[2]->group);
-        $this->assertEquals('c', $properties[2]->name);
-        $this->assertEquals(['night', 'day'], json_decode($properties[2]->payload, true));
+        $this->assertEquals('c', $keys[2]);
+        $this->assertEquals(['night', 'day'], json_decode($values[2], true));
 
-        $this->assertEquals('test', $properties[3]->group);
-        $this->assertEquals('d', $properties[3]->name);
-        $this->assertEquals(null, json_decode($properties[3]->payload, true));
+        $this->assertEquals('d', $keys[3]);
+        $this->assertEquals(null, json_decode($values[3], true));
 
-        $this->assertEquals('test', $properties[4]->group);
-        $this->assertEquals('e', $properties[4]->name);
-        $this->assertEquals(42, json_decode($properties[4]->payload, true));
+        $this->assertEquals('e', $keys[4]);
+        $this->assertEquals(42, json_decode($values[4], true));
     }
 
     /** @test */
@@ -157,20 +136,18 @@ class DatabaseSettingsRepositoryTest extends TestCase
 
         $this->repository->deleteProperty('test', 'a');
 
-        $this->assertDatabaseDoesNotHaveSetting('test.a');
+        $this->assertFalse($this->client->hExists('test', 'a'));
     }
 
     /** @test */
     public function it_can_import_settings(): void
     {
-        $this->repository->import([
-            'test' => [
-                'a' => 'Alpha',
-                'b' => true,
-            ],
-            'check' => [
-                'a' => 42,
-            ],
+        $this->repository->updateOrCreatePropertiesInGroup('test', [
+            'a' => 'Alpha',
+            'b' => true,
+        ]);
+        $this->repository->updateOrCreatePropertiesInGroup('check', [
+            'a' => 42,
         ]);
 
         $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
@@ -183,72 +160,47 @@ class DatabaseSettingsRepositoryTest extends TestCase
     {
         $this->repository->createProperty('test', 'a', 'Alpha');
 
-        $this->repository->import([
-            'test' => [
-                'a' => 'Beta',
-            ],
+        $this->repository->updateOrCreatePropertiesInGroup('test', [
+            'a' => 'Beta',
         ]);
 
         $this->assertEquals('Beta', $this->repository->getPropertyPayload('test', 'a'));
     }
 
     /** @test */
-    public function it_can_export_settings(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-
-        $this->repository->createProperty('check', 'a', 42);
-
-        $this->assertEquals([
-            'test' => [
-                'a' => 'Alpha',
-                'b' => true,
-            ],
-            'check' => [
-                'a' => 42,
-            ],
-        ], $this->repository->export());
-    }
-
-    /** @test */
     public function it_can_lock_settings()
     {
-        $propertyA = $this->repository->createProperty('test', 'a', 'Alpha');
-        $propertyB = $this->repository->createProperty('test', 'b', 'Beta');
-        $propertyC = $this->repository->createProperty('test', 'c', 'Gamma');
+        $this->repository->createProperty('test', 'a', 'Alpha');
+        $this->repository->createProperty('test', 'b', 'Beta');
+        $this->repository->createProperty('test', 'c', 'Gamma');
 
         $this->repository->lockProperties('test', ['a', 'c']);
 
-        $this->assertTrue($propertyA->refresh()->locked);
-        $this->assertFalse($propertyB->refresh()->locked);
-        $this->assertTrue($propertyC->refresh()->locked);
+        $this->assertEqualsCanonicalizing(['a', 'c'], $this->client->sMembers('locks.test'));
     }
 
     /** @test */
     public function it_can_unlock_settings()
     {
-        $propertyA = $this->repository->createProperty('test', 'a', 'Alpha');
-        $propertyB = $this->repository->createProperty('test', 'b', 'Beta');
-        $propertyC = $this->repository->createProperty('test', 'c', 'Gamma');
+        $this->repository->createProperty('test', 'a', 'Alpha');
+        $this->repository->createProperty('test', 'b', 'Beta');
+        $this->repository->createProperty('test', 'c', 'Gamma');
 
-        foreach ([$propertyA, $propertyB, $propertyC] as $property) {
-            $property->update(['locked' => true]);
-        }
+        $this->repository->lockProperties('test', ['a', 'b', 'c']);
 
         $this->repository->unlockProperties('test', ['a', 'c']);
 
-        $this->assertFalse($propertyA->refresh()->locked);
-        $this->assertTrue($propertyB->refresh()->locked);
-        $this->assertFalse($propertyC->refresh()->locked);
+        $this->assertEqualsCanonicalizing(['b'], $this->client->sMembers('locks.test'));
     }
 
     /** @test */
     public function it_can_get_the_locked_properties()
     {
-        $this->repository->createProperty('test', 'a', 'Alpha')->update(['locked' => true]);
+        $this->repository->createProperty('test', 'a', 'Alpha');
         $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma')->update(['locked' => true]);
+        $this->repository->createProperty('test', 'c', 'Gamma');
+
+        $this->repository->lockProperties('test', ['a', 'c']);
 
         $lockedProperties = $this->repository->getLockedProperties('test');
 

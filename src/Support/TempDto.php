@@ -1,6 +1,6 @@
 <?php
 
-namespace Spatie\LaravelSettings;
+namespace Spatie\LaravelSettings\Support;
 
 use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\DataTransferObjectError;
