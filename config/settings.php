@@ -61,11 +61,9 @@ return [
         ]
     ],
 
-    'enable_cache' => false,
-
     /*
     |--------------------------------------------------------------------------
-    | Repositories
+    | Casts
     |--------------------------------------------------------------------------
     |
     | Types other than the primitive PHP types can be converted from and to
@@ -79,9 +77,28 @@ return [
         CarbonImmutable::class => Spatie\LaravelSettings\SettingsCasts\CarbonImmutableCast::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Auto discover setting
+    |--------------------------------------------------------------------------
+    |
+    | The package will look for settings in these paths and automatically
+    | register them.
+    |
+    */
     'auto_discover_settings' => [
         app()->path(),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache path
+    |--------------------------------------------------------------------------
+    |
+    | When in production it is advised to cache the automatically discovered
+    | and registered settings. The discovered settings will be cached in
+    | this path.
+    |
+    */
     'cache_path' => storage_path('app/laravel-settings'),
 ];

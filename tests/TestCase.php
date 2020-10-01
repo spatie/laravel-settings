@@ -27,9 +27,7 @@ class TestCase extends BaseTestCase
 
 
         include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
-        include_once __DIR__ . '/../database/migrations/create_settings_caches_table.php.stub';
         (new \CreateSettingsTable())->up();
-        (new \CreateSettingsCachesTable())->up();
     }
 
     protected function assertDatabaseHasSetting(string $property, $value): void
