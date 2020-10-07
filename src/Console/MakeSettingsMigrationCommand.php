@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 class MakeSettingsMigrationCommand extends Command
 {
-    protected $signature = 'make:settings-migration {name}';
+    protected $signature = 'make:settings-migration {name : The name of the migration}';
 
     protected $description = 'Create a new settings migration file';
 

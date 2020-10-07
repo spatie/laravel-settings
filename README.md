@@ -137,7 +137,7 @@ return [
     |
     */
     'casts' => [
-        DateTime::class => Spatie\LaravelSettings\SettingsCasts\DateTimeCast::class,
+        DateTime::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeImmutable::class => Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast::class,
         Carbon::class => Spatie\LaravelSettings\SettingsCasts\CarbonCast::class,
         CarbonImmutable::class => Spatie\LaravelSettings\SettingsCasts\CarbonImmutableCast::class,

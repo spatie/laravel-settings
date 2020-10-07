@@ -38,10 +38,13 @@ class SettingsContainerTest extends TestCase
 
         resolve(DummySimpleSettings::class);
         resolve(DummySimpleSettings::class);
+        resolve(DummySimpleSettings::class);
+        resolve(DummySimpleSettings::class);
+        resolve(DummySimpleSettings::class);
 
         $log = DB::connection()->getQueryLog();
 
-        $this->assertCount(1, $log);
+        $this->assertCount(2, $log); // Properties and locks
     }
 
     /** @test */

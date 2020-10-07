@@ -2,14 +2,15 @@
 
 namespace Spatie\LaravelSettings;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use ReflectionClass;
+use ReflectionProperty;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
-use Spatie\LaravelSettings\Support\TempDto;
 
-abstract class Settings extends TempDto
+abstract class Settings implements Arrayable, Jsonable
 {
-    protected array $casts = [];
-
     abstract public static function group(): string;
 
     public static function repository(): ?string
@@ -17,69 +18,68 @@ abstract class Settings extends TempDto
         return null;
     }
 
-    public function casts(): array
+    public static function casts(): array
     {
         return [];
     }
 
-    public static function getRepositoryName()
-    {
-        return self::repository() ?? config('settings.default_repository');
-    }
-
-    public function fill(array $properties): self
-    {
-        $newProperties = array_merge(
-            $this->resolveMapper()->getSettings(static::class),
-            $properties
-        );
-
-        $this->replaceProperties($newProperties);
-
-        return $this;
-    }
-
-    public function save(): self
-    {
-        $this->resolveMapper()->save($this);
-
-        return $this;
-    }
-
-    public function lock(string ...$properties)
-    {
-        $this->resolveRepository()->lockProperties(static::group(), $properties);
-    }
-
-    public function unlock(string ...$properties)
-    {
-        $this->resolveRepository()->unlockProperties(static::group(), $properties);
-    }
-
-    public function getCasts(): array
-    {
-        return array_merge($this->casts, $this->casts());
-    }
-
     public static function fake(array $values): self
     {
-        $realProperties = app(SettingsRepository::class)->getPropertiesInGroup(static::group());
+        $realProperties = SettingsRepositoryFactory::create(self::repository())->getPropertiesInGroup(static::group());
 
         return app()->instance(static::class, new static(
             array_merge($realProperties, $values)
         ));
     }
 
-    private function resolveRepository(): SettingsRepository
+    public function __construct(array $properties = [])
     {
-        return SettingsRepositoryFactory::create(self::getRepositoryName());
+        $this->fill($properties);
     }
 
-    private function resolveMapper(): SettingsMapper
+    public function fill(array $properties): self
     {
-        return new SettingsMapper(
-            $this->resolveRepository(),
-            resolve(SettingsConfig::class)
+        foreach ($properties as $name => $payload) {
+            $this->{$name} = $payload;
+        }
+
+        return $this;
+    }
+
+    public function save(): self
+    {
+        return SettingsDecorator::create(static::class)->save($this);
+    }
+
+    public function lock(string ...$properties)
+    {
+        SettingsRepositoryFactory::create(self::repository())->lockProperties(
+            static::group(),
+            $properties
         );
+    }
+
+    public function unlock(string ...$properties)
+    {
+        SettingsRepositoryFactory::create(self::repository())->unlockProperties(
+            static::group(),
+            $properties
+        );
+    }
+
+    public function toArray(): array
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+
+        return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
+                $property->getName() => $this->{$property->getName()},
+            ])
+            ->toArray();
+    }
+
+    public function toJson($options = 0): string
+    {
+        return json_encode($this->toArray(), $options);
     }
 }

@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Spatie\DataTransferObject\DataTransferObject;
 
 return [
     /*
@@ -12,6 +13,7 @@ return [
     | You can register all the settings dto's here
     |
     */
+
     'settings' => [
 
     ],
@@ -25,6 +27,7 @@ return [
     | directory
     |
     */
+
     'migrations_path' => database_path('settings'),
 
     /*
@@ -36,6 +39,7 @@ return [
     | repository will be used for loading and saving settings.
     |
     */
+
     'default_repository' => 'database',
 
     /*
@@ -48,6 +52,7 @@ return [
     | your own repository types.
     |
     */
+
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
@@ -58,23 +63,23 @@ return [
             'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
             'connection' => null,
             'prefix' => null,
-        ]
+        ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Casts
+    | Default casts
     |--------------------------------------------------------------------------
     |
     | Types other than the primitive PHP types can be converted from and to
     | repositories by these casts.
     |
     */
-    'casts' => [
-        DateTime::class => Spatie\LaravelSettings\SettingsCasts\DateTimeCast::class,
-        DateTimeImmutable::class => Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast::class,
-        Carbon::class => Spatie\LaravelSettings\SettingsCasts\CarbonCast::class,
-        CarbonImmutable::class => Spatie\LaravelSettings\SettingsCasts\CarbonImmutableCast::class,
+
+    'default_casts' => [
+        DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
+        DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
+        DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
     ],
 
     /*
@@ -86,6 +91,7 @@ return [
     | register them.
     |
     */
+
     'auto_discover_settings' => [
         app()->path(),
     ],
@@ -100,5 +106,6 @@ return [
     | this path.
     |
     */
+
     'cache_path' => storage_path('app/laravel-settings'),
 ];

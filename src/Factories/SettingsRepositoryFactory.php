@@ -9,22 +9,16 @@ use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class SettingsRepositoryFactory
 {
-    private static array $mapping = [
-        'database' => DatabaseSettingsRepository::class,
-        'redis' => RedisSettingsRepository::class,
-    ];
-
     public static function create(?string $name = null): SettingsRepository
     {
         $name ??= config('settings.default_repository');
 
-        // TODO: you should check the config not the mapping, although the mapping should also be checked
-        if (! array_key_exists($name, static::$mapping)) {
+        if (! array_key_exists($name, config('settings.repositories'))) {
             throw new Exception("Tried to create unknown settings repository: {$name}");
         }
 
-        $config = config('settings.repositories.'. config('settings.default_repository'));
+        $config = config("settings.repositories.{$name}");
 
-        return new static::$mapping[$name]($config);
+        return new $config['type']($config);
     }
 }
