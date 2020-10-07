@@ -13,18 +13,22 @@ class DateTimeZoneCast implements SettingsCast
         $this->type = $type;
     }
 
+    public function get($payload): ?DateTimeZone
+    {
+        return $payload !== null
+            ? new DateTimeZone($payload)
+            : null;
+    }
+
     /**
-     * @param DateTimeZone $payload
+     * @param DateTimeZone|null $payload
      *
      * @return string
      */
-    public function get($payload): string
+    public function set($payload): ?string
     {
-        return $payload->getName();
-    }
-
-    public function set($payload): DateTimeZone
-    {
-        return new DateTimeZone($payload);
+        return $payload !== null
+            ? $payload->getName()
+            : null;
     }
 }

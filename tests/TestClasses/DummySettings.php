@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\Tests\TestClasses;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
+use DateTimeZone;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCasts\DtoCast;
 
@@ -31,6 +32,8 @@ class DummySettings extends Settings
     public DateTimeImmutable $date_time;
 
     public Carbon $carbon;
+
+    public ?DateTimeZone $nullable_date_time_zone;
 
     public static function group(): string
     {

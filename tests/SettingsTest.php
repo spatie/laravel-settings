@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\Tests;
 
 use Carbon\Carbon;
 use DateTimeImmutable;
+use DateTimeZone;
 use Event;
 use Exception;
 use Spatie\LaravelSettings\Events\LoadedSettings;
@@ -53,6 +54,7 @@ class SettingsTest extends TestCase
 //            ]);
             $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
             $blueprint->add('carbon', $carbon->toAtomString());
+            $blueprint->add('nullable_date_time_zone', null);
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
@@ -97,8 +99,9 @@ class SettingsTest extends TestCase
     {
         $dateTime = new DateTimeImmutable('16-05-1994 12:00:00');
         $carbon = new Carbon('16-05-1994 12:00:00');
+        $dateTimeZone = new DateTimeZone('europe/brussels');
 
-        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime): void {
+        $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($dateTimeZone, $carbon, $dateTime): void {
             $blueprint->add('string', 'Ruben');
             $blueprint->add('bool', false);
             $blueprint->add('int', 42);
@@ -116,6 +119,7 @@ class SettingsTest extends TestCase
             ]);
             $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
             $blueprint->add('carbon', $carbon->toAtomString());
+            $blueprint->add('nullable_date_time_zone', $dateTimeZone->getName());
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
@@ -137,6 +141,7 @@ class SettingsTest extends TestCase
                 new DummyDto(['name' => 'Wouter']),
                 new DummyDto(['name' => 'Jef']),
             ],
+            'nullable_date_time_zone' => null,
         ]);
 
         $settings->save();
@@ -157,6 +162,7 @@ class SettingsTest extends TestCase
 //        ]);
         $this->assertEquals($dateTime, $settings->date_time);
         $this->assertEquals($carbon, $settings->carbon);
+        $this->assertNull($settings->nullable_date_time_zone);
     }
 
     /** @test */

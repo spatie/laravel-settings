@@ -9,12 +9,15 @@ use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\AbstractList;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Float_;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Object_;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionNamedType;
 use ReflectionProperty;
+use Spatie\LaravelSettings\Exceptions\CouldNotResolveDocblockType;
 
 class PropertyReflector
 {
@@ -44,7 +47,7 @@ class PropertyReflector
             return null;
         }
 
-        return new Object_(new Fqsen('\\'.$reflectionType->getName()));
+        return new Object_(new Fqsen('\\' . $reflectionType->getName()));
     }
 
     private static function reflectDocblock(
@@ -52,6 +55,10 @@ class PropertyReflector
         string $type
     ): Type {
         $resolvedType = (new TypeResolver())->resolve($type);
+
+        if ($resolvedType instanceof Compound) {
+            return self::reflectCompoundDocblock($reflectionProperty, $resolvedType);
+        }
 
         if ($resolvedType instanceof Object_) {
             return $resolvedType;
@@ -70,6 +77,26 @@ class PropertyReflector
             }
         }
 
-        throw new Exception("Could not resolve type in docblock: `{$type}` of property `{$reflectionProperty->getDeclaringClass()->getName()}::{$reflectionProperty->getName()}`");
+        throw CouldNotResolveDocblockType::create($type, $reflectionProperty);
+    }
+
+    private static function reflectCompoundDocblock(
+        ReflectionProperty $reflectionProperty,
+        Compound $compound
+    ): Type {
+        $types = iterator_to_array($compound->getIterator());
+
+        if(count($types) > 2){
+            throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
+        }
+
+        if(! in_array(new Null_(), $types)){
+            throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
+        }
+
+        return array_filter(
+            $types,
+            fn(Type $type) => ! $types instanceof Null_
+        )[0];
     }
 }

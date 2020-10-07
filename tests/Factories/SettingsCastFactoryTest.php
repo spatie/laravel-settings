@@ -129,4 +129,33 @@ class SettingsCastFactoryTest extends TestCase
 
         $this->assertNull($cast);
     }
+
+    /** @test */
+    public function it_can_have_a_nullable_cast()
+    {
+        $fake = new class {
+            public ?DateTime $array;
+        };
+
+        $reflectionProperty = new ReflectionProperty($fake, 'array');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, []);
+
+        $this->assertEquals(new DateTimeInterfaceCast(DateTime::class), $cast);
+    }
+
+    /** @test */
+    public function it_can_have_a_nullable_docblock_cast()
+    {
+        $fake = new class {
+            /** @var \DateTime|null  */
+            public $array;
+        };
+
+        $reflectionProperty = new ReflectionProperty($fake, 'array');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, []);
+
+        $this->assertEquals(new DateTimeInterfaceCast(DateTime::class), $cast);
+    }
 }
