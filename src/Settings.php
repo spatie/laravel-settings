@@ -7,7 +7,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use ReflectionClass;
 use ReflectionProperty;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
-use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 abstract class Settings implements Arrayable, Jsonable
 {
@@ -72,7 +71,7 @@ abstract class Settings implements Arrayable, Jsonable
         $reflectionClass = new ReflectionClass(static::class);
 
         return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->mapWithKeys(fn(ReflectionProperty $property) => [
+            ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ])
             ->toArray();

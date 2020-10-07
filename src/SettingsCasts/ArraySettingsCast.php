@@ -19,7 +19,7 @@ class ArraySettingsCast implements SettingsCast
     public function get($payload): array
     {
         return array_map(
-            fn($data) => $this->cast->get($data),
+            fn ($data) => $this->cast->get($data),
             $payload
         );
     }
@@ -27,7 +27,7 @@ class ArraySettingsCast implements SettingsCast
     public function set($payload)
     {
         return array_map(
-            fn($data) => $this->cast->set($data),
+            fn ($data) => $this->cast->set($data),
             $payload
         );
     }

@@ -20,19 +20,19 @@ class DateTimeInterfaceCast implements SettingsCast
 
     public function get($payload): DateTimeInterface
     {
-        if($this->type === Carbon::class){
+        if ($this->type === Carbon::class) {
             return new Carbon($payload);
         }
 
-        if($this->type === CarbonImmutable::class){
+        if ($this->type === CarbonImmutable::class) {
             return new CarbonImmutable($payload);
         }
 
-        if($this->type === DateTimeImmutable::class){
+        if ($this->type === DateTimeImmutable::class) {
             return new DateTimeImmutable($payload);
         }
 
-        if($this->type === DateTime::class){
+        if ($this->type === DateTime::class) {
             return new DateTime($payload);
         }
 

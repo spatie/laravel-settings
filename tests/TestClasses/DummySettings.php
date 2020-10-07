@@ -40,7 +40,7 @@ class DummySettings extends Settings
     public static function casts(): array
     {
         return [
-            'dto' => new DtoCast(DummyDto::class)
+            'dto' => new DtoCast(DummyDto::class),
         ];
     }
 }

@@ -2,26 +2,14 @@
 
 namespace Spatie\LaravelSettings\Factories;
 
-use Exception;
 use Illuminate\Support\Str;
-use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
-use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\AbstractList;
-use phpDocumentor\Reflection\Types\Array_;
-use phpDocumentor\Reflection\Types\Boolean;
-use phpDocumentor\Reflection\Types\Float_;
-use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Object_;
-use PhpParser\Node\Scalar\String_;
-use ReflectionNamedType;
 use ReflectionProperty;
-use ReflectionType;
-use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
 use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
 use Spatie\LaravelSettings\Support\PropertyReflector;
-use Spatie\LaravelSettings\Support\ReflectedSettingsPropertyType;
 
 class SettingsCastFactory
 {
@@ -90,5 +78,4 @@ class SettingsCastFactory
             || in_array($type, class_implements($base))
             || is_subclass_of($type, $base);
     }
-
 }
