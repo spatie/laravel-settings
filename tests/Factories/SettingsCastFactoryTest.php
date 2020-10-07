@@ -148,7 +148,7 @@ class SettingsCastFactoryTest extends TestCase
     public function it_can_have_a_nullable_docblock_cast()
     {
         $fake = new class {
-            /** @var \DateTime|null  */
+            /** @var \DateTime|null */
             public $array;
         };
 

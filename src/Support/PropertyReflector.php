@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Support;
 
-use Exception;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\TypeResolver;
@@ -86,17 +85,17 @@ class PropertyReflector
     ): Type {
         $types = iterator_to_array($compound->getIterator());
 
-        if(count($types) > 2){
+        if (count($types) > 2) {
             throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
         }
 
-        if(! in_array(new Null_(), $types)){
+        if (! in_array(new Null_(), $types)) {
             throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
         }
 
         return array_filter(
             $types,
-            fn(Type $type) => ! $types instanceof Null_
+            fn (Type $type) => ! $types instanceof Null_
         )[0];
     }
 }
