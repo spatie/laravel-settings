@@ -45,9 +45,7 @@ public function updateTimezone(GlobalSettings $settings, Request $request){
 
 ## Support us
 
-Learn how to create a package like this one, by watching our premium video course:
-
-[![Laravel Package training](https://spatie.be/github/package-training.jpg)](https://laravelpackage.training)
+[![Image](https://github-ads.s3.eu-central-1.amazonaws.com/laravel-settings.jpg)](https://spatie.be/github-ad-click/laravel-settings)
 
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
@@ -170,10 +168,6 @@ You can create multiple groups of settings each with their own Dto, you could fo
 Although it is possible to use the same group for different Dto's we don't recommand using a group identifier more than once.
 
 You can add this settings DTO to your config file in the `settings` section, so it can be injected into the application when needed. Or let the package autodiscover settings, more on that later.
-
-
-
-
 
 ## Testing
 
