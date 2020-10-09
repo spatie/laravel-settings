@@ -9,11 +9,9 @@ jobs:
     services:
       redis:
         image: redis
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        ports:
+          - 6379/tcp
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       fail-fast: true
@@ -52,3 +50,5 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit
+        env:
+          REDIS_PORT: ${{ job.services.redis.ports['6379'] }}
