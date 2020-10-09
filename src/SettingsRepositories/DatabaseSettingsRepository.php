@@ -7,7 +7,7 @@ use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
-    /** @var \Spatie\LaravelSettings\Models\SettingsProperty|string */
+    /** @var string|class-string<Illuminate\Database\Eloquent\Model>*/
     private string $propertyModel;
 
     public function __construct(array $config)

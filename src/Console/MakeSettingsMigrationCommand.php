@@ -31,7 +31,7 @@ class MakeSettingsMigrationCommand extends Command
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         $this->files->put(
-            $path = $this->getPath($name, $path),
+            $this->getPath($name, $path),
             str_replace('{{ class }}', $name, $this->getStub())
         );
     }

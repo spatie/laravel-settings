@@ -23,6 +23,6 @@ class SettingsProperty extends Model
             ->where('name', $name)
             ->first('payload');
 
-        return json_decode($setting->get('payload'));
+        return json_decode($setting->getAttribute('payload'));
     }
 }

@@ -19,7 +19,7 @@ class SettingsDecorator
 {
     private array $defaultCasts;
 
-    /** @var string|\Spatie\LaravelSettings\Settings */
+    /** @var string|class-string */
     private string $settingsClass;
 
     /** @var array|\ReflectionProperty[] */
@@ -112,10 +112,6 @@ class SettingsDecorator
         ReflectionProperty $reflectionProperty,
         array $lockedProperties
     ): bool {
-        if ($lockedProperties === null) {
-            return false;
-        }
-
         return in_array($reflectionProperty->name, $lockedProperties);
     }
 

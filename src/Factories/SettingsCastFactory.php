@@ -35,7 +35,7 @@ class SettingsCastFactory
     /**
      * @param string|SettingsCast $cast
      *
-     * @return \Spatie\LaravelSettings\SettingsCasts\SettingsCast|null
+     * @return \Spatie\LaravelSettings\SettingsCasts\SettingsCast
      */
     private static function createLocalCast(
         $cast

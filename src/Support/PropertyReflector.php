@@ -86,16 +86,16 @@ class PropertyReflector
         $types = iterator_to_array($compound->getIterator());
 
         if (count($types) > 2) {
-            throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
+            throw CouldNotResolveDocblockType::create(implode('|', $types), $reflectionProperty);
         }
 
         if (! in_array(new Null_(), $types)) {
-            throw CouldNotResolveDocblockType::create((string) $types, $reflectionProperty);
+            throw CouldNotResolveDocblockType::create(implode('|', $types), $reflectionProperty);
         }
 
         return array_filter(
             $types,
-            fn (Type $type) => ! $types instanceof Null_
+            fn (Type $types) => ! $types instanceof Null_
         )[0];
     }
 }
