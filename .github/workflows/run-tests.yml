@@ -1,17 +1,27 @@
 name: run-tests
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [7.4]
-        laravel: [7.*]
-        dependency-version: [prefer-lowest, prefer-stable]
+        os: [ ubuntu-latest, windows-latest ]
+        php: [ 7.4 ]
+        laravel: [ 7.* ]
+        dependency-version: [ prefer-lowest, prefer-stable ]
         include:
           - laravel: 7.*
             testbench: 5.*
