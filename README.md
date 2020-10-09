@@ -6,42 +6,56 @@
 
 **Under development, do not use!**
 
-So you've got an application with some settings, these settings are stored within your database, a redis instance or something else and you want to have access to them through your whole application. Wouldn't it be cool if these settings were typed objects that you could inject everywhere in your application? With as an added bonus that your ide can typehint these settings?
-
-In this package you can create a settings DTO:
+This package allows you to store settings in a repository (database, redis, ...) and use them throug your application without a hassle. You create a settings DTO as such:
 
 ```php
-class GlobalSettings extends Settings
+class GeneralSettings extends Settings
 {
-    public string $timezone;
-
-	 public bool $enable_submissions;
-
+    public string $site_name;
+    
+    public bool $site_active;
+    
     public static function group(): string
     {
-        return 'global';
+        return 'general';
     }
 }
 ```
 
-Now wherever you can inject something in your Laravel application (for example in the controller) and get values from the settings:
+Now, when you want to use these settings somewhere in your application, you can inject them since we register them in the Laravel Container. For example in a controller:
 
 ```php
-public function currentTime(GlobalSettings $settings){
-	return Carbon::now()->withTimezone($settings->timezone);
+class GeneralSettingsController
+{
+	public function show(GeneralSettings $settings){
+		return view('settings.show', [
+			'site_name' => $settings->site_name,
+			'site_active' => $settings->site_active	
+		]);
+	}
 }
 ```
 
-Saving settings can be done as such:
+You can update settings as such:
 
 ```php
-public function updateTimezone(GlobalSettings $settings, Request $request){
-	$settings->timezone = $request->input('timezone');
-	$settings->save();
-	
-	return redirect()->back();
+class GeneralSettingsController
+{
+	public function update(
+		GeneralSettingsRequest $request,
+		GeneralSettings $settings
+	){
+		$settings->site_name = $request->input('site_name');
+		$settings->site_active = $request->input('site_active');
+		
+		$settings->save();
+		
+		return redirect()->back();
+	}
 }
 ```
+
+Let's take a look on how to create your own settings.
 
 ## Support us
 
@@ -80,9 +94,10 @@ return [
     | Settings
     |--------------------------------------------------------------------------
     |
-    | You can register all the settings dto's here
+    | You can register all the settings dto's here.
     |
     */
+
     'settings' => [
 
     ],
@@ -92,10 +107,11 @@ return [
     | Migrations path
     |--------------------------------------------------------------------------
     |
-    | When creating new setting migrations, the files will be stored in this
-    | directory
+    | When you create a new settings migration via the `make:settings-migration`
+    | command the package will store these migrations in this directory.
     |
     */
+
     'migrations_path' => database_path('settings'),
 
     /*
@@ -103,10 +119,11 @@ return [
     | Default repository
     |--------------------------------------------------------------------------
     |
-    | When no repository explicitly was given to a settings dto this
-    | repository will be used for loading and saving settings.
+    | When no repository was set for a settings dto this repository will be
+    | used for loading and saving settings.
     |
     */
+
     'default_repository' => 'database',
 
     /*
@@ -114,60 +131,224 @@ return [
     | Repositories
     |--------------------------------------------------------------------------
     |
-    | In these repositories you can store you own settings, types of
-    | repositories include database and redis, or you can create
-    | your own repository types.
+    | Settings will be stored and loaded from these repositories. There are
+    | two types of repositories: database and redis. But its always
+    | possible to create your own repositories.
     |
     */
+
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
             'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
             'connection' => null,
         ],
+        'redis' => [
+            'type' => Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository::class,
+            'connection' => null,
+            'prefix' => null,
+        ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Repositories
+    | Default casts
     |--------------------------------------------------------------------------
     |
-    | Types other than the primitive PHP types can be converted from and to
-    | repositories by these casts.
+    | When the package discovers a setting with a type other than the PHP built
+    | in types, it should be casted. These casts will automatically cast types
+    | when they occur in a settings dto.
     |
     */
-    'casts' => [
-        DateTime::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
-        DateTimeImmutable::class => Spatie\LaravelSettings\SettingsCasts\DateTimeImmutableCast::class,
-        Carbon::class => Spatie\LaravelSettings\SettingsCasts\CarbonCast::class,
-        CarbonImmutable::class => Spatie\LaravelSettings\SettingsCasts\CarbonImmutableCast::class,
+
+    'default_casts' => [
+        DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
+        DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
+        Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto discover setting
+    |--------------------------------------------------------------------------
+    |
+    | The package will look for settings in these paths and automatically
+    | register them.
+    |
+    */
+
+    'auto_discover_settings' => [
+        app()->path(),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache path
+    |--------------------------------------------------------------------------
+    |
+    | When in production it is advised to cache the automatically discovered
+    | and registered setting dto's these will be cached in this path.
+    |
+    */
+
+    'cache_path' => storage_path('app/laravel-settings'),
 ];
 ```
 
 ## Usage
 
-Let's get started by creating a Settings Dto, under the hood this is actually a data-transfer-object from our [data-transfer-object](https://github.com/spatie/data-transfer-object) package. A Settings Dto is a class that extends `Settings` and has a static function `group`, that's a string describing to which group of settings it belongs. 
+The whole package is built arround setting DTO's, basicly these are classes with some public properties that extend from `Settings`. They also have a static method `group` that should return a string.
+
+You can create multiple groups of settings each with their own DTO, you could for example have `GeneralSettings`with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+
+Although it is possible to use the same group for different DTO's we advise you not to use the same group for multiple setting DTO's.
+
 
 ```php
-class GlobalSettings extends Settings
+class GeneralSettings extends Settings
 {
-	public string $timezone;
-
- 	public bool $enable_submissions;
-
+    public string $site_name;
+    
+    public bool $site_active;
+    
     public static function group(): string
     {
-        return 'global';
+        return 'general';
     }
 }
 ```
 
-You can create multiple groups of settings each with their own Dto, you could for example have `GlobalSettings`with the `global` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+Each property should be typed or partially typed by a docblock, more on that later.
 
-Although it is possible to use the same group for different Dto's we don't recommand using a group identifier more than once.
+In the end you will have to add this DTO to the `settings.php` config file in the `settings` section.
 
-You can add this settings DTO to your config file in the `settings` section, so it can be injected into the application when needed. Or let the package autodiscover settings, more on that later.
+Settings will be stored and loaded from a repository, there are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example you could have two `database` repositories, one that goes to a `settings` table in your database and one that goes to a `global_settings` table.
+
+You can explicitly set the repository of a settings DTO by implementing the `repository` method:
+
+```php
+class GeneralSettings extends Settings
+{
+    public string $site_name;
+    
+    public bool $site_active;
+    
+    public static function group(): string
+    {
+        return 'general';
+    }
+    
+    public static function repository(): ?string
+    {
+        return 'global_settings';
+    }
+}
+```
+
+When a repository is not set for a settings DTO, the `default_repository` in the `settings.php` config file will be used.
+
+### Creating settings migrations
+
+Before you will be able to load/update settings you will have to migrate them, though this might sound a bit strange at the beginning it is actually quite logic. You want to have some default settings to begin with when you're creating a fresh application. And what would happen if we change a settings DTO? Our code changed but our data didn't.
+
+This is why the package requires migrations each time you're changing/creating the structure of your settings. These migrations will run next to the refular Laravel database migrations and we've added some tooling to write them as quickly as possible.
+
+Creating a settings migration works just like you would create a regular database migration, you can run the following command:
+
+```bash
+php artisan make:settings-migration CreateGeneralSettings
+```
+
+This will add a migration to the `application/database/settings` directory:
+
+```php
+use Spatie\LaravelSettings\SettingsMigration;
+
+class CreateGeneralSettings extends SettingsMigration
+{
+    public function up(): void
+    {
+
+    }
+}
+```
+
+We haven't added a `down` method but this can be added manually if required. In the `up` method you can change the settings data in a repository. There are a few default operations supported:
+
+#### Adding a property
+
+You can add a property to a settings group as such
+
+```php
+public function up(): void
+{
+	$this->migrator->add('general.timezone', 'Europe/Brussels');
+}
+```
+
+Now we've added a `timezone` property to the `general` group which is bein used by the `GeneralSettings` DTO. You should always give a default value for a newly created setting in this case this is the `Europe/Brussels` timezone.
+
+#### Renaming a property
+
+It is possible to rename a property:
+
+```php
+public function up(): void
+{
+	$this->migrator->rename('general.timezone', 'general.local_timezone');
+}
+```
+
+You can also move a property to another group:
+
+```php
+public function up(): void
+{
+	$this->migrator->rename('general.timezone', 'country.timezone');
+}
+```
+
+#### Updating a property
+
+It is possible to update the contents of a property:
+
+```php
+public function up(): void
+{
+	$this->migrator->update(
+		'general.timezone', 
+		fn(string $timezone) => return 'America/New_York'
+	);
+}
+```
+
+As you can see, this method takes a closure as an argument. This makes it possible to update a value based upon its old value.
+
+#### Deleting a property
+
+```php
+public function up(): void
+{
+	$this->migrator->delete('general.timezone');
+}
+```
+
+When you're working on a big DTO with a lot of properties it can be a bit cumbersome to always have to prepend the settings group. That's why you can also perform operations within a settings group:
+
+```php
+public function up(): void
+{
+    $this->settingsMigrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
+    	$blueprint->add('timzone', 'Europe/Brussels');
+    	
+    	$blueprint->rename('timezone', 'local_timezone');
+    	
+    	$blueprint->update('timezone', fn(string $timezone) => return 'America/New_York');
+    	
+    	$blueprint->delete('timezone');
+	});
+}
+```
 
 ## Testing
 

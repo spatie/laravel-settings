@@ -1,16 +1,12 @@
 <?php
 
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Spatie\DataTransferObject\DataTransferObject;
-
 return [
     /*
     |--------------------------------------------------------------------------
     | Settings
     |--------------------------------------------------------------------------
     |
-    | You can register all the settings dto's here
+    | You can register all the settings dto's here.
     |
     */
 
@@ -23,8 +19,8 @@ return [
     | Migrations path
     |--------------------------------------------------------------------------
     |
-    | When creating new setting migrations, the files will be stored in this
-    | directory
+    | When you create a new settings migration via the `make:settings-migration`
+    | command the package will store these migrations in this directory.
     |
     */
 
@@ -35,8 +31,8 @@ return [
     | Default repository
     |--------------------------------------------------------------------------
     |
-    | When no repository explicitly was given to a settings dto this
-    | repository will be used for loading and saving settings.
+    | When no repository was set for a settings dto this repository will be
+    | used for loading and saving settings.
     |
     */
 
@@ -47,9 +43,9 @@ return [
     | Repositories
     |--------------------------------------------------------------------------
     |
-    | In these repositories you can store you own settings, types of
-    | repositories include database and redis, or you can create
-    | your own repository types.
+    | Settings will be stored and loaded from these repositories. There are
+    | two types of repositories: database and redis. But its always
+    | possible to create your own repositories.
     |
     */
 
@@ -71,15 +67,16 @@ return [
     | Default casts
     |--------------------------------------------------------------------------
     |
-    | Types other than the primitive PHP types can be converted from and to
-    | repositories by these casts.
+    | When the package discovers a setting with a type other than the PHP built
+    | in types, it should be casted. These casts will automatically cast types
+    | when they occur in a settings dto.
     |
     */
 
     'default_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
-        DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
+        Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
     ],
 
     /*
@@ -102,8 +99,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When in production it is advised to cache the automatically discovered
-    | and registered settings. The discovered settings will be cached in
-    | this path.
+    | and registered setting dto's these will be cached in this path.
     |
     */
 

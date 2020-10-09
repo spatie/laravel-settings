@@ -4,11 +4,12 @@ namespace Spatie\LaravelSettings;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
 use ReflectionClass;
 use ReflectionProperty;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 
-abstract class Settings implements Arrayable, Jsonable
+abstract class Settings implements Arrayable, Jsonable, Responsable
 {
     abstract public static function group(): string;
 
@@ -71,7 +72,7 @@ abstract class Settings implements Arrayable, Jsonable
         $reflectionClass = new ReflectionClass(static::class);
 
         return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ])
             ->toArray();
@@ -80,5 +81,10 @@ abstract class Settings implements Arrayable, Jsonable
     public function toJson($options = 0): string
     {
         return json_encode($this->toArray(), $options);
+    }
+
+    public function toResponse($request)
+    {
+        return $this->toJson();
     }
 }
