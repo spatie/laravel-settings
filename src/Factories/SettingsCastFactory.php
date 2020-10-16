@@ -5,6 +5,7 @@ namespace Spatie\LaravelSettings\Factories;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\AbstractList;
+use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
 use ReflectionProperty;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
@@ -19,11 +20,11 @@ class SettingsCastFactory
     ): ?SettingsCast {
         $name = $reflectionProperty->getName();
 
-        if (array_key_exists($name, $localCasts)) {
-            return self::createLocalCast($localCasts[$name]);
-        }
-
         $reflectedType = PropertyReflector::resolveType($reflectionProperty);
+
+        if (array_key_exists($name, $localCasts)) {
+            return self::createLocalCast($localCasts[$name], $reflectedType);
+        }
 
         if ($reflectedType === null) {
             return null;
@@ -33,19 +34,30 @@ class SettingsCastFactory
     }
 
     /**
-     * @param string|SettingsCast $cast
+     * @param string|SettingsCast $castDefinition
+     * @param \phpDocumentor\Reflection\Type|null $type
      *
      * @return \Spatie\LaravelSettings\SettingsCasts\SettingsCast
      */
     private static function createLocalCast(
-        $cast
+        $castDefinition,
+        ?Type $type
     ): SettingsCast {
-        if ($cast instanceof SettingsCast) {
-            return $cast;
+        if ($castDefinition instanceof SettingsCast) {
+            return $castDefinition;
         }
 
-        $castClass = Str::before($cast, ':');
-        $arguments = explode(',', Str::after($cast, ':'));
+        $castClass = Str::before($castDefinition, ':');
+
+        $arguments = str_contains($castDefinition, ':')
+            ? explode(',', Str::after($castDefinition, ':'))
+            : [];
+
+        $reflectedType = self::getLocalCastReflectedType($type);
+
+        if ($reflectedType) {
+            array_push($arguments, $reflectedType);
+        }
 
         return new $castClass(...$arguments);
     }
@@ -57,15 +69,19 @@ class SettingsCastFactory
             return new ArraySettingsCast(self::createDefaultCast($type->getValueType()));
         }
 
+        if ($type instanceof Nullable) {
+            return self::createDefaultCast($type->getActualType());
+        }
+
         if (! $type instanceof Object_) {
             return null;
         }
 
-        $type = ltrim((string ) $type->getFqsen(), '\\');
+        $fqsen = self::getObjectFqsen($type);
 
-        foreach (config('settings.default_casts') as $base => $cast) {
-            if (self::shouldCast($type, $base)) {
-                return new $cast($type);
+        foreach (config('settings.global_casts') as $base => $cast) {
+            if (self::shouldCast($fqsen, $base)) {
+                return new $cast($fqsen);
             }
         }
 
@@ -77,5 +93,23 @@ class SettingsCastFactory
         return $type === $base
             || in_array($type, class_implements($base))
             || is_subclass_of($type, $base);
+    }
+
+    private static function getLocalCastReflectedType(?Type $type): ?string
+    {
+        if ($type instanceof Object_) {
+            return self::getObjectFqsen($type);
+        }
+
+        if ($type instanceof Nullable) {
+            return self::getLocalCastReflectedType($type->getActualType());
+        }
+
+        return null;
+    }
+
+    private static function getObjectFqsen(Object_ $type): string
+    {
+        return ltrim((string ) $type->getFqsen(), '\\');
     }
 }

@@ -28,7 +28,7 @@ class SettingsCastFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_resolve_a_default_cast()
+    public function it_can_resolve_a_global_cast()
     {
         $fake = new class {
             public DateTime $datetime;
@@ -42,7 +42,7 @@ class SettingsCastFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_resolve_a_default_cast_as_docblock()
+    public function it_can_resolve_a_global_cast_as_docblock()
     {
         $fake = new class {
             /** @var DateTime */
@@ -54,22 +54,6 @@ class SettingsCastFactoryTest extends TestCase
         $cast = SettingsCastFactory::resolve($reflectionProperty, []);
 
         $this->assertEquals(new DateTimeInterfaceCast(DateTime::class), $cast);
-    }
-
-    /** @test */
-    public function it_can_create_a_specific_cast_with_class_identifier_and_arguments()
-    {
-        $fake = new class {
-            public $dto;
-        };
-
-        $reflectionProperty = new ReflectionProperty($fake, 'dto');
-
-        $cast = SettingsCastFactory::resolve($reflectionProperty, [
-            'dto' => DtoCast::class . ':' . DummyDto::class,
-        ]);
-
-        $this->assertEquals(new DtoCast(DummyDto::class), $cast);
     }
 
     /** @test */
@@ -87,7 +71,7 @@ class SettingsCastFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_have_a_cast_with_an_array()
+    public function it_can_have_a_global_cast_with_an_array()
     {
         $fake = new class {
             /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
@@ -102,7 +86,7 @@ class SettingsCastFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_have_a_cast_with_an_array_without_array_type()
+    public function it_can_have_a_global_cast_with_an_array_without_array_type()
     {
         $fake = new class {
             /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
@@ -117,7 +101,7 @@ class SettingsCastFactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_have_a_plain_array()
+    public function it_can_have_a_plain_array_without_cast()
     {
         $fake = new class {
             public array $array;
@@ -148,7 +132,7 @@ class SettingsCastFactoryTest extends TestCase
     public function it_can_have_a_nullable_docblock_cast()
     {
         $fake = new class {
-            /** @var \DateTime|null */
+            /** @var ?\DateTime */
             public $array;
         };
 
@@ -157,5 +141,60 @@ class SettingsCastFactoryTest extends TestCase
         $cast = SettingsCastFactory::resolve($reflectionProperty, []);
 
         $this->assertEquals(new DateTimeInterfaceCast(DateTime::class), $cast);
+    }
+
+    /** @test */
+    public function it_can_create_a_local_cast_without_arguments()
+    {
+        $this->withoutGlobalCasts();
+
+        $fake = new class {
+            public DateTime $datetime;
+        };
+
+        $reflectionProperty = new ReflectionProperty($fake, 'datetime');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, [
+            'datetime' => DateTimeInterfaceCast::class,
+        ]);
+
+        $this->assertEquals(new DateTimeInterfaceCast(DateTime::class), $cast);
+    }
+
+    /** @test */
+    public function it_can_create_a_local_cast_with_class_identifier_and_arguments()
+    {
+        $fake = new class {
+            public $dto;
+        };
+
+        $reflectionProperty = new ReflectionProperty($fake, 'dto');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, [
+            'dto' => DtoCast::class . ':' . DummyDto::class,
+        ]);
+
+        $this->assertEquals(new DtoCast(DummyDto::class), $cast);
+    }
+
+    /** @test */
+    public function it_can_create_a_local_cast_with_an_already_constructed_cast()
+    {
+        $fake = new class {
+            public DummyDto $dto;
+        };
+
+        $reflectionProperty = new ReflectionProperty($fake, 'dto');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, [
+            'dto' => new DtoCast(DummyDto::class),
+        ]);
+
+        $this->assertEquals(new DtoCast(DummyDto::class), $cast);
+    }
+
+    private function withoutGlobalCasts()
+    {
+        config()->set('settings.global_casts', []);
     }
 }

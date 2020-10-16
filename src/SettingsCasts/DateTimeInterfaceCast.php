@@ -13,9 +13,9 @@ class DateTimeInterfaceCast implements SettingsCast
 {
     private string $type;
 
-    public function __construct(string $type)
+    public function __construct(?string $type)
     {
-        $this->type = $type;
+        $this->type = $type ?? DateTime::class;
     }
 
     public function get($payload): DateTimeInterface

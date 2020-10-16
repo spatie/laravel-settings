@@ -6,7 +6,7 @@ return [
     | Settings
     |--------------------------------------------------------------------------
     |
-    | You can register all the settings dto's here.
+    | You can register all the settings DTO's here.
     |
     */
 
@@ -31,7 +31,7 @@ return [
     | Default repository
     |--------------------------------------------------------------------------
     |
-    | When no repository was set for a settings dto this repository will be
+    | When no repository was set for a settings DTO this repository will be
     | used for loading and saving settings.
     |
     */
@@ -64,16 +64,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default casts
+    | Global casts
     |--------------------------------------------------------------------------
     |
     | When the package discovers a setting with a type other than the PHP built
     | in types, it should be casted. These casts will automatically cast types
-    | when they occur in a settings dto.
+    | when they occur in a settings DTO.
     |
     */
 
-    'default_casts' => [
+    'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
         Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
@@ -99,7 +99,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When in production it is advised to cache the automatically discovered
-    | and registered setting dto's these will be cached in this path.
+    | and registered setting DTO's these will be cached in this path.
     |
     */
 

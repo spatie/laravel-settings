@@ -41,7 +41,7 @@ class SettingsDecorator
             throw new Exception("Tried decorating {$settingsClass} which is not extending `Spatie\LaravelSettings\Settings::class`");
         }
 
-        $this->defaultCasts = config('settings.default_casts');
+        $this->defaultCasts = config('settings.global_casts');
         $this->settingsClass = $settingsClass;
         $this->reflectionProperties = (new ReflectionClass($settingsClass))->getProperties(ReflectionProperty::IS_PUBLIC);
         $this->repository = SettingsRepositoryFactory::create($settingsClass::repository());

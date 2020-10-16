@@ -12,6 +12,7 @@ use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Float_;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Null_;
+use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionNamedType;
@@ -46,7 +47,11 @@ class PropertyReflector
             return null;
         }
 
-        return new Object_(new Fqsen('\\' . $reflectionType->getName()));
+        $type = new Object_(new Fqsen('\\' . $reflectionType->getName()));
+
+        return $reflectionType->allowsNull()
+            ? new Nullable($type)
+            : $type;
     }
 
     private static function reflectDocblock(
@@ -55,8 +60,11 @@ class PropertyReflector
     ): Type {
         $resolvedType = (new TypeResolver())->resolve($type);
 
-        if ($resolvedType instanceof Compound) {
-            return self::reflectCompoundDocblock($reflectionProperty, $resolvedType);
+        if ($resolvedType instanceof Nullable) {
+            return new Nullable(self::reflectDocblock(
+                $reflectionProperty,
+                (string) $resolvedType->getActualType()
+            ));
         }
 
         if ($resolvedType instanceof Object_) {
@@ -77,25 +85,5 @@ class PropertyReflector
         }
 
         throw CouldNotResolveDocblockType::create($type, $reflectionProperty);
-    }
-
-    private static function reflectCompoundDocblock(
-        ReflectionProperty $reflectionProperty,
-        Compound $compound
-    ): Type {
-        $types = iterator_to_array($compound->getIterator());
-
-        if (count($types) > 2) {
-            throw CouldNotResolveDocblockType::create(implode('|', $types), $reflectionProperty);
-        }
-
-        if (! in_array(new Null_(), $types)) {
-            throw CouldNotResolveDocblockType::create(implode('|', $types), $reflectionProperty);
-        }
-
-        return array_filter(
-            $types,
-            fn (Type $types) => ! $types instanceof Null_
-        )[0];
     }
 }

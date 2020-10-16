@@ -8,9 +8,9 @@ class DateTimeZoneCast implements SettingsCast
 {
     private string $type;
 
-    public function __construct(string $type)
+    public function __construct(?string $type)
     {
-        $this->type = $type;
+        $this->type = $type ?? DateTimeZone::class;
     }
 
     public function get($payload): ?DateTimeZone
