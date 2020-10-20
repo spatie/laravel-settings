@@ -55,7 +55,7 @@ class GeneralSettingsController
 }
 ```
 
-Let's take a look at how to create your own settings DT.
+Let's take a look at how to create your own settings DTO.
 
 ## Support us
 
@@ -201,9 +201,9 @@ return [
 
 The package is built around setting DTO's. These are classes with some public properties that extend from `Settings`. They also have a static method `group` that should return a string.
 
-You can create multiple groups of settings, each with their own DTO. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+You can create multiple groups of settings, each with their own DTO. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
 
-Although it is possible to use the same group for different DTO's we advise you not to use the same group for multiple setting DTO's.
+Although it is possible to use the same group for different DTO's we advise you not to use the same group for multiple settings DTO's.
 
 
 ```php
@@ -457,7 +457,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => new DateTimeInterfaceCast(DateTime::class)
+            'bith_date' => new DateTimeInterfaceWithTimeZoneCast(DateTime::class, 'Europe/Brussels')
         ];
     }
 }
@@ -522,7 +522,7 @@ class DateSettings extends Settings
 
 The package will automatically find the cast and will use it to transform types between the settings DTO and repository.
 
-#### Using typed properties
+#### Typing properties
 
 There are quite a few options to type properties. You could type them in PHP:
 
@@ -586,7 +586,7 @@ When you want to disable the ability to update the value of a setting, you can a
 $dateSettings->lock('birth_date');
 ```
 
-It is now impossible to update the value of `birth_date`. When `birthdate` was overwritten, and settings were saved, the package will load the old value of `birthdate` from the repository.
+It is now impossible to update the value of `birth_date`. When trying to overwrite `birthdate` and saving settings, the package will load the old value of `birthdate` from the repository and it looks like nothing happened.
 
 You can also lock multiple settings at once:
 
@@ -602,7 +602,7 @@ $dateSettings->unlock('birth_date', 'name', 'email');
 
 ### Faking settings
 
-In tests, it is sometimes desired that some settings DTO's can be quickly used values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
+In tests, it is sometimes desired that some settings DTO's can be quickly used with values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
 
 ```php
 DateSettings::fake([
@@ -634,7 +634,7 @@ interface SettingsCast
 }
 ```
 
-A created caster can be used for local and global casts, but there are slight differences between them. The package will always try to inject the type of property, an FQSEN. It's casting as a first argument when constructing the caster. When it cannot deduce the type, null will be injected.
+A created caster can be used for local and global casts, but there are slight differences between them. The package will always try to inject the type of property it is casting. This is an FQSEN and will be provided as a first argument when constructing the caster. When it cannot deduce the type, `null will be used as first argument.
 
 An example of such caster with a type injected is a simplified `DtoCast`:
 
@@ -660,7 +660,7 @@ class DtoCast implements SettingsCast
 }
 ```
 
-The above is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within its constructor, the type will be a specific DTO class, for example, `DateDto::class`. In the `get` method, we will construct a `DateDto::class` with the repository properties. We receive a `DateDto::class` as payload in the `set` method and convert it to an array for safe storing in the repository.
+The above is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within its constructor, the type will be a specific DTO class, for example, `DateDto::class`. In the `get` method, the caster will construct a `DateDto::class` with the repository properties. The caster receives a `DateDto::class` as payload in the `set` method and convert it to an array for safe storing in the repository.
 
 #### Local casts
 
@@ -762,7 +762,7 @@ class CastSettings extends Settings
 
 When using global casts, the package will again try to deduce the type of property it's casting. In this case, it can only use the property type or try to infer the type of the property's docblock.
 
-A global cast should be configured in the `settings.php` config file and always has a specific (set) of type(s) it works on. These types can be a particular class, a group of classes implementing an interface, or a set of classes extending from another class.
+A global cast should be configured in the `settings.php` config file and always has a specific (set) of type(s) it works on. These types can be a particular class, a group of classes implementing an interface, or a group of classes extending from another class.
 
 A good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
 
@@ -776,7 +776,7 @@ A good example here is the `DateTimeInterfaceCast` we've added by default in the
     ...
 ```
 
-Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings DTO. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. 
+Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings DTO. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
 
 The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings DTO. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
 
@@ -853,7 +853,9 @@ interface SettingsRepository
 }
 ```
 
-All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`) within the `database`, and `redis` repository types. These raw values are converted to JSON. But this is not required. It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
+All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`). Within the `database`, and `redis` repository types, These raw values are converted to JSON. But this is not required. 
+
+It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
 
 Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
 
