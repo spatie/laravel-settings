@@ -27,12 +27,12 @@ Now, when you want to use these settings somewhere in your application, you can 
 ```php
 class GeneralSettingsController
 {
-	public function show(GeneralSettings $settings){
-		return view('settings.show', [
-			'site_name' => $settings->site_name,
-			'site_active' => $settings->site_active	
-		]);
-	}
+    public function show(GeneralSettings $settings){
+        return view('settings.show', [
+            'site_name' => $settings->site_name,
+            'site_active' => $settings->site_active    
+        ]);
+    }
 }
 ```
 
@@ -41,17 +41,17 @@ You can update settings as such:
 ```php
 class GeneralSettingsController
 {
-	public function update(
-		GeneralSettingsRequest $request,
-		GeneralSettings $settings
-	){
-		$settings->site_name = $request->input('site_name');
-		$settings->site_active = $request->input('site_active');
-		
-		$settings->save();
-		
-		return redirect()->back();
-	}
+    public function update(
+        GeneralSettingsRequest $request,
+        GeneralSettings $settings
+    ){
+        $settings->site_name = $request->input('site_name');
+        $settings->site_active = $request->input('site_active');
+        
+        $settings->save();
+        
+        return redirect()->back();
+    }
 }
 ```
 
@@ -236,7 +236,7 @@ return [
     */
 
     'settings' => [
-		GeneralSettings::class
+        GeneralSettings::class
     ],
 ```
 
@@ -316,7 +316,7 @@ You can add a property to a settings group as such
 ```php
 public function up(): void
 {
-	$this->migrator->add('general.timezone', 'Europe/Brussels');
+    $this->migrator->add('general.timezone', 'Europe/Brussels');
 }
 ```
 
@@ -331,7 +331,7 @@ It is possible to rename a property:
 ```php
 public function up(): void
 {
-	$this->migrator->rename('general.timezone', 'general.local_timezone');
+    $this->migrator->rename('general.timezone', 'general.local_timezone');
 }
 ```
 
@@ -340,7 +340,7 @@ You can also move a property to another group:
 ```php
 public function up(): void
 {
-	$this->migrator->rename('general.timezone', 'country.timezone');
+    $this->migrator->rename('general.timezone', 'country.timezone');
 }
 ```
 
@@ -351,10 +351,10 @@ It is possible to update the contents of a property:
 ```php
 public function up(): void
 {
-	$this->migrator->update(
-		'general.timezone', 
-		fn(string $timezone) => return 'America/New_York'
-	);
+    $this->migrator->update(
+        'general.timezone', 
+        fn(string $timezone) => return 'America/New_York'
+    );
 }
 ```
 
@@ -365,7 +365,7 @@ As you can see, this method takes a closure as an argument. This makes it possib
 ```php
 public function up(): void
 {
-	$this->migrator->delete('general.timezone');
+    $this->migrator->delete('general.timezone');
 }
 ```
 
@@ -377,14 +377,14 @@ When you're working on a big DTO with a lot of properties it can be a bit cumber
 public function up(): void
 {
     $this->settingsMigrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
-    	$blueprint->add('timzone', 'Europe/Brussels');
-    	
-    	$blueprint->rename('timezone', 'local_timezone');
-    	
-    	$blueprint->update('timezone', fn(string $timezone) => return 'America/New_York');
-    	
-    	$blueprint->delete('timezone');
-	});
+        $blueprint->add('timzone', 'Europe/Brussels');
+        
+        $blueprint->rename('timezone', 'local_timezone');
+        
+        $blueprint->update('timezone', fn(string $timezone) => return 'America/New_York');
+        
+        $blueprint->delete('timezone');
+    });
 }
 ```
 
@@ -434,7 +434,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeInterfaceCast::class
+            'bith_date' => DateTimeInterfaceCast::class
         ];
     }
 }
@@ -457,7 +457,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-        	'bith_date' => new DateTimeInterfaceCast(DateTime::class)
+            'bith_date' => new DateTimeInterfaceCast(DateTime::class)
         ];
     }
 }
@@ -480,7 +480,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
+            'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
         ];
     }
 }
@@ -545,7 +545,7 @@ Or you can use docblocks:
 ```php
 class DateSettings extends Settings
 {
-	/** @var \DateTime  */
+    /** @var \DateTime  */
     public $birth_date;
     
     /** @var ?int  */
@@ -606,7 +606,7 @@ In tests, it is sometimes desired that some settings DTO's can be quickly used v
 
 ```php
 DateSettings::fake([
-	'birthdate_date' => new DateTime('16-05-1994')
+    'birthdate_date' => new DateTime('16-05-1994')
 ]);
 ```
 
@@ -671,16 +671,16 @@ When using a local cast, there are a few different possibilities to deduce the t
 
 class CastSettings extends Settings 
 {
-	public DateTime $birth_date;
-	
-	public static function casts(): array
+    public DateTime $birth_date;
+    
+    public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeInterfaceCast::class
+            'bith_date' => DateTimeInterfaceCast::class
         ];
     }
-	
-	...
+    
+    ...
 }
 ```
 
@@ -689,17 +689,17 @@ class CastSettings extends Settings
 
 class CastSettings extends Settings
 {
-	/** @var \DateTime  */
-	public $birth_date;
-	
-	public static function casts(): array
+    /** @var \DateTime  */
+    public $birth_date;
+    
+    public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeInterfaceCast::class
+            'bith_date' => DateTimeInterfaceCast::class
         ];
     }
-	
-	...
+    
+    ...
 }
 ```
 
@@ -709,16 +709,16 @@ class CastSettings extends Settings
 
 class CastSettings extends Settings
 {
-	public $birth_date;
-	
-	public static function casts(): array
+    public $birth_date;
+    
+    public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
+            'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
         ];
     }
     
-	...
+    ...
 }
 ```
 
@@ -727,16 +727,16 @@ In that last case: by explicit definition, it is possible to provide extra argum
 ```php
 class CastSettings extends Settings
 {
-	public $birth_date;
-	
-	public static function casts(): array
+    public $birth_date;
+    
+    public static function casts(): array
     {
         return [
-        	'bith_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
+            'bith_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
         ];
     }
     
-	...
+    ...
 }
 ```
 
@@ -745,16 +745,16 @@ Although in this case it might be more readable to construct the caster within t
 ```php
 class CastSettings extends Settings
 {
-	public $birth_date;
-	
-	public static function casts(): array
+    public $birth_date;
+    
+    public static function casts(): array
     {
         return [
-        	'bith_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
+            'bith_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
         ];
     }
     
-	...
+    ...
 }
 ```
 
@@ -767,7 +767,7 @@ A global cast should be configured in the `settings.php` config file and has alw
 An good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
 
 ```php
-	...
+    ...
 
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
@@ -883,3 +883,4 @@ If you discover any security related issues, please email freek@spatie.be instea
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
