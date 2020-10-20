@@ -20,7 +20,10 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function getPropertiesInGroup(string $group): array
     {
-        /** @var \Spatie\LaravelSettings\Models\SettingsProperty $temp */
+        /**
+         * @var \Spatie\LaravelSettings\Models\SettingsProperty $temp
+         * @psalm-suppress UndefinedClass
+         */
         $temp = new $this->propertyModel;
 
         return DB::connection($this->connection ?? $temp->getConnectionName())

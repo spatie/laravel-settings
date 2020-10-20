@@ -85,6 +85,6 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function toResponse($request)
     {
-        return $this->toJson();
+        return response()->json($this->toJson());
     }
 }
