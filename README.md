@@ -1,4 +1,4 @@
-# Store your application settings
+# Store strongly typed application settings
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-settings/run-tests?label=tests)](https://github.com/spatie/laravel-settings/actions?query=workflow%3Arun-tests+branch%3Amaster)
@@ -6,7 +6,7 @@
 
 **Under development, do not use!**
 
-This package allows you to store settings in a repository (database, redis, ...) and use them through an application without hassle. You create a settings DTO as such:
+This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings DTO as such:
 
 ```php
 class GeneralSettings extends Settings
@@ -22,7 +22,7 @@ class GeneralSettings extends Settings
 }
 ```
 
-Now, when you want to use these settings somewhere in your application, you can inject them since we register them in the Laravel Container. For example in a controller:
+When you want to use these settings somewhere in your application, you can inject them since we register them in the Laravel Container. For example, in a controller:
 
 ```php
 class GeneralSettingsController
@@ -55,7 +55,7 @@ class GeneralSettingsController
 }
 ```
 
-Let's take a look on how to create your own settings.
+Let's take a look at how to create your own settings DT.
 
 ## Support us
 
@@ -120,7 +120,7 @@ return [
     | Default repository
     |--------------------------------------------------------------------------
     |
-    | When no repository was set for a settings DTO this repository will be
+    | When no repository was set for a settings DTO, this repository will be
     | used for loading and saving settings.
     |
     */
@@ -133,8 +133,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Settings will be stored and loaded from these repositories. There are
-    | two types of repositories: database and redis. But its always
-    | possible to create your own repositories.
+    | two types of repositories: database and Redis. But its always
+    | possible to create your specific types of repositories.
     |
     */
 
@@ -157,7 +157,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When the package discovers a setting with a type other than the PHP built
-    | in types, it should be casted. These casts will automatically cast types
+    | in types, it should be cast. These casts will automatically cast types
     | when they occur in a settings DTO.
     |
     */
@@ -187,8 +187,8 @@ return [
     | Cache path
     |--------------------------------------------------------------------------
     |
-    | When in production it is advised to cache the automatically discovered
-    | and registered setting DTO's these will be cached in this path.
+    | When in production, it is advised to cache the automatically discovered
+    | and registered setting DTO's will be cached in this path.
     |
     */
 
@@ -199,9 +199,9 @@ return [
 
 ## Usage
 
-The package is built arround setting DTO's, basicly these are classes with some public properties that extend from `Settings`. They also have a static method `group` that should return a string.
+The package is built around setting DTO's. These are classes with some public properties that extend from `Settings`. They also have a static method `group` that should return a string.
 
-You can create multiple groups of settings each with their own DTO, you could for example have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
+You can create multiple groups of settings, each with their own DTO. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these settings.
 
 Although it is possible to use the same group for different DTO's we advise you not to use the same group for multiple setting DTO's.
 
@@ -220,9 +220,9 @@ class GeneralSettings extends Settings
 }
 ```
 
-Each property should be typed or partially typed by a docblock, more on that later.
+Each property should be typed or partially typed by a docblock. More on that later.
 
-In the end you will have to add this DTO to the `settings.php` config file in the `settings` section so it can be loaded by Laravel:
+In the end, you will have to add this DTO to the `settings.php` config file in the `settings` section so it can be loaded by Laravel:
 
 ```php
 return [
@@ -240,9 +240,9 @@ return [
     ],
 ```
 
-It is also possible to autodiscover settings DTO's, the package will look through your application and tries to discover Settings DTO's. You can specify the paths where these settings will be searched in the config `auto_discover_settings` array. By default this is the application's app path.
+It is also possible to auto-discover settings DTO's. The package will look through your application and tries to discover Settings DTO's. You can specify the paths where these settings will be searched in the config `auto_discover_settings` array. By default, this is the application's app path.
 
-Autodiscovering settings requires some extra time before you're application is booted up, that's why it is possible to cache them using the following command:
+Autodiscovering settings requires some extra time before your application is booted up. That's why it is possible to cache them using the following command:
 
 ```bash
 php artisan settings:discover
@@ -256,7 +256,7 @@ php artisan settings:clear-discovered
 
 ### Selecting a repository
 
-Settings will be stored and loaded from a repository, there are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example you could have two `database` repositories, one that goes to a `settings` table in your database and one that goes to a `global_settings` table.
+Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
 
 You can explicitly set the repository of a settings DTO by implementing the `repository` method:
 
@@ -283,11 +283,11 @@ When a repository is not set for a settings DTO, the `default_repository` in the
 
 ### Creating settings migrations
 
-Before you will be able to load/update settings you will have to migrate them, though this might sound a bit strange at the beginning it is actually quite logic. You want to have some default settings to begin with when you're creating a fresh application. And what would happen if we change a settings DTO? Our code would change but our data doesn't.
+Before you can load/update settings, you will have to migrate them. Though this might sound a bit strange at the beginning, it is quite logical. You want to have some default settings to start with when you're creating a new application. And what would happen if we change a settings DTO? Our code would change, but our data doesn't.
 
-This is why the package requires migrations each time you're changing/creating the structure of your settings DTO. These migrations will run next to the regular Laravel database migrations and we've added some tooling to write them as quickly as possible.
+That's why the package requires migrations each time you're changing/creating the structure of your settings DTO. These migrations will run next to the regular Laravel database migrations, and we've added some tooling to write them as quickly as possible.
 
-Creating a settings migration works just like you would create a regular database migration, you can run the following command:
+Creating a settings migration works just like you would create a regular database migration. You can run the following command:
 
 ```bash
 php artisan make:settings-migration CreateGeneralSettings
@@ -307,11 +307,11 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method but this can be added manually if required. In the `up` method you can change the settings data in a repository when migrating. There are a few default operations supported:
+We haven't added a `down` method, but this can be added if required. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
-You can add a property to a settings group as such
+You can add a property to a settings group as such:
 
 ```php
 public function up(): void
@@ -320,9 +320,9 @@ public function up(): void
 }
 ```
 
-Now we've added a `timezone` property to the `general` group which is being used by the `GeneralSettings` DTO. You should always give a default value for a newly created setting in this case this is the `Europe/Brussels` timezone.
+Now we've added a `timezone` property to the `general` group, which is being used by the `GeneralSettings` DTO. You should always give a default value for a newly created setting. In this case, this is the `Europe/Brussels` timezone.
 
-If the property in the settings DTO is nullable, then it's perfectly possible to give `null` as a default value.
+If the property in the settings DTO is nullable, it's possible to give `null` as a default value.
 
 #### Renaming a property
 
@@ -358,7 +358,7 @@ public function up(): void
 }
 ```
 
-As you can see, this method takes a closure as an argument. This makes it possible to update a value based upon its old value.
+As you can see, this method takes a closure as an argument, which makes it possible to update a value based upon its old value.
 
 #### Deleting a property
 
@@ -371,7 +371,7 @@ public function up(): void
 
 #### Operations in group
 
-When you're working on a big DTO with a lot of properties it can be a bit cumbersome to always have to prepend the settings group. That's why you can also perform operations within a settings group:
+When you're working on a big DTO with a lot of properties, it can be a bit cumbersome always to have to prepend the settings group. That's why you can also perform operations within a settings group:
 
 ```php
 public function up(): void
@@ -415,11 +415,11 @@ class RegularTypeSettings extends Settings
 
 Internally the package will convert these types to JSON and save them as such in the repository. But what about types like `DateTime` and `Carbon` or your own created types? Although these types can be converted to JSON, building them back up again from JSON isn't supported.
 
-That's why you can specify casts within this package, there are two ways to define these casts: locally or glablly.
+That's why you can specify casts within this package. There are two ways to define these casts: locally or globally.
 
 #### Local casts
 
-Local casts work on one specific settings DTO and should be defined for each property:
+Local casts work on one specific settings DTO's and should be defined for each property:
 
 ```php
 class DateSettings extends Settings
@@ -440,7 +440,7 @@ class DateSettings extends Settings
 }
 ```
 
-The `DateTimeInterfaceCast` can be used for properties with types like `DateTime`, `DateTimeImmutable`, `Carbon` and `CarbonImmutable`. You can also use an already constructed cast, this becomes handy when you need to pass some extra arguments to the cast:
+The `DateTimeInterfaceCast` can be used for properties with types like `DateTime`, `DateTimeImmutable`, `Carbon` and `CarbonImmutable`. You can also use an already constructed cast. It becomes handy when you need to pass some extra arguments to the cast:
 
 
 
@@ -463,7 +463,7 @@ class DateSettings extends Settings
 }
 ```
 
-As you can see we provide `DateTime::class` to the cast so it knows what type of `DateTime` it should use, this is because the `birth_date` property was not typed and the cast couldn't infer the type to use.
+As you can see, we provide `DateTime::class` to the cast, so it knows what type of `DateTime` it should use because the `birth_date` property was not typed, and the cast couldn't infer the type to use.
 
 You can also provide arguments to a cast without constructing it:
 
@@ -488,7 +488,7 @@ class DateSettings extends Settings
 
 #### Global casts
 
-Local casts are great for defining types for specific properties of the settings DTO. But it's a lot of work to define a local cast for each regullary used type like a `DateTime`. Global casts try to simplify this process.
+Local casts are great for defining types for specific properties of the settings DTO. But it's a lot of work to define a local cast for each regularly used type like a `DateTime`. Global casts try to simplify this process.
 
 You can define global casts in the `global_casts` array of the package configuration. We've added some default casts to the configuration that can be handy:
 
@@ -506,7 +506,7 @@ You can define global casts in the `global_casts` array of the package configura
  - a type that implements an interface (`DateTimeInterface::class`)
  - a type that extends from another class (`DataTransferObject::class`)
  
-In your settings DTO when you use a `DateTime` property (which implements `DateTimeInterface`) you no longer have to define local casts:
+In your settings DTO, when you use a `DateTime` property (which implements `DateTimeInterface`), you no longer have to define local casts:
 
 ```php
 class DateSettings extends Settings
@@ -524,7 +524,7 @@ The package will automatically find the cast and will use it to transform types 
 
 #### Using typed properties
 
-There are quite a few options to type properties, you could type them in PHP:
+There are quite a few options to type properties. You could type them in PHP:
 
 ```php
 class DateSettings extends Settings
@@ -558,7 +558,7 @@ class DateSettings extends Settings
 }
 ```
 
-Docblocks can be very usefull to type arrays of objects:
+Docblocks can be very useful to type arrays of objects:
 
 ```php
 class DateSettings extends Settings
@@ -580,13 +580,13 @@ class DateSettings extends Settings
 
 ### Locking properties
 
-When you want to disable the ability to update the value of a setting you can add a lock to it:
+When you want to disable the ability to update the value of a setting, you can add a lock to it:
 
 ```php
 $dateSettings->lock('birth_date');
 ```
 
-It is now impossible to update the value of `birth_date`. When `birthdate` was overwritten and settings were saved then the package will load the old value of `birthdate` from the repository.
+It is now impossible to update the value of `birth_date`. When `birthdate` was overwritten, and settings were saved, the package will load the old value of `birthdate` from the repository.
 
 You can also lock multiple settings at once:
 
@@ -602,7 +602,7 @@ $dateSettings->unlock('birth_date', 'name', 'email');
 
 ### Faking settings
 
-In tests, it is sometimes desired that some settings DTO's can be quickly used values that are different from default ones you've written in your migrations. That's why you can fake settings, faked settings DTo's will be registered in the container. And you have the possibility to overwrite some or all the properties in the settings DTO:
+In tests, it is sometimes desired that some settings DTO's can be quickly used values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
 
 ```php
 DateSettings::fake([
@@ -634,7 +634,7 @@ interface SettingsCast
 }
 ```
 
-A created caster can be used for local and global casts but there are slight differences between the two. The package will always try to inject the type of property, a fqsen, it's casting as a first argument when constructing the caster. When it cannot deduce the type, null will be injected.
+A created caster can be used for local and global casts, but there are slight differences between them. The package will always try to inject the type of property, an FQSEN. It's casting as a first argument when constructing the caster. When it cannot deduce the type, null will be injected.
 
 An example of such caster with a type injected is a simplified `DtoCast`:
 
@@ -660,7 +660,7 @@ class DtoCast implements SettingsCast
 }
 ```
 
-This is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within it's contructor the type will be a specific DTO class, for example `DateDto::class`. In the `get` method we will construct a `DateDto::class` with the properties from the repository. We receive a `DateDto::class` as payload in the `set` method an convert it to an array for safe storing in the repository.
+The above is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within its constructor, the type will be a specific DTO class, for example, `DateDto::class`. In the `get` method, we will construct a `DateDto::class` with the repository properties. We receive a `DateDto::class` as payload in the `set` method and convert it to an array for safe storing in the repository.
 
 #### Local casts
 
@@ -740,7 +740,7 @@ class CastSettings extends Settings
 }
 ```
 
-Although in this case it might be more readable to construct the caster within the settings DTO:
+Although in this case, it might be more readable to construct the caster within the settings DTO:
 
 ```php
 class CastSettings extends Settings
@@ -760,11 +760,11 @@ class CastSettings extends Settings
 
 #### Global casts
 
-When using global casts, the package will again try to deduce the type of property it's casting. In this case it can only use the the type of the property or try to deduce the type of the docblock of the property.
+When using global casts, the package will again try to deduce the type of property it's casting. In this case, it can only use the property type or try to infer the type of the property's docblock.
 
-A global cast should be configured in the `settings.php` config file and has always has a specific (set) of type(s) it works on. This can be a specific class, a set of classes implementing an interface, ora set of classes extending from another class. For more examples.
+A global cast should be configured in the `settings.php` config file and always has a specific (set) of type(s) it works on. These types can be a particular class, a group of classes implementing an interface, or a set of classes extending from another class.
 
-An good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
+A good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
 
 ```php
     ...
@@ -778,12 +778,12 @@ An good example here is the `DateTimeInterfaceCast` we've added by default in th
 
 Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings DTO. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. 
 
-The type injected in the caster will be the type of the property. So let's say you have property with the type `DateTime` within your settings DTO. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
+The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings DTO. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
 
 
 ### Repostitories
 
-There are two types of repositories included in the package, the `redis` and `database` repository, you can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
+There are two types of repositories included in the package, the `redis` and `database` repository. You can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
 
 #### Database repository
 
@@ -801,7 +801,7 @@ The Redis repository also has two optional configuration options:
 
 #### Creating your own repository type
 
-It is possible to create your own types of repositories, a repository is a class which implements `SettingsRepository`:
+It is possible to create your own types of repositories. A repository is a class which implements `SettingsRepository`:
 
 ```php
 interface SettingsRepository
@@ -837,7 +837,7 @@ interface SettingsRepository
     public function deleteProperty(string $group, string $name): void;
 
     /**
-     * Lock a set of properties for a certain group
+     * Lock a set of properties for a specific group
      */
     public function lockProperties(string $group, array $properties): void;
 
@@ -853,9 +853,9 @@ interface SettingsRepository
 }
 ```
 
-All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`) within the `database` and `redis` repository types these raw values are converted to json. But this is not required. It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
+All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`) within the `database`, and `redis` repository types. These raw values are converted to JSON. But this is not required. It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
 
-The constructor of each repository will receive a `$config` array that the user defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor, they will be injected when the repository is created.
+Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
 
 ## Testing
 

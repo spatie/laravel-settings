@@ -31,7 +31,7 @@ return [
     | Default repository
     |--------------------------------------------------------------------------
     |
-    | When no repository was set for a settings DTO this repository will be
+    | When no repository was set for a settings DTO, this repository will be
     | used for loading and saving settings.
     |
     */
@@ -44,8 +44,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Settings will be stored and loaded from these repositories. There are
-    | two types of repositories: database and redis. But its always
-    | possible to create your own repositories.
+    | two types of repositories: database and Redis. But its always
+    | possible to create your specific types of repositories.
     |
     */
 
@@ -68,7 +68,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When the package discovers a setting with a type other than the PHP built
-    | in types, it should be casted. These casts will automatically cast types
+    | in types, it should be cast. These casts will automatically cast types
     | when they occur in a settings DTO.
     |
     */
@@ -98,8 +98,8 @@ return [
     | Cache path
     |--------------------------------------------------------------------------
     |
-    | When in production it is advised to cache the automatically discovered
-    | and registered setting DTO's these will be cached in this path.
+    | When in production, it is advised to cache the automatically discovered
+    | and registered setting DTO's will be cached in this path.
     |
     */
 

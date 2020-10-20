@@ -35,7 +35,7 @@ interface SettingsRepository
     public function deleteProperty(string $group, string $name): void;
 
     /**
-     * Lock a set of properties for a certain group
+     * Lock a set of properties for a specific group
      */
     public function lockProperties(string $group, array $properties): void;
 
