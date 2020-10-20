@@ -673,7 +673,6 @@ class CastSettings extends Settings
 {
 	public DateTime $birth_date;
 	
-		
 	public static function casts(): array
     {
         return [
