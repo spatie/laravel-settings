@@ -6,8 +6,6 @@
 [![GitHub Check and fix styling](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 
-**Under development, do not use!**
-
 This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings DTO as such:
 
 ```php
