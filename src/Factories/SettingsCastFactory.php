@@ -49,7 +49,7 @@ class SettingsCastFactory
 
         $castClass = Str::before($castDefinition, ':');
 
-        $arguments = str_contains($castDefinition, ':')
+        $arguments = Str::contains($castDefinition, ':')
             ? explode(',', Str::after($castDefinition, ':'))
             : [];
 

@@ -24,7 +24,7 @@ class ClearDiscoveredSettingsCacheCommandTest extends TestCase
     }
 
     /** @test */
-    public function it_can_clear_the_registered_projectors()
+    public function it_can_clear_the_registered_settings()
     {
         $this->artisan('settings:discover')->assertExitCode(0);
 
