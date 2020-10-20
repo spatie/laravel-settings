@@ -7,7 +7,7 @@ use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
-    /** @var string|\Illuminate\Database\Eloquent\Model*/
+    /** @var string|\Illuminate\Database\Eloquent\Model */
     private string $propertyModel;
 
     private ?string $connection;

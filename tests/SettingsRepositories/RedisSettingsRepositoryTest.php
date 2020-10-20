@@ -22,7 +22,7 @@ class RedisSettingsRepositoryTest extends TestCase
         $this->client->flushAll();
 
         $this->repository = resolve(RedisSettingsRepository::class, [
-            'config' => []
+            'config' => [],
         ]);
     }
 
@@ -185,7 +185,7 @@ class RedisSettingsRepositoryTest extends TestCase
     public function it_can_use_a_prefix()
     {
         $this->repository = resolve(RedisSettingsRepository::class, [
-            'config' => ['prefix' => 'spatie']
+            'config' => ['prefix' => 'spatie'],
         ]);
 
         $this->repository->createProperty('test', 'a', 'Alpha');

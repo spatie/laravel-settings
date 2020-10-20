@@ -18,7 +18,7 @@ class SettingsRepositoryFactory
         $config = config("settings.repositories.{$name}");
 
         return resolve($config['type'], [
-            'config' => $config
+            'config' => $config,
         ]);
     }
 }
