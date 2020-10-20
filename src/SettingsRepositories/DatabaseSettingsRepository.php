@@ -7,12 +7,15 @@ use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
-    /** @var string|class-string<Illuminate\Database\Eloquent\Model> */
+    /** @var string|\Illuminate\Database\Eloquent\Model*/
     private string $propertyModel;
+
+    private ?string $connection;
 
     public function __construct(array $config)
     {
         $this->propertyModel = $config['model'] ?? SettingsProperty::class;
+        $this->connection = $config['connection'] ?? null;
     }
 
     public function getPropertiesInGroup(string $group): array
@@ -20,7 +23,7 @@ class DatabaseSettingsRepository implements SettingsRepository
         /** @var \Spatie\LaravelSettings\Models\SettingsProperty $temp */
         $temp = new $this->propertyModel;
 
-        return DB::connection($temp->getConnectionName())
+        return DB::connection($this->connection ?? $temp->getConnectionName())
             ->table($temp->getTable())
             ->where('group', $group)
             ->get(['name', 'payload'])
@@ -30,22 +33,9 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->toArray();
     }
 
-    public function updateOrCreatePropertiesInGroup(string $group, array $properties): void
-    {
-        foreach ($properties as $name => $value) {
-            $this->propertyModel::updateOrCreate([
-                'group' => $group,
-                'name' => $name,
-                'locked' => false,
-            ], [
-                'payload' => json_encode($value),
-            ]);
-        }
-    }
-
     public function checkIfPropertyExists(string $group, string $name): bool
     {
-        return $this->propertyModel::query()
+        return $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->where('name', $name)
             ->exists();
@@ -53,7 +43,7 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function getPropertyPayload(string $group, string $name)
     {
-        $setting = $this->propertyModel::query()
+        $setting = $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->where('name', $name)
             ->first('payload')
@@ -64,7 +54,7 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function createProperty(string $group, string $name, $payload): void
     {
-        $this->propertyModel::create([
+        $this->propertyModel::on($this->connection)->create([
             'group' => $group,
             'name' => $name,
             'payload' => json_encode($payload),
@@ -74,7 +64,7 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function updatePropertyPayload(string $group, string $name, $value): void
     {
-        $this->propertyModel::query()
+        $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->where('name', $name)
             ->update([
@@ -84,23 +74,23 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function deleteProperty(string $group, string $name): void
     {
-        $this->propertyModel::query()
+        $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->where('name', $name)
             ->delete();
     }
 
-    public function lockProperties(string $group, array $properties)
+    public function lockProperties(string $group, array $properties): void
     {
-        $this->propertyModel::query()
+        $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->whereIn('name', $properties)
             ->update(['locked' => true]);
     }
 
-    public function unlockProperties(string $group, array $properties)
+    public function unlockProperties(string $group, array $properties): void
     {
-        $this->propertyModel::query()
+        $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->whereIn('name', $properties)
             ->update(['locked' => false]);
@@ -108,7 +98,7 @@ class DatabaseSettingsRepository implements SettingsRepository
 
     public function getLockedProperties(string $group): array
     {
-        return $this->propertyModel::query()
+        return $this->propertyModel::on($this->connection)
             ->where('group', $group)
             ->where('locked', true)
             ->pluck('name')

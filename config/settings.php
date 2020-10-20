@@ -52,7 +52,7 @@ return [
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
-            'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
+            'model' => null,
             'connection' => null,
         ],
         'redis' => [

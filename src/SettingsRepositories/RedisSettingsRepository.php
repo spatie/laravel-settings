@@ -11,24 +11,15 @@ class RedisSettingsRepository implements SettingsRepository
 
     private string $prefix;
 
-    public function __construct(array $config)
+    public function __construct(array $config, RedisManager $connection)
     {
-        $this->connection = resolve(RedisManager::class)
+        $this->connection = $connection
             ->connection($config['connection'] ?? null)
             ->client();
 
         $this->prefix = array_key_exists('prefix', $config)
             ? "{$config['prefix']}."
             : '';
-    }
-
-    public function updateOrCreatePropertiesInGroup(string $group, array $properties): void
-    {
-        $properties = collect($properties)->mapWithKeys(function ($payload, string $name) {
-            return [$name => json_encode($payload)];
-        })->toArray();
-
-        $this->connection->hMSet($this->prefix . $group, $properties);
     }
 
     public function getPropertiesInGroup(string $group): array
@@ -59,17 +50,17 @@ class RedisSettingsRepository implements SettingsRepository
         $this->connection->hSet($this->prefix . $group, $name, json_encode($value));
     }
 
-    public function deleteProperty(string $group, string $name)
+    public function deleteProperty(string $group, string $name): void
     {
         $this->connection->hDel($this->prefix . $group, $name);
     }
 
-    public function lockProperties(string $group, array $properties)
+    public function lockProperties(string $group, array $properties): void
     {
         $this->connection->sAdd($this->getLocksSetKey($group), ...$properties);
     }
 
-    public function unlockProperties(string $group, array $properties)
+    public function unlockProperties(string $group, array $properties): void
     {
         $this->connection->sRem($this->getLocksSetKey($group), ...$properties);
     }

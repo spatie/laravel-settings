@@ -21,7 +21,9 @@ class RedisSettingsRepositoryTest extends TestCase
 
         $this->client->flushAll();
 
-        $this->repository = new RedisSettingsRepository([]);
+        $this->repository = resolve(RedisSettingsRepository::class, [
+            'config' => []
+        ]);
     }
 
     /** @test */
@@ -136,33 +138,6 @@ class RedisSettingsRepositoryTest extends TestCase
         $this->assertFalse($this->client->hExists('test', 'a'));
     }
 
-    /** @test */
-    public function it_can_import_settings(): void
-    {
-        $this->repository->updateOrCreatePropertiesInGroup('test', [
-            'a' => 'Alpha',
-            'b' => true,
-        ]);
-        $this->repository->updateOrCreatePropertiesInGroup('check', [
-            'a' => 42,
-        ]);
-
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(true, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(42, $this->repository->getPropertyPayload('check', 'a'));
-    }
-
-    /** @test */
-    public function it_will_update_payloads_when_importing_settings(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-
-        $this->repository->updateOrCreatePropertiesInGroup('test', [
-            'a' => 'Beta',
-        ]);
-
-        $this->assertEquals('Beta', $this->repository->getPropertyPayload('test', 'a'));
-    }
 
     /** @test */
     public function it_can_lock_settings()
@@ -204,5 +179,52 @@ class RedisSettingsRepositoryTest extends TestCase
         $this->assertCount(2, $lockedProperties);
         $this->assertContains('a', $lockedProperties);
         $this->assertContains('c', $lockedProperties);
+    }
+
+    /** @test */
+    public function it_can_use_a_prefix()
+    {
+        $this->repository = resolve(RedisSettingsRepository::class, [
+            'config' => ['prefix' => 'spatie']
+        ]);
+
+        $this->repository->createProperty('test', 'a', 'Alpha');
+
+        $this->assertEquals([
+            'a' => json_encode('Alpha'),
+        ], $this->client->hGetAll('spatie.test'));
+
+        $this->assertEquals([
+            'a' => 'Alpha',
+        ], $this->repository->getPropertiesInGroup('test'));
+
+        $this->assertTrue($this->repository->checkIfPropertyExists('test', 'a'));
+
+        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
+
+        $this->repository->updatePropertyPayload('test', 'a', 'Alpha Updated');
+
+        $this->assertEquals(
+            json_encode('Alpha Updated'),
+            $this->client->hGet('spatie.test', 'a')
+        );
+
+        $this->repository->lockProperties('test', ['a']);
+
+        $this->assertEquals(['a'], $this->repository->getLockedProperties('test'));
+
+        $this->assertEquals(
+            ['a'],
+            $this->client->sMembers('spatie.locks.test')
+        );
+
+        $this->repository->unlockProperties('test', ['a']);
+
+        $this->assertEmpty($this->client->sMembers('spatie.locks.test'));
+
+        $this->repository->deleteProperty('test', 'a');
+
+        $this->assertEmpty($this->repository->getPropertiesInGroup('test'));
+        $this->assertEmpty($this->client->hGetAll('spatie.test'));
     }
 }

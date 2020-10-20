@@ -59,7 +59,7 @@ Let's take a look on how to create your own settings.
 
 ## Support us
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-settings.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-settings)
+[![Image](https://github-ads.s3.eu-central-1.amazonaws.com/laravel-settings.jpg)](https://spatie.be/github-ad-click/laravel-settings)
 
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
@@ -504,7 +504,7 @@ You can define global casts in the `global_casts` array of the package configura
  
  - a specific type (`DateTimeZone::class`)
  - a type that implements an interface (`DateTimeInterface::class`)
- - a type that extends from another class `DataTransferObject::class`
+ - a type that extends from another class (`DataTransferObject::class`)
  
 In your settings DTO when you use a `DateTime` property (which implements `DateTimeInterface`) you no longer have to define local casts:
 
@@ -522,7 +522,7 @@ class DateSettings extends Settings
 
 The package will automatically find the cast and will use it to transform types between the settings DTO and repository.
 
-### Typing properties
+#### Using typed properties
 
 There are quite a few options to type properties, you could type them in PHP:
 
@@ -600,13 +600,263 @@ Unlocking settings can be done as such:
 $dateSettings->unlock('birth_date', 'name', 'email');
 ```
 
-### Encrypting properties
-
 ### Faking settings
 
-### Creating casts
+In tests, it is sometimes desired that some settings DTO's can be quickly used values that are different from default ones you've written in your migrations. That's why you can fake settings, faked settings DTo's will be registered in the container. And you have the possibility to overwrite some or all the properties in the settings DTO:
 
-### Writing your own casts
+```php
+DateSettings::fake([
+	'birthdate_date' => new DateTime('16-05-1994')
+]);
+```
+
+Now, when the `DateSettings` DTO is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
+
+
+### Writing your own casters
+
+A caster is a class implementing the `SettingsCast` interface:
+
+```php
+interface SettingsCast
+{
+    /**
+     * Will be used to when retrieving a value from the repository, and
+     * inserting it into the settings DTO.
+     */
+    public function get($payload);
+
+    /**
+     * Will be used to when retrieving a value from the settings DTO, and
+     * inserting it into the repository.
+     */
+    public function set($payload);
+}
+```
+
+A created caster can be used for local and global casts but there are slight differences between the two. The package will always try to inject the type of property, a fqsen, it's casting as a first argument when constructing the caster. When it cannot deduce the type, null will be injected.
+
+An example of such caster with a type injected is a simplified `DtoCast`:
+
+```php
+class DtoCast implements SettingsCast
+{
+    private string $type;
+
+    public function __construct(?string $type)
+    {
+        $this->type = $type;
+    }
+
+    public function get($payload): DataTransferObject
+    {
+        return new $this->type($payload);
+    }
+
+    public function set($payload): array
+    {
+        return $payload->toArray();
+    }
+}
+```
+
+This is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within it's contructor the type will be a specific DTO class, for example `DateDto::class`. In the `get` method we will construct a `DateDto::class` with the properties from the repository. We receive a `DateDto::class` as payload in the `set` method an convert it to an array for safe storing in the repository.
+
+#### Local casts
+
+When using a local cast, there are a few different possibilities to deduce the type:
+
+```php
+// By the type of property
+
+class CastSettings extends Settings 
+{
+	public DateTime $birth_date;
+	
+		
+	public static function casts(): array
+    {
+        return [
+        	'bith_date' => DateTimeInterfaceCast::class
+        ];
+    }
+	
+	...
+}
+```
+
+```php
+// By the docblock of a property
+
+class CastSettings extends Settings
+{
+	/** @var \DateTime  */
+	public $birth_date;
+	
+	public static function casts(): array
+    {
+        return [
+        	'bith_date' => DateTimeInterfaceCast::class
+        ];
+    }
+	
+	...
+}
+```
+
+
+```php
+// By explicit definition
+
+class CastSettings extends Settings
+{
+	public $birth_date;
+	
+	public static function casts(): array
+    {
+        return [
+        	'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
+        ];
+    }
+    
+	...
+}
+```
+
+In that last case: by explicit definition, it is possible to provide extra arguments that will be passed to the constructor:
+
+```php
+class CastSettings extends Settings
+{
+	public $birth_date;
+	
+	public static function casts(): array
+    {
+        return [
+        	'bith_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
+        ];
+    }
+    
+	...
+}
+```
+
+Although in this case it might be more readable to construct the caster within the settings DTO:
+
+```php
+class CastSettings extends Settings
+{
+	public $birth_date;
+	
+	public static function casts(): array
+    {
+        return [
+        	'bith_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
+        ];
+    }
+    
+	...
+}
+```
+
+#### Global casts
+
+When using global casts, the package will again try to deduce the type of property it's casting. In this case it can only use the the type of the property or try to deduce the type of the docblock of the property.
+
+A global cast should be configured in the `settings.php` config file and has always has a specific (set) of type(s) it works on. This can be a specific class, a set of classes implementing an interface, ora set of classes extending from another class. For more examples.
+
+An good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
+
+```php
+	...
+
+    'global_casts' => [
+        DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
+    ],
+    
+    ...
+```
+
+Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings DTO. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. 
+
+The type injected in the caster will be the type of the property. So let's say you have property with the type `DateTime` within your settings DTO. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
+
+
+### Repostitories
+
+There are two types of repositories included in the package, the `redis` and `database` repository, you can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
+
+#### Database repository
+
+The database repository has two optional configuration options:
+
+- `model` the Eloquent model used to load/save properties to the database
+- `connection` the connection to use when interacting with the database
+
+#### Redis repository
+
+The Redis repository also has two optional configuration options:
+
+- `prefix` an optional prefix that will be prepended to the keys
+- `connection` the connection to use when interacting with Redis
+
+#### Creating your own repository type
+
+It is possible to create your own types of repositories, a repository is a class which implements `SettingsRepository`:
+
+```php
+interface SettingsRepository
+{
+    /**
+     * Get all the properties in the repository for a single group
+     */
+    public function getPropertiesInGroup(string $group): array;
+
+    /**
+     * Check if a property exists in a group
+     */
+    public function checkIfPropertyExists(string $group, string $name): bool;
+
+    /**
+     * Get the payload of a property
+     */
+    public function getPropertyPayload(string $group, string $name);
+
+    /**
+     * Create a property within a group with a payload
+     */
+    public function createProperty(string $group, string $name, $payload): void;
+
+    /**
+     * Update the payload of a property within a group
+     */
+    public function updatePropertyPayload(string $group, string $name, $value): void;
+
+    /**
+     * Delete a property from a group
+     */
+    public function deleteProperty(string $group, string $name): void;
+
+    /**
+     * Lock a set of properties for a certain group
+     */
+    public function lockProperties(string $group, array $properties): void;
+
+    /**
+     * Unlock a set of properties for a group
+     */
+    public function unlockProperties(string $group, array $properties): void;
+
+    /**
+     * Get all the locked properties within a group
+     */
+    public function getLockedProperties(string $group): array;
+}
+```
+
+All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`) within the `database` and `redis` repository types these raw values are converted to json. But this is not required. It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
+
+The constructor of each repository will receive a `$config` array that the user defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor, they will be injected when the repository is created.
 
 ## Testing
 

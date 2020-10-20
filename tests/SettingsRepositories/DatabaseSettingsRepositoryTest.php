@@ -2,9 +2,13 @@
 
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
+use Closure;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestCase;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class DatabaseSettingsRepositoryTest extends TestCase
 {
@@ -161,34 +165,6 @@ class DatabaseSettingsRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_import_settings(): void
-    {
-        $this->repository->updateOrCreatePropertiesInGroup('test', [
-            'a' => 'Alpha',
-            'b' => true,
-        ]);
-        $this->repository->updateOrCreatePropertiesInGroup('check', [
-            'a' => 42,
-        ]);
-
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(true, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(42, $this->repository->getPropertyPayload('check', 'a'));
-    }
-
-    /** @test */
-    public function it_will_update_payloads_when_importing_settings(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-
-        $this->repository->updateOrCreatePropertiesInGroup('test', [
-            'a' => 'Beta',
-        ]);
-
-        $this->assertEquals('Beta', $this->repository->getPropertyPayload('test', 'a'));
-    }
-
-    /** @test */
     public function it_can_lock_settings()
     {
         $this->repository->createProperty('test', 'a', 'Alpha');
@@ -245,6 +221,69 @@ class DatabaseSettingsRepositoryTest extends TestCase
         $this->assertContains('c', $lockedProperties);
     }
 
+    /**
+     * @test
+     * @dataProvider configurationsProvider
+     *
+     * @param \Closure $repositoryFactory
+     */
+    public function it_can_have_different_configuration_options(Closure $repositoryFactory)
+    {
+        $this->prepareOtherConnection();
+
+        $otherRepository = $repositoryFactory();
+
+        $otherRepository->createProperty('test', 'a', 'Alpha');
+
+        $this->assertEmpty($this->repository->getPropertiesInGroup('test'));
+        $this->assertEquals(['a' => 'Alpha'], $otherRepository->getPropertiesInGroup('test'));
+
+        $otherRepository->createProperty('test', 'b', 'Beta');
+        $otherRepository->updatePropertyPayload('test', 'b', 'Beta updated');
+
+        $this->assertEquals('Beta updated', $otherRepository->getPropertyPayload('test', 'b'));
+
+        $otherRepository->lockProperties('test', ['b']);
+
+        $this->assertEquals(['b'], $otherRepository->getLockedProperties('test'));
+
+        $otherRepository->unlockProperties('test', ['b']);
+
+        $this->assertEmpty($otherRepository->getLockedProperties('test'));
+
+        $otherRepository->deleteProperty('test', 'b');
+
+        $this->assertEquals([
+            'a' => 'Alpha',
+        ], $otherRepository->getPropertiesInGroup('test'));
+    }
+
+    public function configurationsProvider(): array
+    {
+        return [
+            [
+                function () {
+                    return new DatabaseSettingsRepository([
+                        'connection' => 'other',
+                    ]);
+                },
+            ], [
+                function () {
+                    $model = new class extends SettingsProperty {
+                        public function getConnectionName()
+                        {
+                            return 'other';
+                        }
+                    };
+
+                    return new DatabaseSettingsRepository([
+                        'model' => get_class($model),
+                    ]);
+                },
+            ],
+        ];
+    }
+
     private function getSettingsProperty(string $group, string $name): SettingsProperty
     {
         /** @var \Spatie\LaravelSettings\Models\SettingsProperty $settingsProperty */
@@ -254,5 +293,31 @@ class DatabaseSettingsRepositoryTest extends TestCase
             ->first();
 
         return $settingsProperty;
+    }
+
+    private function prepareOtherConnection()
+    {
+        $tempDir = (new TemporaryDirectory())->create();
+
+        file_put_contents($tempDir->path('database.sqlite'), '');
+
+        config()->set('database.connections.other', [
+            'driver' => 'sqlite',
+            'url' => env('DATABASE_URL'),
+            'database' => env('DB_DATABASE', $tempDir->path('database.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ]);
+
+        Schema::connection('other')->create('settings', function (Blueprint $table): void {
+            $table->id();
+
+            $table->string('group')->index();
+            $table->string('name');
+            $table->boolean('locked');
+            $table->json('payload');
+
+            $table->timestamps();
+        });
     }
 }
