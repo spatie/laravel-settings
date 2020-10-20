@@ -29,7 +29,7 @@
         "phpunit/phpunit": "^9.1",
         "psalm/plugin-laravel": "^1.2",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^3.11"
+        "vimeo/psalm": "^4.00"
     },
     "autoload": {
         "psr-4": {
