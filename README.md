@@ -600,7 +600,7 @@ Unlocking settings can be done as such:
 $dateSettings->unlock('birth_date', 'name', 'email');
 ```
 
-### Encrypting settings
+### Encrypting properties
 
 Some properties in your settings DTO can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
 
@@ -676,7 +676,7 @@ public function up(): void
 
 Of course, you can use these methods when using `inGroup` migration operations.
 
-### Faking settings
+### Faking settings DTO's
 
 In tests, it is sometimes desired that some settings DTO's can be quickly used with values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
 
