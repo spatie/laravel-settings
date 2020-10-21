@@ -600,6 +600,82 @@ Unlocking settings can be done as such:
 $dateSettings->unlock('birth_date', 'name', 'email');
 ```
 
+### Encrypting settings
+
+Some properties in your settings DTO can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
+
+Adding encryption to properties of your settings DTO can be done as such. By adding the `encrypted` static method to your settings DTO and list all the properties that should be encrypted:
+
+```php
+class GeneralSettings extends Settings
+{
+    public string $site_name;
+    
+    public bool $site_active;
+    
+    public static function group(): string
+    {
+        return 'general';
+    }
+    
+    public static function encrypted(): array
+    {
+        return [
+            'site_name'
+        ];
+    }
+}
+```
+
+#### Using encryption in migrations
+
+Creating and updating encrypted properties in migrations work a little bit differently than non-encrypted properties.
+
+Instead of calling the `add` method to create a new property, you should use the `addEncrypted` method:
+
+```php
+public function up(): void
+{
+    $this->migrator->addEncrypted('general.site_name', 'Spatie');
+}
+```
+
+The same goes for the `update` method, which should be replaced by `updateEncrypted`:
+
+```php
+public function up(): void
+{
+    $this->migrator->updateEncrypted(
+        'general.site_name', 
+        fn(string $siteName) => return 'Space'
+    );
+}
+```
+
+You can make a non-encrypted property encrypted in a migration:
+
+```php
+public function up(): void
+{
+    $this->migrator->add('general.site_name', 'Spatie');
+
+    $this->migrator->encrypt('general.site_name');
+}
+```
+
+Or make an encrypted property non-encrypted:
+
+```php
+public function up(): void
+{
+    $this->migrator->addEncrypted('general.site_name', 'Spatie');
+
+    $this->migrator->decrypt('general.site_name');
+}
+```
+
+Of course, you can use these methods when using `inGroup` migration operations.
+
 ### Faking settings
 
 In tests, it is sometimes desired that some settings DTO's can be quickly used with values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
