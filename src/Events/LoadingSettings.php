@@ -2,14 +2,15 @@
 
 namespace Spatie\LaravelSettings\Events;
 
+use Spatie\LaravelSettings\Support\SettingsPropertyDataCollection;
+
 class LoadingSettings
 {
     public string $settingsClass;
 
-    /** @var array|\Spatie\LaravelSettings\Support\SettingsPropertyData[] */
-    public array $properties;
+    public SettingsPropertyDataCollection $properties;
 
-    public function __construct(string $settingsClass, array $properties)
+    public function __construct(string $settingsClass, SettingsPropertyDataCollection $properties)
     {
         $this->settingsClass = $settingsClass;
         $this->properties = $properties;

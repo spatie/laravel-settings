@@ -21,7 +21,7 @@ class SettingsContainer
         $this->getSettingClasses()->each(
             fn (string $settingClass) => $this->app->singleton(
                 $settingClass,
-                fn () => SettingsDecorator::create($settingClass)->load()
+                fn () => SettingsMapper::create($settingClass)->load()
             )
         );
     }

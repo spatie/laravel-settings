@@ -61,4 +61,42 @@ class SettingsBlueprintTest extends TestCase
 
         $this->assertDatabaseHasSetting('test.property', 'otherPayload');
     }
+
+    /** @test */
+    public function it_can_add_a_property_encrypted()
+    {
+        $this->blueprint->addEncrypted('property', 'payload');
+
+        $this->assertDatabaseHasEncryptedSetting('test.property', 'payload');
+    }
+
+    /** @test */
+    public function it_can_update_an_encrypted_property()
+    {
+        $this->blueprint->addEncrypted('property', 'payload');
+
+        $this->blueprint->updateEncrypted('property', fn () => 'otherPayload');
+
+        $this->assertDatabaseHasEncryptedSetting('test.property', 'otherPayload');
+    }
+
+    /** @test */
+    public function it_can_encrypt_a_setting()
+    {
+        $this->blueprint->add('property', 'payload');
+
+        $this->blueprint->encrypt('property');
+
+        $this->assertDatabaseHasEncryptedSetting('test.property', 'payload');
+    }
+
+    /** @test */
+    public function it_can_decrypt_a_setting()
+    {
+        $this->blueprint->addEncrypted('property', 'payload');
+
+        $this->blueprint->decrypt('property');
+
+        $this->assertDatabaseHasSetting('test.property', 'payload');
+    }
 }

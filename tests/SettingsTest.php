@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings\Tests;
 
 use Carbon\Carbon;
+use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Event;
@@ -14,8 +15,10 @@ use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
-use Spatie\LaravelSettings\SettingsDecorator;
+use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
@@ -58,7 +61,7 @@ class SettingsTest extends TestCase
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
-        $settings = SettingsDecorator::create(DummySettings::class)->load();
+        $settings = SettingsMapper::create(DummySettings::class)->load();
 
         $this->assertEquals('Ruben', $settings->string);
         $this->assertEquals(false, $settings->bool);
@@ -83,7 +86,7 @@ class SettingsTest extends TestCase
     {
         $this->expectException(MissingSettingsException::class);
 
-        SettingsDecorator::create(DummySettings::class)->load();
+        SettingsMapper::create(DummySettings::class)->load();
     }
 
     /** @test */
@@ -91,7 +94,7 @@ class SettingsTest extends TestCase
     {
         $this->expectException(Exception::class);
 
-        SettingsDecorator::create(DummyDto::class)->load();
+        SettingsMapper::create(DummyDto::class)->load();
     }
 
     /** @test */
@@ -123,7 +126,7 @@ class SettingsTest extends TestCase
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
-        $settings = SettingsDecorator::create(DummySettings::class)->load();
+        $settings = SettingsMapper::create(DummySettings::class)->load();
 
         $settings->fill([
             'string' => 'Brent',
@@ -215,7 +218,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        $settings = SettingsDecorator::create(DummySimpleSettings::class)->load();
+        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
 
         $settings->lock('description');
 
@@ -236,7 +239,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        $settings = SettingsDecorator::create(DummySimpleSettings::class)->load();
+        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
 
         $settings->fill([
             'name' => 'Nina Simone',
@@ -258,7 +261,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        SettingsDecorator::create(DummySimpleSettings::class)->load();
+        SettingsMapper::create(DummySimpleSettings::class)->load();
 
         Event::assertDispatched(LoadingSettings::class, function (LoadingSettings $event) {
             $this->assertEquals(DummySimpleSettings::class, $event->settingsClass);
@@ -278,7 +281,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        $settings = SettingsDecorator::create(DummySimpleSettings::class)->load();
+        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
 
         Event::assertDispatched(LoadedSettings::class, function (LoadedSettings $event) use ($settings) {
             $this->assertEquals($settings, $event->settings);
@@ -297,7 +300,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        $settings = SettingsDecorator::create(DummySimpleSettings::class)
+        $settings = SettingsMapper::create(DummySimpleSettings::class)
             ->load()
             ->save();
 
@@ -320,7 +323,7 @@ class SettingsTest extends TestCase
             $blueprint->add('description', 'Hello Dolly');
         });
 
-        $settings = SettingsDecorator::create(DummySimpleSettings::class)
+        $settings = SettingsMapper::create(DummySimpleSettings::class)
             ->load()
             ->save();
 
@@ -329,5 +332,55 @@ class SettingsTest extends TestCase
 
             return true;
         });
+    }
+
+    /** @test */
+    public function it_can_encrypt_settings()
+    {
+        $dateTime = new DateTime('16-05-1994 12:00:00');
+
+        $this->migrator->inGroup('dummy_encrypted', function (SettingsBlueprint $blueprint) use ($dateTime): void {
+            $blueprint->add('string', 'Hello', true);
+            $blueprint->add('nullable', null, true);
+            $blueprint->add('cast', $dateTime->format(DATE_ATOM), true);
+        });
+
+        $stringProperty = SettingsProperty::get('dummy_encrypted.string');
+        $this->assertNotEquals('Hello', $stringProperty);
+        $this->assertEquals('Hello', decrypt($stringProperty));
+
+        $nullableProperty = SettingsProperty::get('dummy_encrypted.nullable');
+        $this->assertNull($nullableProperty);
+
+        $castProperty = SettingsProperty::get('dummy_encrypted.cast');
+        $this->assertNotEquals($dateTime, $castProperty);
+        $this->assertEquals($dateTime->format(DATE_ATOM), decrypt($castProperty));
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings $settings */
+        $settings = SettingsMapper::create(DummyEncryptedSettings::class)->load();
+
+        $this->assertEquals('Hello', $settings->string);
+        $this->assertNull($settings->nullable);
+        $this->assertEquals($dateTime, $settings->cast);
+
+        $updatedDateTime = new DateTime('16-05-2020 12:00:00');
+
+        $settings->string = 'Is is it me you\'re looking for';
+        $settings->nullable = 'Not null anymore';
+        $settings->cast = $updatedDateTime;
+
+        $settings->save();
+
+        $stringProperty = SettingsProperty::get('dummy_encrypted.string');
+        $this->assertNotEquals('Is is it me you\'re looking for', $stringProperty);
+        $this->assertEquals('Is is it me you\'re looking for', decrypt($stringProperty));
+
+        $nullableProperty = SettingsProperty::get('dummy_encrypted.nullable');
+        $this->assertNotEquals('Not null anymore', $nullableProperty);
+        $this->assertEquals('Not null anymore', decrypt($nullableProperty));
+
+        $castProperty = SettingsProperty::get('dummy_encrypted.cast');
+        $this->assertNotEquals($updatedDateTime, $castProperty);
+        $this->assertEquals($updatedDateTime->format(DATE_ATOM), decrypt($castProperty));
     }
 }

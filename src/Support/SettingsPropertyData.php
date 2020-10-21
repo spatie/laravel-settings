@@ -18,7 +18,7 @@ class SettingsPropertyData
 
     private bool $nullable;
 
-    private bool $present;
+    private bool $encrypted;
 
     public function __construct(
         string $name,
@@ -26,14 +26,14 @@ class SettingsPropertyData
         ?SettingsCast $cast,
         bool $locked,
         bool $nullable,
-        bool $present
+        bool $encrypted
     ) {
         $this->name = $name;
         $this->payload = $payload;
         $this->cast = $cast;
         $this->locked = $locked;
         $this->nullable = $nullable;
-        $this->present = $present;
+        $this->encrypted = $encrypted;
     }
 
     public function getName(): string
@@ -41,7 +41,7 @@ class SettingsPropertyData
         return $this->name;
     }
 
-    public function getPayload()
+    public function getRawPayload()
     {
         return $this->payload;
     }
@@ -51,16 +51,17 @@ class SettingsPropertyData
         return $this->locked;
     }
 
-    public function isPresent(): bool
-    {
-        return $this->present;
-    }
-
     public function getValue()
     {
-        $value = $this->cast !== null
-            ? $this->cast->get($this->payload)
-            : $this->payload;
+        $value = $this->payload;
+
+        if ($this->encrypted) {
+            $value = Crypto::decrypt($value);
+        }
+
+        if($this->cast !== null){
+            $value = $this->cast->get($value);
+        }
 
         $this->ensureCorrectType($value);
 
@@ -73,15 +74,17 @@ class SettingsPropertyData
             return;
         }
 
-        $this->ensureCorrectType($value);
-
-        if ($this->cast === null || $value === null) {
-            $this->payload = $value;
-
-            return;
+        if($this->cast){
+            $value = $this->cast->set($value);
         }
 
-        $this->payload = $this->cast->set($value);
+        $this->ensureCorrectType($value);
+
+        if ($this->encrypted) {
+            $value = Crypto::encrypt($value);
+        }
+
+        $this->payload = $value;
     }
 
     private function ensureCorrectType($value)

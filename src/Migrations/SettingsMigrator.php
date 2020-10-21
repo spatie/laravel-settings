@@ -8,6 +8,7 @@ use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\Support\Crypto;
 
 class SettingsMigrator
 {
@@ -43,10 +44,14 @@ class SettingsMigrator
         $this->deleteProperty($from);
     }
 
-    public function add(string $property, $value): void
+    public function add(string $property, $value, bool $encrypted = false): void
     {
         if ($this->checkIfPropertyExists($property)) {
             throw SettingAlreadyExists::whenAdding($property);
+        }
+
+        if ($encrypted) {
+            $value = Crypto::encrypt($value);
         }
 
         $this->createProperty($property, $value);
@@ -61,16 +66,41 @@ class SettingsMigrator
         $this->deleteProperty($property);
     }
 
-    public function update(string $property, Closure $closure): void
+    public function update(string $property, Closure $closure, bool $encrypted = false): void
     {
         if (! $this->checkIfPropertyExists($property)) {
             throw SettingDoesNotExist::whenEditing($property);
         }
 
-        $this->updatePropertyPayload(
-            $property,
-            $closure($this->getPropertyPayload($property))
-        );
+        $originalPayload = $encrypted
+            ? Crypto::decrypt($this->getPropertyPayload($property))
+            : $this->getPropertyPayload($property);
+
+        $updatedPayload = $encrypted
+            ? Crypto::encrypt($closure($originalPayload))
+            : $closure($originalPayload);
+
+        $this->updatePropertyPayload($property, $updatedPayload);
+    }
+
+    public function addEncrypted(string $property, $value): void
+    {
+        $this->add($property, $value, true);
+    }
+
+    public function updateEncrypted(string $property, Closure $closure): void
+    {
+        $this->update($property, $closure, true);
+    }
+
+    public function encrypt(string $property): void
+    {
+        $this->update($property, fn($payload) => Crypto::encrypt($payload));
+    }
+
+    public function decrypt(string $property): void
+    {
+        $this->update($property, fn($payload) => Crypto::decrypt($payload));
     }
 
     public function inGroup(string $group, Closure $closure): void

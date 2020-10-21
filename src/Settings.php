@@ -23,6 +23,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         return [];
     }
 
+    public static function encrypted(): array
+    {
+        return [];
+    }
+
     public static function fake(array $values): self
     {
         $realProperties = SettingsRepositoryFactory::create(self::repository())->getPropertiesInGroup(static::group());
@@ -48,7 +53,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function save(): self
     {
-        return SettingsDecorator::create(static::class)->save($this);
+        return SettingsMapper::create(static::class)->save($this);
     }
 
     public function lock(string ...$properties)
@@ -72,7 +77,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $reflectionClass = new ReflectionClass(static::class);
 
         return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ])
             ->toArray();

@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\Tests;
 
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
@@ -24,6 +25,7 @@ class DiscoversSettingsTest extends TestCase
         $this->assertEqualsCanonicalizing([
             DummySimpleSettings::class,
             DummySettings::class,
+            DummyEncryptedSettings::class
         ], $discovered);
     }
 }

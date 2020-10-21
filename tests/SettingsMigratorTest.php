@@ -158,4 +158,42 @@ class SettingsMigratorTest extends TestCase
 
         $this->assertDatabaseHasSetting('test.a', 'Alpha');
     }
+
+    /** @test */
+    public function it_can_add_a_setting_encrypted()
+    {
+        $this->settingsMigrator->addEncrypted('compliance.enabled', true);
+
+        $this->assertDatabaseHasEncryptedSetting('compliance.enabled', true);
+    }
+
+    /** @test */
+    public function it_can_update_an_encrypted_setting()
+    {
+        $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
+
+        $this->settingsMigrator->updateEncrypted('user.name', fn (string $name) => 'Ruben Van Assche');
+
+        $this->assertDatabaseHasEncryptedSetting('user.name', 'Ruben Van Assche');
+    }
+
+    /** @test */
+    public function it_can_encrypt_a_setting()
+    {
+        $this->settingsMigrator->add('user.name', 'Brent Roose');
+
+        $this->settingsMigrator->encrypt('user.name');
+
+        $this->assertDatabaseHasEncryptedSetting('user.name', 'Brent Roose');
+    }
+
+    /** @test */
+    public function it_can_decrypt_a_setting()
+    {
+        $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
+
+        $this->settingsMigrator->decrypt('user.name');
+
+        $this->assertDatabaseHasSetting('user.name', 'Brent Roose');
+    }
 }

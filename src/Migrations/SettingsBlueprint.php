@@ -24,9 +24,9 @@ class SettingsBlueprint
         );
     }
 
-    public function add(string $name, $value): void
+    public function add(string $name, $value, bool $encrypted = false): void
     {
-        $this->migrator->add($this->prependWithGroup($name), $value);
+        $this->migrator->add($this->prependWithGroup($name), $value, $encrypted);
     }
 
     public function delete(string $name): void
@@ -34,9 +34,29 @@ class SettingsBlueprint
         $this->migrator->delete($this->prependWithGroup($name));
     }
 
-    public function update(string $name, Closure $closure): void
+    public function update(string $name, Closure $closure, bool $encrypted = false): void
     {
-        $this->migrator->update($this->prependWithGroup($name), $closure);
+        $this->migrator->update($this->prependWithGroup($name), $closure, $encrypted);
+    }
+
+    public function addEncrypted(string $name, $value): void
+    {
+        $this->migrator->addEncrypted($this->prependWithGroup($name), $value);
+    }
+
+    public function updateEncrypted(string $name, Closure $closure): void
+    {
+        $this->migrator->updateEncrypted($this->prependWithGroup($name), $closure);
+    }
+
+    public function encrypt(string $name): void
+    {
+        $this->migrator->encrypt($this->prependWithGroup($name));
+    }
+
+    public function decrypt(string $name): void
+    {
+        $this->migrator->decrypt($this->prependWithGroup($name));
     }
 
     private function prependWithGroup(string $name): string
