@@ -95,12 +95,12 @@ class SettingsMigrator
 
     public function encrypt(string $property): void
     {
-        $this->update($property, fn($payload) => Crypto::encrypt($payload));
+        $this->update($property, fn ($payload) => Crypto::encrypt($payload));
     }
 
     public function decrypt(string $property): void
     {
-        $this->update($property, fn($payload) => Crypto::decrypt($payload));
+        $this->update($property, fn ($payload) => Crypto::decrypt($payload));
     }
 
     public function inGroup(string $group, Closure $closure): void

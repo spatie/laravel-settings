@@ -59,7 +59,7 @@ class SettingsPropertyData
             $value = Crypto::decrypt($value);
         }
 
-        if($this->cast !== null){
+        if ($this->cast !== null) {
             $value = $this->cast->get($value);
         }
 
@@ -74,7 +74,7 @@ class SettingsPropertyData
             return;
         }
 
-        if($this->cast){
+        if ($this->cast) {
             $value = $this->cast->set($value);
         }
 

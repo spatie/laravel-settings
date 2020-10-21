@@ -25,7 +25,7 @@ class DiscoversSettingsTest extends TestCase
         $this->assertEqualsCanonicalizing([
             DummySimpleSettings::class,
             DummySettings::class,
-            DummyEncryptedSettings::class
+            DummyEncryptedSettings::class,
         ], $discovered);
     }
 }

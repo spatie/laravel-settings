@@ -27,10 +27,10 @@ class SettingsPropertyDataCollection extends DataTransferObjectCollection
 
         $reflectionProperties = array_filter(
             $reflectionProperties,
-            fn(ReflectionProperty $reflectionProperty) => array_key_exists($reflectionProperty->name, $properties)
+            fn (ReflectionProperty $reflectionProperty) => array_key_exists($reflectionProperty->name, $properties)
         );
 
-        $collection = array_map(fn(ReflectionProperty $reflectionProperty) => new SettingsPropertyData(
+        $collection = array_map(fn (ReflectionProperty $reflectionProperty) => new SettingsPropertyData(
             $name = $reflectionProperty->name,
             self::resolvePayload($name, $properties),
             self::resolveCast($reflectionProperty, $settingsClass::casts()),
