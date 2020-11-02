@@ -69,7 +69,7 @@ EOT;
         }
     }
 
-    protected function getPath($name, $path)
+    protected function getPath($name, $path): string
     {
         return $path . '/' . date('Y_m_d_His') . '_' . Str::snake($name) . '.php';
     }
