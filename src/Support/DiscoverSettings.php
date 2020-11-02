@@ -9,13 +9,13 @@ use Symfony\Component\Finder\Finder;
 
 class DiscoverSettings
 {
-    private array $directories = [];
+    protected array $directories = [];
 
-    private string $basePath = '';
+    protected string $basePath = '';
 
-    private string $rootNamespace = '';
+    protected string $rootNamespace = '';
 
-    private array $ignoredFiles = [];
+    protected array $ignoredFiles = [];
 
     public function __construct()
     {
@@ -66,7 +66,7 @@ class DiscoverSettings
             ->toArray();
     }
 
-    private function fullQualifiedClassNameFromFile(SplFileInfo $file): string
+    protected function fullQualifiedClassNameFromFile(SplFileInfo $file): string
     {
         $class = trim(Str::replaceFirst($this->basePath, '', $file->getRealPath()), DIRECTORY_SEPARATOR);
 

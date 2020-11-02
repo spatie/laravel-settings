@@ -52,7 +52,7 @@ class PropertyReflector
             : $type;
     }
 
-    private static function reflectDocblock(
+    protected static function reflectDocblock(
         ReflectionProperty $reflectionProperty,
         string $type
     ): Type {

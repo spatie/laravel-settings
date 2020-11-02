@@ -39,7 +39,7 @@ class SettingsCastFactory
      *
      * @return \Spatie\LaravelSettings\SettingsCasts\SettingsCast
      */
-    private static function createLocalCast(
+    protected static function createLocalCast(
         $castDefinition,
         ?Type $type
     ): SettingsCast {
@@ -62,7 +62,7 @@ class SettingsCastFactory
         return new $castClass(...$arguments);
     }
 
-    private static function createDefaultCast(
+    protected static function createDefaultCast(
         Type $type
     ): ?SettingsCast {
         if ($type instanceof AbstractList) {
@@ -88,14 +88,14 @@ class SettingsCastFactory
         return null;
     }
 
-    private static function shouldCast(string $type, string $base): bool
+    protected static function shouldCast(string $type, string $base): bool
     {
         return $type === $base
             || in_array($type, class_implements($base))
             || is_subclass_of($type, $base);
     }
 
-    private static function getLocalCastReflectedType(?Type $type): ?string
+    protected static function getLocalCastReflectedType(?Type $type): ?string
     {
         if ($type instanceof Object_) {
             return self::getObjectFqsen($type);
@@ -108,7 +108,7 @@ class SettingsCastFactory
         return null;
     }
 
-    private static function getObjectFqsen(Object_ $type): string
+    protected static function getObjectFqsen(Object_ $type): string
     {
         return ltrim((string ) $type->getFqsen(), '\\');
     }

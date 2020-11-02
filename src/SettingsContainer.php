@@ -9,7 +9,7 @@ use Spatie\LaravelSettings\Support\DiscoverSettings;
 
 class SettingsContainer
 {
-    private Application $app;
+    protected Application $app;
 
     public function __construct(Application $app)
     {
@@ -37,7 +37,7 @@ class SettingsContainer
         return collect($settings)->unique();
     }
 
-    private function discoverSettings(): array
+    protected function discoverSettings(): array
     {
         $cachedDiscoveredSettings = config('settings.cache_path') . '/settings.php';
 

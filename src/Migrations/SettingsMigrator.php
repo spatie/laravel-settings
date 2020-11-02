@@ -12,7 +12,7 @@ use Spatie\LaravelSettings\Support\Crypto;
 
 class SettingsMigrator
 {
-    private SettingsRepository $repository;
+    protected SettingsRepository $repository;
 
     public function __construct(SettingsRepository $connection)
     {
@@ -108,7 +108,7 @@ class SettingsMigrator
         $closure(new SettingsBlueprint($group, $this));
     }
 
-    private function getPropertyParts(string $property): array
+    protected function getPropertyParts(string $property): array
     {
         $propertyParts = explode('.', $property);
 
@@ -119,35 +119,35 @@ class SettingsMigrator
         return ['group' => $propertyParts[0], 'name' => $propertyParts[1]];
     }
 
-    private function checkIfPropertyExists(string $property): bool
+    protected function checkIfPropertyExists(string $property): bool
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         return $this->repository->checkIfPropertyExists($group, $name);
     }
 
-    private function getPropertyPayload(string $property)
+    protected function getPropertyPayload(string $property)
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         return $this->repository->getPropertyPayload($group, $name);
     }
 
-    private function createProperty(string $property, $payload): void
+    protected function createProperty(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         $this->repository->createProperty($group, $name, $payload);
     }
 
-    private function updatePropertyPayload(string $property, $payload): void
+    protected function updatePropertyPayload(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         $this->repository->updatePropertyPayload($group, $name, $payload);
     }
 
-    private function deleteProperty(string $property): void
+    protected function deleteProperty(string $property): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 

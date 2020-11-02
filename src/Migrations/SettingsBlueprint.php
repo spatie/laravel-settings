@@ -6,9 +6,9 @@ use Closure;
 
 class SettingsBlueprint
 {
-    private string $group;
+    protected string $group;
 
-    private SettingsMigrator $migrator;
+    protected SettingsMigrator $migrator;
 
     public function __construct(string $group, SettingsMigrator $migrator)
     {
@@ -59,7 +59,7 @@ class SettingsBlueprint
         $this->migrator->decrypt($this->prependWithGroup($name));
     }
 
-    private function prependWithGroup(string $name): string
+    protected function prependWithGroup(string $name): string
     {
         return "{$this->group}.{$name}";
     }

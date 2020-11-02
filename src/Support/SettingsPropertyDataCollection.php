@@ -42,27 +42,27 @@ class SettingsPropertyDataCollection extends DataTransferObjectCollection
         return new self($collection);
     }
 
-    private static function resolvePayload(string $name, array $properties)
+    protected static function resolvePayload(string $name, array $properties)
     {
         return $properties[$name] ?? null;
     }
 
-    private static function resolveCast(ReflectionProperty $reflectionProperty, array $localCasts): ?SettingsCast
+    protected static function resolveCast(ReflectionProperty $reflectionProperty, array $localCasts): ?SettingsCast
     {
         return SettingsCastFactory::resolve($reflectionProperty, $localCasts);
     }
 
-    private static function resolveIsLocked(string $name, array $lockedProperties): bool
+    protected static function resolveIsLocked(string $name, array $lockedProperties): bool
     {
         return in_array($name, $lockedProperties);
     }
 
-    private static function resolveIsNullable(ReflectionProperty $reflectionProperty): bool
+    protected static function resolveIsNullable(ReflectionProperty $reflectionProperty): bool
     {
         return $reflectionProperty->getType()->allowsNull();
     }
 
-    private static function resolveShouldBeEncrypted(string $name, array $encryptedProperties): bool
+    protected static function resolveShouldBeEncrypted(string $name, array $encryptedProperties): bool
     {
         return in_array($name, $encryptedProperties);
     }

@@ -6,7 +6,7 @@ use DateTimeZone;
 
 class DateTimeZoneCast implements SettingsCast
 {
-    private string $type;
+    protected string $type;
 
     public function __construct(?string $type)
     {

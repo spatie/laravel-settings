@@ -13,7 +13,7 @@ class MakeSettingsMigrationCommand extends Command
 
     protected $description = 'Create a new settings migration file';
 
-    private Filesystem $files;
+    protected Filesystem $files;
 
     public function __construct(Filesystem $files)
     {
@@ -36,7 +36,7 @@ class MakeSettingsMigrationCommand extends Command
         );
     }
 
-    private function getStub(): string
+    protected function getStub(): string
     {
         return <<<EOT
 <?php
@@ -54,7 +54,7 @@ class {{ class }} extends SettingsMigration
 EOT;
     }
 
-    private function ensureMigrationDoesntAlreadyExist($name, $migrationPath = null): void
+    protected function ensureMigrationDoesntAlreadyExist($name, $migrationPath = null): void
     {
         if (! empty($migrationPath)) {
             $migrationFiles = $this->files->glob($migrationPath . '/*.php');
@@ -69,7 +69,7 @@ EOT;
         }
     }
 
-    private function getPath($name, $path)
+    protected function getPath($name, $path)
     {
         return $path . '/' . date('Y_m_d_His') . '_' . Str::snake($name) . '.php';
     }

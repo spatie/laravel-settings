@@ -18,14 +18,14 @@ use Spatie\LaravelSettings\Support\SettingsPropertyDataCollection;
 class SettingsMapper
 {
     /** @var string|class-string */
-    private string $settingsClass;
+    protected string $settingsClass;
 
     /** @var array|\ReflectionProperty[] */
-    private array $reflectionProperties;
+    protected array $reflectionProperties;
 
-    private SettingsRepository $repository;
+    protected SettingsRepository $repository;
 
-    private SettingsPropertyDataCollection $properties;
+    protected SettingsPropertyDataCollection $properties;
 
     public static function create(string $settingsClass)
     {
@@ -94,7 +94,7 @@ class SettingsMapper
         return $settings;
     }
 
-    private function ensureNoMissingSettings(
+    protected function ensureNoMissingSettings(
         string $operation
     ): void {
         $requiredProperties = array_map(

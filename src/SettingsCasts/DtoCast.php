@@ -7,7 +7,7 @@ use Spatie\DataTransferObject\DataTransferObject;
 
 class DtoCast implements SettingsCast
 {
-    private string $type;
+    protected string $type;
 
     public function __construct(?string $type)
     {
@@ -29,7 +29,7 @@ class DtoCast implements SettingsCast
         return $payload->toArray();
     }
 
-    private function ensureDtoTypeExists(?string $type): string
+    protected function ensureDtoTypeExists(?string $type): string
     {
         if ($type === null) {
             throw new Exception('Cannot create a DTO cast because no DTO class was given');

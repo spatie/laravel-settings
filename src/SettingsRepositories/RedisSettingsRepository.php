@@ -7,9 +7,9 @@ use Illuminate\Redis\RedisManager;
 class RedisSettingsRepository implements SettingsRepository
 {
     /** @var \Redis */
-    private $connection;
+    protected $connection;
 
-    private string $prefix;
+    protected string $prefix;
 
     public function __construct(array $config, RedisManager $connection)
     {
@@ -70,7 +70,7 @@ class RedisSettingsRepository implements SettingsRepository
         return $this->connection->sMembers($this->getLocksSetKey($group));
     }
 
-    private function getLocksSetKey(string $group): string
+    protected function getLocksSetKey(string $group): string
     {
         return $this->prefix . 'locks.' . $group;
     }

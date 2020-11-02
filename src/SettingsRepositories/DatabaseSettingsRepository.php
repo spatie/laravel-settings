@@ -8,9 +8,9 @@ use Spatie\LaravelSettings\Models\SettingsProperty;
 class DatabaseSettingsRepository implements SettingsRepository
 {
     /** @var string|\Illuminate\Database\Eloquent\Model */
-    private string $propertyModel;
+    protected string $propertyModel;
 
-    private ?string $connection;
+    protected ?string $connection;
 
     public function __construct(array $config)
     {

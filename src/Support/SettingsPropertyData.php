@@ -7,18 +7,18 @@ use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
 
 class SettingsPropertyData
 {
-    private string $name;
+    protected string $name;
 
     /** @var mixed */
-    private $payload;
+    protected $payload;
 
-    private ?SettingsCast $cast;
+    protected ?SettingsCast $cast;
 
-    private bool $locked;
+    protected bool $locked;
 
-    private bool $nullable;
+    protected bool $nullable;
 
-    private bool $encrypted;
+    protected bool $encrypted;
 
     public function __construct(
         string $name,
@@ -87,7 +87,7 @@ class SettingsPropertyData
         $this->payload = $value;
     }
 
-    private function ensureCorrectType($value)
+    protected function ensureCorrectType($value)
     {
         if ($value === null && $this->nullable === false) {
             throw new Exception("Property {$this->name} cannot be null");
