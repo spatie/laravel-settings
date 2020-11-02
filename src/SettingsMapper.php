@@ -5,9 +5,9 @@ namespace Spatie\LaravelSettings;
 use Exception;
 use ReflectionClass;
 use ReflectionProperty;
-use Spatie\LaravelSettings\Events\LoadedSettings;
+use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\LoadingSettings;
-use Spatie\LaravelSettings\Events\SavedSettings;
+use Spatie\LaravelSettings\Events\SettingsSaved;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
@@ -62,7 +62,7 @@ class SettingsMapper
             $settings->{$property->getName()} = $property->getValue();
         }
 
-        event(new LoadedSettings($settings));
+        event(new SettingsLoaded($settings));
 
         return $settings;
     }
@@ -89,7 +89,7 @@ class SettingsMapper
             );
         }
 
-        event(new SavedSettings($settings));
+        event(new SettingsSaved($settings));
 
         return $settings;
     }

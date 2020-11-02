@@ -8,9 +8,9 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Event;
 use Exception;
-use Spatie\LaravelSettings\Events\LoadedSettings;
+use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\LoadingSettings;
-use Spatie\LaravelSettings\Events\SavedSettings;
+use Spatie\LaravelSettings\Events\SettingsSaved;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
@@ -274,7 +274,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_will_emit_an_event_when_loaded_settings()
     {
-        Event::fake([LoadedSettings::class]);
+        Event::fake([SettingsLoaded::class]);
 
         $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
             $blueprint->add('name', 'Louis Armstrong');
@@ -283,7 +283,7 @@ class SettingsTest extends TestCase
 
         $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
 
-        Event::assertDispatched(LoadedSettings::class, function (LoadedSettings $event) use ($settings) {
+        Event::assertDispatched(SettingsLoaded::class, function (SettingsLoaded $event) use ($settings) {
             $this->assertEquals($settings, $event->settings);
 
             return true;
@@ -316,7 +316,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_will_emit_an_event_when_saved_settings()
     {
-        Event::fake([SavedSettings::class]);
+        Event::fake([SettingsSaved::class]);
 
         $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
             $blueprint->add('name', 'Louis Armstrong');
@@ -327,7 +327,7 @@ class SettingsTest extends TestCase
             ->load()
             ->save();
 
-        Event::assertDispatched(SavedSettings::class, function (SavedSettings $event) use ($settings) {
+        Event::assertDispatched(SettingsSaved::class, function (SettingsSaved $event) use ($settings) {
             $this->assertEquals($settings, $event->settings);
 
             return true;

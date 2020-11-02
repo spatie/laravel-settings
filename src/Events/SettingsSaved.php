@@ -4,7 +4,7 @@ namespace Spatie\LaravelSettings\Events;
 
 use Spatie\LaravelSettings\Settings;
 
-class LoadedSettings
+class SettingsSaved
 {
     public Settings $settings;
 
