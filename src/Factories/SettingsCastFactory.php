@@ -77,11 +77,11 @@ class SettingsCastFactory
             return null;
         }
 
-        $fqsen = self::getObjectFqsen($type);
+        $className = self::getObjectClassName($type);
 
         foreach (config('settings.global_casts') as $base => $cast) {
-            if (self::shouldCast($fqsen, $base)) {
-                return new $cast($fqsen);
+            if (self::shouldCast($className, $base)) {
+                return new $cast($className);
             }
         }
 
@@ -98,7 +98,7 @@ class SettingsCastFactory
     protected static function getLocalCastReflectedType(?Type $type): ?string
     {
         if ($type instanceof Object_) {
-            return self::getObjectFqsen($type);
+            return self::getObjectClassName($type);
         }
 
         if ($type instanceof Nullable) {
@@ -108,7 +108,7 @@ class SettingsCastFactory
         return null;
     }
 
-    protected static function getObjectFqsen(Object_ $type): string
+    protected static function getObjectClassName(Object_ $type): string
     {
         return ltrim((string ) $type->getFqsen(), '\\');
     }
