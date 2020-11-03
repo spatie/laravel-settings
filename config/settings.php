@@ -3,7 +3,7 @@
 return [
 
     /*
-     * You can register all the settings DTO's here.
+     * You can register all the settings classes here.
      */
     'settings' => [
 
@@ -17,7 +17,7 @@ return [
     'migrations_path' => database_path('settings'),
 
     /*
-     * When no repository was set for a settings DTO, this repository will be
+     * When no repository was set for a settings class this repository will be
      * used for loading and saving settings.
      */
 
@@ -45,7 +45,7 @@ return [
     /*
      * When the package discovers a setting with a type other than the PHP built
      * in types, it should be cast. These casts will automatically cast types
-     * when they occur in a settings DTO.
+     * when they occur in a settings class.
      */
 
     'global_casts' => [
@@ -65,8 +65,9 @@ return [
 
     /*
      * When in production, it is advised to cache the automatically discovered
-     * and registered setting DTO's will be cached in this path.
+     * and registered setting classes will be cached in this path.
      */
 
     'cache_path' => storage_path('app/laravel-settings'),
 ];
+
