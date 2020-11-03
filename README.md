@@ -6,7 +6,7 @@
 [![GitHub Check and fix styling](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 
-This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings DTO as such:
+This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings class as such:
 
 ```php
 class GeneralSettings extends Settings
@@ -55,7 +55,7 @@ class GeneralSettingsController
 }
 ```
 
-Let's take a look at how to create your own settings DTO.
+Let's take a look at how to create your own settings classes.
 
 ## Support us
 
@@ -90,58 +90,38 @@ This is the contents of the published config file:
 
 ```php
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Settings
-    |--------------------------------------------------------------------------
-    |
-    | You can register all the settings DTO's here.
-    |
-    */
 
+    /*
+     * You can register all the settings classes here.
+     */
     'settings' => [
 
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Migrations path
-    |--------------------------------------------------------------------------
-    |
-    | When you create a new settings migration via the `make:settings-migration`
-    | command the package will store these migrations in this directory.
-    |
-    */
+     * When you create a new settings migration via the `make:settings-migration`
+     * command the package will store these migrations in this directory.
+     */
 
     'migrations_path' => database_path('settings'),
 
     /*
-    |--------------------------------------------------------------------------
-    | Default repository
-    |--------------------------------------------------------------------------
-    |
-    | When no repository was set for a settings DTO, this repository will be
-    | used for loading and saving settings.
-    |
-    */
+     * When no repository was set for a settings class this repository will be
+     * used for loading and saving settings.
+     */
 
     'default_repository' => 'database',
 
     /*
-    |--------------------------------------------------------------------------
-    | Repositories
-    |--------------------------------------------------------------------------
-    |
-    | Settings will be stored and loaded from these repositories. There are
-    | two types of repositories: database and Redis. But its always
-    | possible to create your specific types of repositories.
-    |
-    */
+     * Settings will be stored and loaded from these repositories. There are
+     * two types of repositories: database and Redis. But its always
+     * possible to create your specific types of repositories.
+     */
 
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
-            'model' => \Spatie\LaravelSettings\Models\SettingsProperty::class,
+            'model' => null,
             'connection' => null,
         ],
         'redis' => [
@@ -152,15 +132,10 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Global casts
-    |--------------------------------------------------------------------------
-    |
-    | When the package discovers a setting with a type other than the PHP built
-    | in types, it should be cast. These casts will automatically cast types
-    | when they occur in a settings DTO.
-    |
-    */
+     * When the package discovers a setting with a type other than the PHP built
+     * in types, it should be cast. These casts will automatically cast types
+     * when they occur in a settings class.
+     */
 
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
@@ -169,41 +144,32 @@ return [
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Auto discover setting
-    |--------------------------------------------------------------------------
-    |
-    | The package will look for settings in these paths and automatically
-    | register them.
-    |
-    */
+     * The package will look for settings in these paths and automatically
+     * register them.
+     */
 
     'auto_discover_settings' => [
         app()->path(),
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Cache path
-    |--------------------------------------------------------------------------
-    |
-    | When in production, it is advised to cache the automatically discovered
-    | and registered setting DTO's will be cached in this path.
-    |
-    */
+     * When in production, it is advised to cache the automatically discovered
+     * and registered setting classes will be cached in this path.
+     */
 
     'cache_path' => storage_path('app/laravel-settings'),
 ];
+
 
 ```
 
 ## Usage
 
-The package is built around setting DTO's. These are classes with some public properties that extend from `Settings`. They also have a static method `group` that should return a string.
+The package is built around settings classes which are classes public properties that extend from `Settings`. They also have a static method `group` that should return a string.
 
-You can create multiple groups of settings, each with their own DTO. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
+You can create multiple groups of settings, each with their own settings class. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
 
-Although it is possible to use the same group for different DTO's we advise you not to use the same group for multiple settings DTO's.
+Although it is possible to use the same group for different settings classes we advise you to give each settings class a unique group.
 
 
 ```php
@@ -220,45 +186,95 @@ class GeneralSettings extends Settings
 }
 ```
 
-Each property should be typed or partially typed by a docblock. More on that later.
-
-In the end, you will have to add this DTO to the `settings.php` config file in the `settings` section so it can be loaded by Laravel:
+Now, you will have to add this settings class to the `settings.php` config file in the `settings` array so it can be loaded by Laravel:
 
 ```php
-return [
     /*
-    |--------------------------------------------------------------------------
-    | Settings
-    |--------------------------------------------------------------------------
-    |
-    | You can register all the settings dto's here.
-    |
-    */
-
+     * You can register all the settings classes here.
+     */
     'settings' => [
         GeneralSettings::class
     ],
 ```
 
-It is also possible to auto-discover settings DTO's. The package will look through your application and tries to discover Settings DTO's. You can specify the paths where these settings will be searched in the config `auto_discover_settings` array. By default, this is the application's app path.
-
-Autodiscovering settings requires some extra time before your application is booted up. That's why it is possible to cache them using the following command:
+Each property in a settings class needs a default value that should be set in its migration, you can create a migration as such:
 
 ```bash
-php artisan settings:discover
+php artisan make:settings-migration CreateGeneralSettings
 ```
 
-You can clear this cache by running:
+This will create a new file in `database/settings` where you can add the properties and their default values:
+
+```php
+use Spatie\LaravelSettings\SettingsMigration;
+
+class CreateGeneralSettings extends SettingsMigration
+{
+    public function up(): void
+    {
+		$this->migrator->add('general.site_name', 'Spatie');
+		$this->migrator->add('general.site_active', true);
+    }
+}
+```
+
+We add the properties `site_name` and `site_active` here to the `general` group with values `Spatie` and `true`. We'll cover a lot more on migrations [later](https://github.com/spatie/laravel-settings#creating-settings-migrations).
+
+You should run the migration to add the properties to the database
 
 ```bash
-php artisan settings:clear-discovered
+php artisan migrate
+```
+
+In the `settings` table of your database these properties are added as such:
+
+| id | group   | name        | payload  | ... |
+|----|---------|-------------|----------|-----|
+| 1  | general | site_name   | "Spatie" | ... |
+| 2  | general | site_active | true     | ... |
+
+Now when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it in your application:
+
+```php
+class IndexController
+{
+    public function __invoke(GeneralSettings $settings){
+        return view('index', [
+            'site_name' => $settings->site_name,
+        ]);
+    }
+}
+```
+
+Or use it load it somewhere in your application as such:
+
+```php
+function getName(): string{
+	return app(GeneralSettings::class)->site_name
+}
+```
+
+Updating settings can be done by changing the public properties of a settings class and calling `save` on it in the end:
+
+```php
+class SettingsController
+{
+    public function __invoke(GeneralSettings $settings, GeneralSettingsRequest $request){
+        $settings->site_name = $request->input('site_name');
+        $settings->site_active = $request->boolean('site_active');
+        
+        $settings->save();
+        
+        return redirect()->back();
+    }
+}
 ```
 
 ### Selecting a repository
 
-Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
+Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have Two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
 
-You can explicitly set the repository of a settings DTO by implementing the `repository` method:
+You can explicitly set the repository of a settings class by implementing the `repository` method:
 
 ```php
 class GeneralSettings extends Settings
@@ -279,13 +295,13 @@ class GeneralSettings extends Settings
 }
 ```
 
-When a repository is not set for a settings DTO, the `default_repository` in the `settings.php` config file will be used.
+When a repository is not set for a settings class, the `default_repository` in the `settings.php` config file will be used. More information about the types of repositories and how they can be configured [here](https://github.com/spatie/laravel-settings#repostitories).
 
 ### Creating settings migrations
 
-Before you can load/update settings, you will have to migrate them. Though this might sound a bit strange at the beginning, it is quite logical. You want to have some default settings to start with when you're creating a new application. And what would happen if we change a settings DTO? Our code would change, but our data doesn't.
+Before you can load/update settings, you will have to migrate them. Though this might sound a bit strange at the beginning, it is quite logical. You want to have some default settings to start with when you're creating a new application. And what would happen if we change a property's name of a settings class? Our code would change, but our data doesn't.
 
-That's why the package requires migrations each time you're changing/creating the structure of your settings DTO. These migrations will run next to the regular Laravel database migrations, and we've added some tooling to write them as quickly as possible.
+That's why the package requires migrations each time you're changing/creating the structure of your settings classes. These migrations will run next to the regular Laravel database migrations, and we've added some tooling to write them as quickly as possible.
 
 Creating a settings migration works just like you would create a regular database migration. You can run the following command:
 
@@ -320,9 +336,9 @@ public function up(): void
 }
 ```
 
-Now we've added a `timezone` property to the `general` group, which is being used by the `GeneralSettings` DTO. You should always give a default value for a newly created setting. In this case, this is the `Europe/Brussels` timezone.
+Now we've added a `timezone` property to the `general` group, which is being used by `GeneralSettings`. You should always give a default value for a newly created setting. In this case, this is the `Europe/Brussels` timezone.
 
-If the property in the settings DTO is nullable, it's possible to give `null` as a default value.
+If the property in the settings class is nullable, it's possible to give `null` as a default value.
 
 #### Renaming a property
 
@@ -371,7 +387,7 @@ public function up(): void
 
 #### Operations in group
 
-When you're working on a big DTO with a lot of properties, it can be a bit cumbersome always to have to prepend the settings group. That's why you can also perform operations within a settings group:
+When you're working on a big settings class with a lot of properties, it can be a bit cumbersome always to have to prepend the settings group. That's why you can also perform operations within a settings group:
 
 ```php
 public function up(): void
@@ -390,7 +406,7 @@ public function up(): void
 
 ### Typing properties
 
-It is possible to create a settings DTO with regular PHP types:
+It is possible to create a settings class with regular PHP types:
 
 
 ```php
@@ -419,7 +435,7 @@ That's why you can specify casts within this package. There are two ways to defi
 
 #### Local casts
 
-Local casts work on one specific settings DTO's and should be defined for each property:
+Local casts work on one specific settings class and should be defined for each property:
 
 ```php
 class DateSettings extends Settings
@@ -488,7 +504,7 @@ class DateSettings extends Settings
 
 #### Global casts
 
-Local casts are great for defining types for specific properties of the settings DTO. But it's a lot of work to define a local cast for each regularly used type like a `DateTime`. Global casts try to simplify this process.
+Local casts are great for defining types for specific properties of the settings class. But it's a lot of work to define a local cast for each regularly used type like a `DateTime`. Global casts try to simplify this process.
 
 You can define global casts in the `global_casts` array of the package configuration. We've added some default casts to the configuration that can be handy:
 
@@ -506,7 +522,7 @@ You can define global casts in the `global_casts` array of the package configura
  - a type that implements an interface (`DateTimeInterface::class`)
  - a type that extends from another class (`DataTransferObject::class`)
  
-In your settings DTO, when you use a `DateTime` property (which implements `DateTimeInterface`), you no longer have to define local casts:
+In your settings class, when you use a `DateTime` property (which implements `DateTimeInterface`), you no longer have to define local casts:
 
 ```php
 class DateSettings extends Settings
@@ -520,7 +536,7 @@ class DateSettings extends Settings
 }
 ```
 
-The package will automatically find the cast and will use it to transform types between the settings DTO and repository.
+The package will automatically find the cast and will use it to transform types between the settings class and repository.
 
 #### Typing properties
 
@@ -602,9 +618,9 @@ $dateSettings->unlock('birth_date', 'name', 'email');
 
 ### Encrypting properties
 
-Some properties in your settings DTO can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
+Some properties in your settings class can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
 
-Adding encryption to properties of your settings DTO can be done as such. By adding the `encrypted` static method to your settings DTO and list all the properties that should be encrypted:
+Adding encryption to properties of your settings class can be done as such. By adding the `encrypted` static method to your settings class and list all the properties that should be encrypted:
 
 ```php
 class GeneralSettings extends Settings
@@ -676,9 +692,9 @@ public function up(): void
 
 Of course, you can use these methods when using `inGroup` migration operations.
 
-### Faking settings DTO's
+### Faking settings classes
 
-In tests, it is sometimes desired that some settings DTO's can be quickly used with values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings DTO's will be registered in the container. And you can overwrite some or all the properties in the settings DTO:
+In tests, it is sometimes desired that some settings classes can be quickly used with values that are different from default ones you've written in your migrations. That's why you can fake settings. Faked settings classes will be registered in the container. And you can overwrite some or all the properties in the settings class:
 
 ```php
 DateSettings::fake([
@@ -686,8 +702,114 @@ DateSettings::fake([
 ]);
 ```
 
-Now, when the `DateSettings` DTO is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
+Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
 
+### Auto discovering settings classes
+
+Each settings class you create should be added to the `settings` array within the `settings.php` config file. When you've got a lot of settings this can be quickly forgotten.
+
+That's why it is also possible to auto-discover settings classes. The package will look through your application and tries to discover settings classes. You can specify the paths where will be searched in the config `auto_discover_settings` array. By default, this is the application's app path.
+
+Autodiscovering settings requires some extra time before your application is booted up. That's why it is possible to cache them using the following command:
+
+```bash
+php artisan settings:discover
+```
+
+You can clear this cache by running:
+
+```bash
+php artisan settings:clear-discovered
+```
+
+### Repostitories
+
+There are two types of repositories included in the package, the `redis` and `database` repository. You can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
+
+#### Database repository
+
+The database repository has two optional configuration options:
+
+- `model` the Eloquent model used to load/save properties to the database
+- `connection` the connection to use when interacting with the database
+
+It will save each property from a settings class as a different single row with following columns:
+
+- group
+- name
+- locked: a boolean indicating wether the property is locked or not
+- payload: a json representation of the value
+
+#### Redis repository
+
+The Redis repository also has two optional configuration options:
+
+- `prefix` an optional prefix that will be prepended to the keys
+- `connection` the connection to use when interacting with Redis
+
+The Redis repository will store the properties of a settings class as a hash with the key `{{ group }}`. For There will also be a set for each group which contains the locked properties with key `locks.{{ group }}`.
+
+For the `general` group these keys would be `general` and `locks.general`. When the prefix is set to, for example, `spatie`. Then the keys would be `spatie.general` and `spatie.locks.general`.
+
+#### Creating your own repository type
+
+It is possible to create your own types of repositories. A repository is a class which implements `SettingsRepository`:
+
+```php
+interface SettingsRepository
+{
+    /**
+     * Get all the properties in the repository for a single group
+     */
+    public function getPropertiesInGroup(string $group): array;
+
+    /**
+     * Check if a property exists in a group
+     */
+    public function checkIfPropertyExists(string $group, string $name): bool;
+
+    /**
+     * Get the payload of a property
+     */
+    public function getPropertyPayload(string $group, string $name);
+
+    /**
+     * Create a property within a group with a payload
+     */
+    public function createProperty(string $group, string $name, $payload): void;
+
+    /**
+     * Update the payload of a property within a group
+     */
+    public function updatePropertyPayload(string $group, string $name, $value): void;
+
+    /**
+     * Delete a property from a group
+     */
+    public function deleteProperty(string $group, string $name): void;
+
+    /**
+     * Lock a set of properties for a specific group
+     */
+    public function lockProperties(string $group, array $properties): void;
+
+    /**
+     * Unlock a set of properties for a group
+     */
+    public function unlockProperties(string $group, array $properties): void;
+
+    /**
+     * Get all the locked properties within a group
+     */
+    public function getLockedProperties(string $group): array;
+}
+```
+
+All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`). Within the `database`, and `redis` repository types, These raw values are converted to JSON. But this is not required. 
+
+It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
+
+Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
 
 ### Writing your own casters
 
@@ -698,12 +820,12 @@ interface SettingsCast
 {
     /**
      * Will be used to when retrieving a value from the repository, and
-     * inserting it into the settings DTO.
+     * inserting it into the settings class.
      */
     public function get($payload);
 
     /**
-     * Will be used to when retrieving a value from the settings DTO, and
+     * Will be used to when retrieving a value from the settings class, and
      * inserting it into the repository.
      */
     public function set($payload);
@@ -816,7 +938,7 @@ class CastSettings extends Settings
 }
 ```
 
-Although in this case, it might be more readable to construct the caster within the settings DTO:
+Although in this case, it might be more readable to construct the caster within the settings class:
 
 ```php
 class CastSettings extends Settings
@@ -852,88 +974,10 @@ A good example here is the `DateTimeInterfaceCast` we've added by default in the
     ...
 ```
 
-Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings DTO. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
+Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime` or `DateTimeImmutable` type as the type of one of the properties of a settings class. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
 
-The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings DTO. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
+The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
 
-
-### Repostitories
-
-There are two types of repositories included in the package, the `redis` and `database` repository. You can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
-
-#### Database repository
-
-The database repository has two optional configuration options:
-
-- `model` the Eloquent model used to load/save properties to the database
-- `connection` the connection to use when interacting with the database
-
-#### Redis repository
-
-The Redis repository also has two optional configuration options:
-
-- `prefix` an optional prefix that will be prepended to the keys
-- `connection` the connection to use when interacting with Redis
-
-#### Creating your own repository type
-
-It is possible to create your own types of repositories. A repository is a class which implements `SettingsRepository`:
-
-```php
-interface SettingsRepository
-{
-    /**
-     * Get all the properties in the repository for a single group
-     */
-    public function getPropertiesInGroup(string $group): array;
-
-    /**
-     * Check if a property exists in a group
-     */
-    public function checkIfPropertyExists(string $group, string $name): bool;
-
-    /**
-     * Get the payload of a property
-     */
-    public function getPropertyPayload(string $group, string $name);
-
-    /**
-     * Create a property within a group with a payload
-     */
-    public function createProperty(string $group, string $name, $payload): void;
-
-    /**
-     * Update the payload of a property within a group
-     */
-    public function updatePropertyPayload(string $group, string $name, $value): void;
-
-    /**
-     * Delete a property from a group
-     */
-    public function deleteProperty(string $group, string $name): void;
-
-    /**
-     * Lock a set of properties for a specific group
-     */
-    public function lockProperties(string $group, array $properties): void;
-
-    /**
-     * Unlock a set of properties for a group
-     */
-    public function unlockProperties(string $group, array $properties): void;
-
-    /**
-     * Get all the locked properties within a group
-     */
-    public function getLockedProperties(string $group): array;
-}
-```
-
-All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`). Within the `database`, and `redis` repository types, These raw values are converted to JSON. But this is not required. 
-
-It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
-
-Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
 
 ## Testing
 
