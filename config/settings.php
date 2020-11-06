@@ -13,14 +13,12 @@ return [
      * When you create a new settings migration via the `make:settings-migration`
      * command the package will store these migrations in this directory.
      */
-
     'migrations_path' => database_path('settings'),
 
     /*
      * When no repository was set for a settings class this repository will be
      * used for loading and saving settings.
      */
-
     'default_repository' => 'database',
 
     /*
@@ -28,7 +26,6 @@ return [
      * two types of repositories: database and Redis. But its always
      * possible to create your specific types of repositories.
      */
-
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
@@ -47,7 +44,6 @@ return [
      * in types, it should be cast. These casts will automatically cast types
      * when they occur in a settings class.
      */
-
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
@@ -58,7 +54,6 @@ return [
      * The package will look for settings in these paths and automatically
      * register them.
      */
-
     'auto_discover_settings' => [
         app()->path(),
     ],
@@ -67,7 +62,5 @@ return [
      * When in production, it is advised to cache the automatically discovered
      * and registered setting classes will be cached in this path.
      */
-
     'cache_path' => storage_path('app/laravel-settings'),
 ];
-

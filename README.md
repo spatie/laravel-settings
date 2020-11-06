@@ -102,14 +102,12 @@ return [
      * When you create a new settings migration via the `make:settings-migration`
      * command the package will store these migrations in this directory.
      */
-
     'migrations_path' => database_path('settings'),
 
     /*
      * When no repository was set for a settings class this repository will be
      * used for loading and saving settings.
      */
-
     'default_repository' => 'database',
 
     /*
@@ -117,7 +115,6 @@ return [
      * two types of repositories: database and Redis. But its always
      * possible to create your specific types of repositories.
      */
-
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
@@ -136,7 +133,6 @@ return [
      * in types, it should be cast. These casts will automatically cast types
      * when they occur in a settings class.
      */
-
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
@@ -147,7 +143,6 @@ return [
      * The package will look for settings in these paths and automatically
      * register them.
      */
-
     'auto_discover_settings' => [
         app()->path(),
     ],
@@ -156,7 +151,6 @@ return [
      * When in production, it is advised to cache the automatically discovered
      * and registered setting classes will be cached in this path.
      */
-
     'cache_path' => storage_path('app/laravel-settings'),
 ];
 
@@ -165,7 +159,7 @@ return [
 
 ## Usage
 
-The package is built around settings classes which are classes public properties that extend from `Settings`. They also have a static method `group` that should return a string.
+The package is built around settings classes wit public properties that will store the settings. Each settings class extends from `Settings` and also has a static method `group` that should return a string uniquely grouping settings.
 
 You can create multiple groups of settings, each with their own settings class. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
 
@@ -220,7 +214,7 @@ class CreateGeneralSettings extends SettingsMigration
 
 We add the properties `site_name` and `site_active` here to the `general` group with values `Spatie` and `true`. We'll cover a lot more on migrations [later](https://github.com/spatie/laravel-settings#creating-settings-migrations).
 
-You should run the migration to add the properties to the database
+You should run the migration to add the properties to the database:
 
 ```bash
 php artisan migrate
@@ -233,7 +227,7 @@ In the `settings` table of your database these properties are added as such:
 | 1  | general | site_name   | "Spatie" | ... |
 | 2  | general | site_active | true     | ... |
 
-Now when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it in your application:
+Now when you want to use the `site_name` property of the `GeneralSettings` class, you can inject it in your application. For example, in a constructor:
 
 ```php
 class IndexController
@@ -246,7 +240,7 @@ class IndexController
 }
 ```
 
-Or use it load it somewhere in your application as such:
+Or load it somewhere in your application as such:
 
 ```php
 function getName(): string{
@@ -254,7 +248,7 @@ function getName(): string{
 }
 ```
 
-Updating settings can be done by changing the public properties of a settings class and calling `save` on it in the end:
+Updating settings can be done by changing the public property values of a settings class and calling `save` on it to persist them:
 
 ```php
 class SettingsController
@@ -272,7 +266,7 @@ class SettingsController
 
 ### Selecting a repository
 
-Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have Two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
+Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
 
 You can explicitly set the repository of a settings class by implementing the `repository` method:
 
@@ -301,7 +295,7 @@ When a repository is not set for a settings class, the `default_repository` in t
 
 Before you can load/update settings, you will have to migrate them. Though this might sound a bit strange at the beginning, it is quite logical. You want to have some default settings to start with when you're creating a new application. And what would happen if we change a property's name of a settings class? Our code would change, but our data doesn't.
 
-That's why the package requires migrations each time you're changing/creating the structure of your settings classes. These migrations will run next to the regular Laravel database migrations, and we've added some tooling to write them as quickly as possible.
+That's why the package requires migrations each time you're changing the properties of your settings class or create a new settings class. These migrations will run next to the regular Laravel database migrations, and we've added some tooling to write them as quickly as possible.
 
 Creating a settings migration works just like you would create a regular database migration. You can run the following command:
 
@@ -323,7 +317,7 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method, but this can be added if required. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
+By default there isn't a `down` method in the migration, but this can be added if required. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
@@ -332,13 +326,13 @@ You can add a property to a settings group as such:
 ```php
 public function up(): void
 {
-    $this->migrator->add('general.timezone', 'Europe/Brussels');
+    $this->migrator->add('general.site_name', 'Spatie');
 }
 ```
 
-Now we've added a `timezone` property to the `general` group, which is being used by `GeneralSettings`. You should always give a default value for a newly created setting. In this case, this is the `Europe/Brussels` timezone.
+This will add a `site_name` property to the `general` group, which is being used by `GeneralSettings`. You should always give a default value for a newly created setting. In this case, we will call the site name: `Spatie`.
 
-If the property in the settings class is nullable, it's possible to give `null` as a default value.
+If the property in the settings class is nullable, it's possible to give `null` as a default value. But, do not forget to make the corresponding property in the settings class also nullable.
 
 #### Renaming a property
 
@@ -347,7 +341,7 @@ It is possible to rename a property:
 ```php
 public function up(): void
 {
-    $this->migrator->rename('general.timezone', 'general.local_timezone');
+    $this->migrator->rename('general.site_name', 'general.name');
 }
 ```
 
@@ -356,7 +350,7 @@ You can also move a property to another group:
 ```php
 public function up(): void
 {
-    $this->migrator->rename('general.timezone', 'country.timezone');
+    $this->migrator->rename('general.site_name', 'site.name');
 }
 ```
 
@@ -368,8 +362,8 @@ It is possible to update the contents of a property:
 public function up(): void
 {
     $this->migrator->update(
-        'general.timezone', 
-        fn(string $timezone) => return 'America/New_York'
+        'general.site_name', 
+        fn(string $site_name) => return strtolower($site_name)
     );
 }
 ```
@@ -381,7 +375,7 @@ As you can see, this method takes a closure as an argument, which makes it possi
 ```php
 public function up(): void
 {
-    $this->migrator->delete('general.timezone');
+    $this->migrator->delete('general.site_name');
 }
 ```
 
@@ -401,6 +395,22 @@ public function up(): void
         
         $blueprint->delete('timezone');
     });
+}
+```
+
+#### Migrating multiple repositories
+
+These migrations will run on the `default_repository` in the `settings.php` config file. It is possible to change the repository they run on like this:
+
+```php
+public function up(): void
+{
+    $this->migrator->repository('redis');
+
+    $this->migrator->add('general.site_name', 'Spatie');
+    $this->migrator->rename('general.site_name', 'site.name');
+    
+    // ...
 }
 ```
 
@@ -429,7 +439,7 @@ class RegularTypeSettings extends Settings
 }
 ```
 
-Internally the package will convert these types to JSON and save them as such in the repository. But what about types like `DateTime` and `Carbon` or your own created types? Although these types can be converted to JSON, building them back up again from JSON isn't supported.
+Internally the package will convert the values of these types to JSON and save them as such in a repository. But what about types like `DateTime` and `Carbon` or your own created types? Although some of these these types can be converted to JSON, constructing them again from JSON when they're loaded isn't supported.
 
 That's why you can specify casts within this package. There are two ways to define these casts: locally or globally.
 
@@ -459,7 +469,6 @@ class DateSettings extends Settings
 The `DateTimeInterfaceCast` can be used for properties with types like `DateTime`, `DateTimeImmutable`, `Carbon` and `CarbonImmutable`. You can also use an already constructed cast. It becomes handy when you need to pass some extra arguments to the cast:
 
 
-
 ```php
 class DateSettings extends Settings
 {
@@ -473,13 +482,13 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => new DateTimeInterfaceWithTimeZoneCast(DateTime::class, 'Europe/Brussels')
+            'bith_date' => new DateTimeInterfaceWithTimeZoneCast(DateTimeImmutable::class)
         ];
     }
 }
 ```
 
-As you can see, we provide `DateTime::class` to the cast, so it knows what type of `DateTime` it should use because the `birth_date` property was not typed, and the cast couldn't infer the type to use.
+As you can see, we provide `DateTimeImmutable::class` to the cast, so it knows what type of `DateTime` it should use because the `birth_date` property was not typed, and the cast couldn't infer the type to use.
 
 You can also provide arguments to a cast without constructing it:
 
@@ -496,7 +505,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
+            'bith_date' => DateTimeInterfaceCast::class.':'. DateTimeImmutable::class
         ];
     }
 }
@@ -536,9 +545,9 @@ class DateSettings extends Settings
 }
 ```
 
-The package will automatically find the cast and will use it to transform types between the settings class and repository.
+It is also possible to create your own casters, you can read more about that [here](https://github.com/spatie/laravel-settings#writing-your-own-casters).
 
-#### Typing properties
+#### Using types
 
 There are quite a few options to type properties. You could type them in PHP:
 
@@ -602,7 +611,7 @@ When you want to disable the ability to update the value of a setting, you can a
 $dateSettings->lock('birth_date');
 ```
 
-It is now impossible to update the value of `birth_date`. When trying to overwrite `birthdate` and saving settings, the package will load the old value of `birthdate` from the repository and it looks like nothing happened.
+It is now impossible to update the value of `birth_date`. When trying to overwrite `birth_date` and saving settings, the package will load the old value of `birth_date ` from the repository and it looks like nothing happened.
 
 You can also lock multiple settings at once:
 
@@ -620,7 +629,7 @@ $dateSettings->unlock('birth_date', 'name', 'email');
 
 Some properties in your settings class can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
 
-Adding encryption to properties of your settings class can be done as such. By adding the `encrypted` static method to your settings class and list all the properties that should be encrypted:
+Adding encryption to properties can be done by adding the `encrypted` static method to your settings class and list all the properties that should be encrypted:
 
 ```php
 class GeneralSettings extends Settings
@@ -642,6 +651,8 @@ class GeneralSettings extends Settings
     }
 }
 ```
+
+The default values for each settings class you create should now also be encrypted from the beginning. Let's take a look on how to do that.
 
 #### Using encryption in migrations
 
@@ -668,7 +679,7 @@ public function up(): void
 }
 ```
 
-You can make a non-encrypted property encrypted in a migration:
+Whenever you want to change a non-encrypted property to an encrypted property or vice versa you should change the data in a migration. You can make a non-encrypted property encrypted as such:
 
 ```php
 public function up(): void
@@ -702,7 +713,7 @@ DateSettings::fake([
 ]);
 ```
 
-Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
+Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`. Properties not overwritten by the `fake` method will have the default value created in the migrations.
 
 ### Auto discovering settings classes
 
@@ -710,7 +721,7 @@ Each settings class you create should be added to the `settings` array within th
 
 That's why it is also possible to auto-discover settings classes. The package will look through your application and tries to discover settings classes. You can specify the paths where will be searched in the config `auto_discover_settings` array. By default, this is the application's app path.
 
-Autodiscovering settings requires some extra time before your application is booted up. That's why it is possible to cache them using the following command:
+Autodiscovering settings requires some extra miliseconds before your application is booted up. That's why it is possible to cache them using the following command:
 
 ```bash
 php artisan settings:discover
@@ -724,7 +735,7 @@ php artisan settings:clear-discovered
 
 ### Repostitories
 
-There are two types of repositories included in the package, the `redis` and `database` repository. You can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
+There are two types of repositories included in the package, the `redis` and `database` repository. Let's take a closer look at these types.
 
 #### Database repository
 
@@ -735,10 +746,10 @@ The database repository has two optional configuration options:
 
 It will save each property from a settings class as a different single row with following columns:
 
-- group
-- name
-- locked: a boolean indicating wether the property is locked or not
-- payload: a json representation of the value
+- `group`
+- `name`
+- `locked`: a boolean indicating wether the property is locked or not
+- `payload`: a JSON representation of the value
 
 #### Redis repository
 
@@ -747,7 +758,7 @@ The Redis repository also has two optional configuration options:
 - `prefix` an optional prefix that will be prepended to the keys
 - `connection` the connection to use when interacting with Redis
 
-The Redis repository will store the properties of a settings class as a hash with the key `{{ group }}`. For There will also be a set for each group which contains the locked properties with key `locks.{{ group }}`.
+The Redis repository will store the properties of a settings class as a hash with the key `{{ group }}`. There will also be a set for each group which contains the locked properties with key `locks.{{ group }}`.
 
 For the `general` group these keys would be `general` and `locks.general`. When the prefix is set to, for example, `spatie`. Then the keys would be `spatie.general` and `spatie.locks.general`.
 
@@ -832,7 +843,7 @@ interface SettingsCast
 }
 ```
 
-A created caster can be used for local and global casts, but there are slight differences between them. The package will always try to inject the type of property it is casting. This is an FQSEN and will be provided as a first argument when constructing the caster. When it cannot deduce the type, `null will be used as first argument.
+A caster can be used for local and global casts, but there are slight differences between them. The package will always try to inject the type of property it is casting. This is a string(the name of the class + namespace) and will be provided as a first argument when constructing the caster. When it cannot deduce the type, `null` will be used as first argument.
 
 An example of such caster with a type injected is a simplified `DtoCast`:
 
@@ -864,9 +875,9 @@ The above is a caster for the [spatie/data-transfer-object](https://github.com/s
 
 When using a local cast, there are a few different possibilities to deduce the type:
 
-```php
-// By the type of property
+By the type of property:
 
+```php
 class CastSettings extends Settings 
 {
     public DateTime $birth_date;
@@ -882,9 +893,9 @@ class CastSettings extends Settings
 }
 ```
 
-```php
-// By the docblock of a property
+By the docblock of a property:
 
+```php
 class CastSettings extends Settings
 {
     /** @var \DateTime  */
@@ -901,9 +912,9 @@ class CastSettings extends Settings
 }
 ```
 
+By explicit definition:
 
 ```php
-// By explicit definition
 
 class CastSettings extends Settings
 {
