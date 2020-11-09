@@ -484,7 +484,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => new DateTimeInterfaceWithTimeZoneCast(DateTimeImmutable::class)
+            'birth_date' => new DateTimeInterfaceWithTimeZoneCast(DateTimeImmutable::class)
         ];
     }
 }
@@ -507,7 +507,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class.':'. DateTimeImmutable::class
+            'birth_date' => DateTimeInterfaceCast::class.':'. DateTimeImmutable::class
         ];
     }
 }
@@ -887,7 +887,7 @@ class CastSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class
+            'birth_date' => DateTimeInterfaceCast::class
         ];
     }
     
@@ -906,7 +906,7 @@ class CastSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class
+            'birth_date' => DateTimeInterfaceCast::class
         ];
     }
     
@@ -925,7 +925,7 @@ class CastSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class.':'.DateTime::class
+            'birth_date' => DateTimeInterfaceCast::class.':'.DateTime::class
         ];
     }
     
@@ -943,7 +943,7 @@ class CastSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
+            'birth_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
         ];
     }
     
@@ -961,7 +961,7 @@ class CastSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
+            'birth_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
         ];
     }
     
