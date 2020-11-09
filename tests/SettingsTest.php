@@ -349,15 +349,15 @@ class SettingsTest extends TestCase
 
         $updatedDateTime = new DateTime('16-05-2020 12:00:00');
 
-        $settings->string = 'Is is it me you\'re looking for';
+        $settings->string = "Is is it me you're looking for";
         $settings->nullable = 'Not null anymore';
         $settings->cast = $updatedDateTime;
 
         $settings->save();
 
         $stringProperty = SettingsProperty::get('dummy_encrypted.string');
-        $this->assertNotEquals('Is is it me you\'re looking for', $stringProperty);
-        $this->assertEquals('Is is it me you\'re looking for', decrypt($stringProperty));
+        $this->assertNotEquals("Is is it me you're looking for", $stringProperty);
+        $this->assertEquals("Is is it me you're looking for", decrypt($stringProperty));
 
         $nullableProperty = SettingsProperty::get('dummy_encrypted.nullable');
         $this->assertNotEquals('Not null anymore', $nullableProperty);
