@@ -210,8 +210,8 @@ class CreateGeneralSettings extends SettingsMigration
 {
     public function up(): void
     {
-		$this->migrator->add('general.site_name', 'Spatie');
-		$this->migrator->add('general.site_active', true);
+        $this->migrator->add('general.site_name', 'Spatie');
+        $this->migrator->add('general.site_active', true);
     }
 }
 ```
@@ -241,7 +241,7 @@ Or use it load it somewhere in your application as such:
 
 ```php
 function getName(): string{
-	return app(GeneralSettings::class)->site_name
+    return app(GeneralSettings::class)->site_name;
 }
 ```
 
