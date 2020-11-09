@@ -19,7 +19,9 @@ class SavingSettings
         Settings $settings
     ) {
         $this->settingsClass = $settingsClass;
+
         $this->properties = $properties;
+
         $this->settings = $settings;
     }
 }

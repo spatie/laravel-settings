@@ -13,6 +13,7 @@ class LoadingSettings
     public function __construct(string $settingsClass, SettingsPropertyDataCollection $properties)
     {
         $this->settingsClass = $settingsClass;
+
         $this->properties = $properties;
     }
 }

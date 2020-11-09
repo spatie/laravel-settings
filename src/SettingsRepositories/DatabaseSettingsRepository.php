@@ -15,6 +15,7 @@ class DatabaseSettingsRepository implements SettingsRepository
     public function __construct(array $config)
     {
         $this->propertyModel = $config['model'] ?? SettingsProperty::class;
+
         $this->connection = $config['connection'] ?? null;
     }
 

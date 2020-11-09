@@ -13,6 +13,7 @@ class SettingsBlueprint
     public function __construct(string $group, SettingsMigrator $migrator)
     {
         $this->group = $group;
+
         $this->migrator = $migrator;
     }
 

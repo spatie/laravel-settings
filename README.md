@@ -515,7 +515,7 @@ class DateSettings extends Settings
 
 #### Global casts
 
-Local casts are great for defining types for specific properties of the settings class. But it's a lot of work to define a local cast for each regularly used type like a `DateTime`. Global casts try to simplify this process.
+Local casts are great for defining types for specific properties of the settings class. It's a lot of work to define a local cast for each regularly used type like a `DateTime`. Global casts try to simplify this process.
 
 You can define global casts in the `global_casts` array of the package configuration. We've added some default casts to the configuration that can be handy:
 
@@ -658,7 +658,7 @@ The default values for each settings class you create should now also be encrypt
 
 #### Using encryption in migrations
 
-Creating and updating encrypted properties in migrations work a little bit differently than non-encrypted properties.
+Creating and updating encrypted properties in migrations work differently than non-encrypted properties.
 
 Instead of calling the `add` method to create a new property, you should use the `addEncrypted` method:
 
