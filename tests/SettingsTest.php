@@ -51,10 +51,7 @@ class SettingsTest extends TestCase
                 ['name' => 'Seb'],
                 ['name' => 'Adriaan'],
             ]);
-//            $blueprint->add('dto_collection', [
-//                ['name' => 'Seb'],
-//                ['name' => 'Adriaan'],
-//            ]);
+
             $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
             $blueprint->add('carbon', $carbon->toAtomString());
             $blueprint->add('nullable_date_time_zone', null);
@@ -73,10 +70,6 @@ class SettingsTest extends TestCase
             new DummyDto(['name' => 'Seb']),
             new DummyDto(['name' => 'Adriaan']),
         ], $settings->dto_array);
-//        $this->assertEquals([
-//            new DummyDto(['name' => 'Seb']),
-//            new DummyDto(['name' => 'Adriaan']),
-//        ], $settings->dto_collection);
         $this->assertEquals($dateTime, $settings->date_time);
         $this->assertEquals($carbon, $settings->carbon);
     }
@@ -159,10 +152,6 @@ class SettingsTest extends TestCase
             ['name' => 'Wouter'],
             ['name' => 'Jef'],
         ]);
-//        $this->assertDatabaseHasSetting('dummy.dto_collection', [
-//            ['name' => 'Wouter'],
-//            ['name' => 'Jef'],
-//        ]);
         $this->assertEquals($dateTime, $settings->date_time);
         $this->assertEquals($carbon, $settings->carbon);
         $this->assertNull($settings->nullable_date_time_zone);
@@ -180,11 +169,6 @@ class SettingsTest extends TestCase
             'array' => ['Bono', 'Adam', 'The Edge'],
             'nullable_string' => null,
             'dto' => new DummyDto(['name' => 'Rias']),
-//            'dto' => ['name' => 'Rias'],
-//            'dto_collection' => [
-//                ['name' => 'Wouter'],
-//                ['name' => 'Jef'],
-//            ],
             'date_time' => new DateTimeImmutable(),
             'carbon' => Carbon::now(),
         ]);
