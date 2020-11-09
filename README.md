@@ -6,9 +6,11 @@
 [![GitHub Check and fix styling](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 
-This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings class as such:
+This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings class like this one:
 
 ```php
+use Spatie\LaravelSettings\Settings;
+
 class GeneralSettings extends Settings
 {
     public string $site_name;
@@ -157,7 +159,7 @@ return [
 
 ## Usage
 
-The package is built around settings classes wit public properties that will store the settings. Each settings class extends from `Settings` and also has a static method `group` that should return a string uniquely grouping settings.
+The package is built around settings classes with public properties responsable for storing the settings. Each settings class extends from `Spatie\LaravelSettings\Settings`. They have a static method `group` that should return a string uniquely grouping settings.
 
 You can create multiple groups of settings, each with their own settings class. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
 
@@ -165,6 +167,8 @@ Although it is possible to use the same group for different settings classes we 
 
 
 ```php
+use Spatie\LaravelSettings\Settings;
+
 class GeneralSettings extends Settings
 {
     public string $site_name;
@@ -189,7 +193,7 @@ Now, you will have to add this settings class to the `settings.php` config file 
     ],
 ```
 
-Each property in a settings class needs a default value that should be set in its migration, you can create a migration as such:
+Each property in a settings class needs a default value that should be set in its migration, you can create a migration using this command:
 
 ```bash
 php artisan make:settings-migration CreateGeneralSettings
@@ -218,7 +222,7 @@ You should run the migration to add the properties to the database:
 php artisan migrate
 ```
 
-In the `settings` table of your database these properties are added as such:
+In the `settings` table of your database these properties are added:
 
 | id | group   | name        | payload  | ... |
 |----|---------|-------------|----------|-----|
@@ -238,7 +242,7 @@ class IndexController
 }
 ```
 
-Or load it somewhere in your application as such:
+Or load it somewhere in your application:
 
 ```php
 function getName(): string{
@@ -319,7 +323,7 @@ By default there isn't a `down` method in the migration, but this can be added i
 
 #### Adding a property
 
-You can add a property to a settings group as such:
+You can add a property to a settings group:
 
 ```php
 public function up(): void
@@ -437,7 +441,7 @@ class RegularTypeSettings extends Settings
 }
 ```
 
-Internally the package will convert the values of these types to JSON and save them as such in a repository. But what about types like `DateTime` and `Carbon` or your own created types? Although some of these these types can be converted to JSON, constructing them again from JSON when they're loaded isn't supported.
+Internally, the package will convert the values of these types to JSON and save them in a repository. But what about types like `DateTime` and `Carbon` or your own created types? Although some of these these types can be converted to JSON, constructing them again from JSON when they're loaded isn't supported.
 
 That's why you can specify casts within this package. There are two ways to define these casts: locally or globally.
 
@@ -617,7 +621,7 @@ You can also lock multiple settings at once:
 $dateSettings->lock('birth_date', 'name', 'email');
 ```
 
-Unlocking settings can be done as such:
+Unlocking settings can be done like this:
 
 ```php
 $dateSettings->unlock('birth_date', 'name', 'email');
@@ -971,7 +975,7 @@ When using global casts, the package will again try to deduce the type of proper
 
 A global cast should be configured in the `settings.php` config file and always has a specific (set) of type(s) it works on. These types can be a particular class, a group of classes implementing an interface, or a group of classes extending from another class.
 
-A good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config as such:
+A good example here is the `DateTimeInterfaceCast` we've added by default in the config. It is defined in the config:
 
 ```php
     ...
