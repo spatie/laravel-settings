@@ -462,7 +462,7 @@ class DateSettings extends Settings
     public static function casts(): array
     {
         return [
-            'bith_date' => DateTimeInterfaceCast::class
+            'birth_date' => DateTimeInterfaceCast::class
         ];
     }
 }
