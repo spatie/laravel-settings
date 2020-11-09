@@ -12,7 +12,7 @@ use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
-use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
@@ -77,7 +77,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_will_fail_loading_when_settings_are_missing(): void
     {
-        $this->expectException(MissingSettingsException::class);
+        $this->expectException(MissingSettings::class);
 
         SettingsMapper::create(DummySettings::class)->load();
     }
@@ -160,7 +160,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_cannot_save_settings_that_do_not_exist(): void
     {
-        $this->expectException(MissingSettingsException::class);
+        $this->expectException(MissingSettings::class);
 
         $settings = new DummySettings([
             'string' => 'Brent',

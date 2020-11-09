@@ -9,7 +9,7 @@ use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
-use Spatie\LaravelSettings\Exceptions\MissingSettingsException;
+use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 use Spatie\LaravelSettings\Support\SettingsPropertyData;
@@ -110,7 +110,7 @@ class SettingsMapper
         $missingSettings = array_diff($requiredProperties, $availableProperties);
 
         if (! empty($missingSettings)) {
-            throw MissingSettingsException::create($this->settingsClass, $missingSettings, $operation);
+            throw MissingSettings::create($this->settingsClass, $missingSettings, $operation);
         }
     }
 }

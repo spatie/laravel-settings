@@ -4,7 +4,7 @@ namespace Spatie\LaravelSettings\Exceptions;
 
 use Exception;
 
-class MissingSettingsException extends Exception
+class MissingSettings extends Exception
 {
     public static function create(string $settingsClass, array $missingProperties, string $operation): self
     {
