@@ -36,7 +36,7 @@ class GeneralSettingsController
 }
 ```
 
-You can update settings as such:
+Here's how you can update the settings
 
 ```php
 class GeneralSettingsController
@@ -55,8 +55,6 @@ class GeneralSettingsController
 }
 ```
 
-Let's take a look at how to create your own settings classes.
-
 ## Support us
 
 [![Image](https://github-ads.s3.eu-central-1.amazonaws.com/laravel-settings.jpg)](https://spatie.be/github-ad-click/laravel-settings)
@@ -67,7 +65,7 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via Composer:
 
 ```bash
 composer require spatie/laravel-settings
