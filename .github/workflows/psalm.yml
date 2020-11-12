@@ -5,6 +5,7 @@ on:
         paths:
             - '**.php'
             - 'psalm.xml'
+            - '.github/workflows/psalm.yml'
 
 jobs:
     psalm:
@@ -30,4 +31,4 @@ jobs:
               run: composer install -n --prefer-dist
 
             - name: Run psalm
-              run: ./vendor/bin/psalm -c psalm.xml
+              run: ./vendor/bin/psalm -c psalm.xml --show-info=true
