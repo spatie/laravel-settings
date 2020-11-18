@@ -29,6 +29,8 @@ class MakeSettingsMigrationCommand extends Command
         $path = config('settings.migrations_path');
 
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
+        
+        $this->files->ensureDirectoryExists($path);
 
         $this->files->put(
             $this->getPath($name, $path),
