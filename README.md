@@ -206,7 +206,7 @@ php artisan make:settings-migration CreateGeneralSettings
 This command will create a new file in `database/settings` where you can add the properties and their default values:
 
 ```php
-use Spatie\LaravelSettings\SettingsMigration;
+use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
 class CreateGeneralSettings extends SettingsMigration
 {
@@ -305,7 +305,7 @@ php artisan make:settings-migration CreateGeneralSettings
 This will add a migration to the `application/database/settings` directory:
 
 ```php
-use Spatie\LaravelSettings\SettingsMigration;
+use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
 class CreateGeneralSettings extends SettingsMigration
 {
