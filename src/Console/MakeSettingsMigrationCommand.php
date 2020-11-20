@@ -29,7 +29,7 @@ class MakeSettingsMigrationCommand extends Command
         $path = config('settings.migrations_path');
 
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
-        
+
         $this->files->ensureDirectoryExists($path);
 
         $this->files->put(
@@ -43,7 +43,7 @@ class MakeSettingsMigrationCommand extends Command
         return <<<EOT
 <?php
 
-use Spatie\LaravelSettings\SettingsMigration;
+use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
 class {{ class }} extends SettingsMigration
 {
