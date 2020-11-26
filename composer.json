@@ -19,16 +19,18 @@
         "php": "^7.4|^8.0",
         "ext-json": "*",
         "illuminate/database": "^7.0|^8.0",
+        "doctrine/dbal" : "^2.12",
         "phpdocumentor/type-resolver": "^1.4",
         "spatie/data-transfer-object": "^2.0",
         "spatie/temporary-directory": "^1.2"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0",
+        "orchestra/testbench": "^5.0|^6.0",
+        "mockery/mockery" : "^1.4",
         "phpunit/phpunit": "^9.1",
-        "psalm/plugin-laravel": "^1.2",
+        "psalm/plugin-laravel": "^1.4",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^4.00",
+        "vimeo/psalm": "^4.2",
         "ext-redis" : "*"
     },
     "autoload": {
