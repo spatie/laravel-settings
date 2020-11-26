@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 1.0.3 2020-11-26
+
+-  add PHP 8 support
+
 ## 1.0.2 - 2020-11-26
 
 - fix package namespace within migrations (#9)
