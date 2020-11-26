@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "ext-json": "*",
         "illuminate/database": "^7.0|^8.0",
         "phpdocumentor/type-resolver": "^1.4",
@@ -24,12 +24,12 @@
         "spatie/temporary-directory": "^1.2"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.16",
         "orchestra/testbench": "^5.0",
         "phpunit/phpunit": "^9.1",
         "psalm/plugin-laravel": "^1.2",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^4.00"
+        "vimeo/psalm": "^4.00",
+        "ext-redis" : "*"
     },
     "autoload": {
         "psr-4": {
@@ -44,8 +44,7 @@
     "scripts": {
         "psalm": "vendor/bin/psalm",
         "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
-        "format": "vendor/bin/php-cs-fixer fix --allow-risky=yes"
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
         "sort-packages": true
