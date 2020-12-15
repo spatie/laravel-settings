@@ -1,4 +1,4 @@
-# Store strongly typed application settings
+****# Store strongly typed application settings
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-settings/run-tests?label=tests)](https://github.com/spatie/laravel-settings/actions?query=workflow%3Arun-tests+branch%3Amaster)
@@ -12,9 +12,9 @@ This package allows you to store settings in a repository (database, Redis, ...)
 class GeneralSettings extends Settings
 {
     public string $site_name;
-    
+
     public bool $site_active;
-    
+
     public static function group(): string
     {
         return 'general';
@@ -30,7 +30,7 @@ class GeneralSettingsController
     public function show(GeneralSettings $settings){
         return view('settings.show', [
             'site_name' => $settings->site_name,
-            'site_active' => $settings->site_active    
+            'site_active' => $settings->site_active
         ]);
     }
 }
@@ -47,9 +47,9 @@ class GeneralSettingsController
     ){
         $settings->site_name = $request->input('site_name');
         $settings->site_active = $request->input('site_active');
-        
+
         $settings->save();
-        
+
         return redirect()->back();
     }
 }
@@ -176,9 +176,9 @@ Although it is possible to use the same group for different settings classes, we
 class GeneralSettings extends Settings
 {
     public string $site_name;
-    
+
     public bool $site_active;
-    
+
     public static function group(): string
     {
         return 'general';
@@ -255,9 +255,9 @@ class SettingsController
     public function __invoke(GeneralSettings $settings, GeneralSettingsRequest $request){
         $settings->site_name = $request->input('site_name');
         $settings->site_active = $request->boolean('site_active');
-        
+
         $settings->save();
-        
+
         return redirect()->back();
     }
 }
@@ -273,14 +273,14 @@ You can explicitly set the repository of a settings class by implementing the `r
 class GeneralSettings extends Settings
 {
     public string $site_name;
-    
+
     public bool $site_active;
-    
+
     public static function group(): string
     {
         return 'general';
     }
-    
+
     public static function repository(): ?string
     {
         return 'global_settings';
@@ -361,7 +361,7 @@ It is possible to update the contents of a property:
 public function up(): void
 {
     $this->migrator->update(
-        'general.timezone', 
+        'general.timezone',
         fn(string $timezone) => return 'America/New_York'
     );
 }
@@ -387,11 +387,11 @@ public function up(): void
 {
     $this->settingsMigrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
         $blueprint->add('timzone', 'Europe/Brussels');
-        
+
         $blueprint->rename('timezone', 'local_timezone');
-        
+
         $blueprint->update('timezone', fn(string $timezone) => return 'America/New_York');
-        
+
         $blueprint->delete('timezone');
     });
 }
@@ -406,15 +406,15 @@ It is possible to create a settings class with regular PHP types:
 class RegularTypeSettings extends Settings
 {
     public string $a_string;
-    
+
     public bool $a_bool;
-    
+
     public int $an_int;
-    
+
     public float $a_float;
-    
+
     public array $an_array;
-    
+
     public static function group(): string
     {
         return 'regular_ype';
@@ -434,12 +434,12 @@ Local casts work on one specific settings class and should be defined for each p
 class DateSettings extends Settings
 {
     public DateTime $birth_date;
-    
+
     public static function group(): string
     {
         return 'date';
     }
-    
+
     public static function casts(): array
     {
         return [
@@ -457,12 +457,12 @@ The `DateTimeInterfaceCast` can be used for properties with types like `DateTime
 class DateSettings extends Settings
 {
     public $birth_date;
-    
+
     public static function group(): string
     {
         return 'date';
     }
-    
+
     public static function casts(): array
     {
         return [
@@ -480,12 +480,12 @@ You can also provide arguments to a cast without constructing it:
 class DateSettings extends Settings
 {
     public $birth_date;
-    
+
     public static function group(): string
     {
         return 'date';
     }
-    
+
     public static function casts(): array
     {
         return [
@@ -510,18 +510,18 @@ You can define global casts in the `global_casts` array of the package configura
 ```
 
  A global cast can work on:
- 
+
  - a specific type (`DateTimeZone::class`)
  - a type that implements an interface (`DateTimeInterface::class`)
  - a type that extends from another class (`DataTransferObject::class`)
- 
+
 In your settings class, when you use a `DateTime` property (which implements `DateTimeInterface`), you no longer have to define local casts:
 
 ```php
 class DateSettings extends Settings
 {
     public DateTime $birth_date;
-    
+
     public static function group(): string
     {
         return 'date';
@@ -539,9 +539,9 @@ There are quite a few options to type properties. You could type them in PHP:
 class DateSettings extends Settings
 {
     public DateTime $birth_date;
-    
+
     public ?int $a_nullable_int;
-    
+
     public static function group(): string
     {
         return 'date';
@@ -556,10 +556,10 @@ class DateSettings extends Settings
 {
     /** @var \DateTime  */
     public $birth_date;
-    
+
     /** @var ?int  */
     public $a_nullable_int;
-    
+
     public static function group(): string
     {
         return 'date';
@@ -574,7 +574,7 @@ class DateSettings extends Settings
 {
     /** @var array<\DateTime>  */
     public array $birth_dates;
-    
+
     // OR
 
     /** @var \DateTime[]  */
@@ -619,14 +619,14 @@ Adding encryption to the properties of your settings class can be done as such. 
 class GeneralSettings extends Settings
 {
     public string $site_name;
-    
+
     public bool $site_active;
-    
+
     public static function group(): string
     {
         return 'general';
     }
-    
+
     public static function encrypted(): array
     {
         return [
@@ -655,7 +655,7 @@ The same goes for the `update` method, which should be replaced by `updateEncryp
 public function up(): void
 {
     $this->migrator->updateEncrypted(
-        'general.site_name', 
+        'general.site_name',
         fn(string $siteName) => return 'Space'
     );
 }
@@ -771,17 +771,17 @@ When using a local cast, there are a few different possibilities to deduce the t
 ```php
 // By the type of property
 
-class CastSettings extends Settings 
+class CastSettings extends Settings
 {
     public DateTime $birth_date;
-    
+
     public static function casts(): array
     {
         return [
             'birth_date' => DateTimeInterfaceCast::class
         ];
     }
-    
+
     ...
 }
 ```
@@ -793,14 +793,14 @@ class CastSettings extends Settings
 {
     /** @var \DateTime  */
     public $birth_date;
-    
+
     public static function casts(): array
     {
         return [
             'birth_date' => DateTimeInterfaceCast::class
         ];
     }
-    
+
     ...
 }
 ```
@@ -812,14 +812,14 @@ class CastSettings extends Settings
 class CastSettings extends Settings
 {
     public $birth_date;
-    
+
     public static function casts(): array
     {
         return [
             'birth_date' => DateTimeInterfaceCast::class.':'.DateTime::class
         ];
     }
-    
+
     ...
 }
 ```
@@ -830,14 +830,14 @@ In that last case: by explicit definition, it is possible to provide extra argum
 class CastSettings extends Settings
 {
     public $birth_date;
-    
+
     public static function casts(): array
     {
         return [
             'birth_date' => DateTimeWthTimeZoneInterfaceCast::class.':'.DateTime::class.',Europe/Brussels'
         ];
     }
-    
+
     ...
 }
 ```
@@ -848,14 +848,14 @@ Although in this case, it might be more readable to construct the caster within 
 class CastSettings extends Settings
 {
     public $birth_date;
-    
+
     public static function casts(): array
     {
         return [
             'birth_date' => new DateTimeWthTimeZoneInterfaceCast(DateTime::class, 'Europe/Brussels')
         ];
     }
-    
+
     ...
 }
 ```
@@ -874,13 +874,13 @@ A good example here is the `DateTimeInterfaceCast` we've added by default in the
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
     ],
-    
+
     ...
 ```
 
 Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime`, or `DateTimeImmutable` type as the type of one of a settings class's properties. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
 
-The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
+The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type.
 
 
 ### Repostitories
@@ -955,11 +955,43 @@ interface SettingsRepository
 }
 ```
 
-All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`). Within the `database`, and `redis` repository types, These raw values are converted to JSON. But this is not required. 
+All these functions should be implemented to interact with the type of storage you're using. The `payload` parameters are raw values(`int`, `bool`, `float`, `string`, `array`). Within the `database`, and `redis` repository types, These raw values are converted to JSON. But this is not required.
 
 It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
 
 Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
+
+## Helper functions
+
+### setting()
+
+Get setting value from setting class, example:
+
+```php
+$app_name = setting('general', 'app_name');
+
+//with fallback (optional)
+$app_name = setting('general', 'app_name', 'fallback_value');
+```
+
+### setting_update()
+
+Update setting value in setting class, example:
+
+```php
+// @returns GeneralSettings
+$generalClass = setting_update('general', 'app_name', 'My website');
+```
+
+You may update multiple keys too, example:
+
+```php
+// @returns GeneralSettings
+$generalClass = setting_update('general', [
+    'app_name' => 'My website'
+    'colors' => ['red', 'orange']
+]);
+```
 
 ## Testing
 
@@ -987,4 +1019,3 @@ If you discover any security related issues, please email freek@spatie.be instea
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
