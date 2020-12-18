@@ -417,7 +417,7 @@ class RegularTypeSettings extends Settings
     
     public static function group(): string
     {
-        return 'regular_ype';
+        return 'regular_type';
     }
 }
 ```
