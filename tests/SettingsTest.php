@@ -213,6 +213,7 @@ class SettingsTest extends TestCase
 
         $this->assertEquals('Nina Simone', $settings->name);
         $this->assertEquals('Hello Dolly', $settings->description);
+        $this->assertEquals(['description'], $settings->getLockedProperties());
     }
 
     /** @test */

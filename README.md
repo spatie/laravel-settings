@@ -603,6 +603,12 @@ You can also lock multiple settings at once:
 $dateSettings->lock('birth_date', 'name', 'email');
 ```
 
+You can get all the locked settings:
+
+```php
+$dateSettings->getLockedProperties(); // ['birth_date']
+```
+
 Unlocking settings can be done as such:
 
 ```php

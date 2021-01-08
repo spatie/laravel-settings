@@ -72,12 +72,19 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         );
     }
 
+    public function getLockedProperties(): array
+    {
+        return SettingsRepositoryFactory::create(self::repository())->getLockedProperties(
+            static::group()
+        );
+    }
+
     public function toArray(): array
     {
         $reflectionClass = new ReflectionClass(static::class);
 
         return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ])
             ->toArray();
