@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 1.0.5 - 2020-01-29
+
+-  bump the `doctrine/dbal` dependency
+
 ## 1.0.4 - 2020-01-08
 
 -  add support for getting the locked settings

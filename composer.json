@@ -19,7 +19,7 @@
         "php": "^7.4|^8.0",
         "ext-json": "*",
         "illuminate/database": "^7.0|^8.0",
-        "doctrine/dbal" : "^2.12",
+        "doctrine/dbal" : "^2.6|^3",
         "phpdocumentor/type-resolver": "^1.4",
         "spatie/data-transfer-object": "^2.0",
         "spatie/temporary-directory": "^1.2"
