@@ -40,6 +40,6 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
         $this->app->singleton(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
 
-        resolve(SettingsContainer::class)->registerBindings();
+        app(SettingsContainer::class)->registerBindings();
     }
 }
