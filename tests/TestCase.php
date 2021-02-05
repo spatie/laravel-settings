@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use DB;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;

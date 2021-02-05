@@ -2,7 +2,6 @@
 
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
-use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 
 class CreateFakeSettings extends SettingsMigration
 {
