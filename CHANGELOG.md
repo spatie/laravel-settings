@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
-## 1.0.6 - 2020-01-29
+## 1.0.6 - 2020-02-05
 
 -  add support for restoring settings after a Laravel schema:dump
 
