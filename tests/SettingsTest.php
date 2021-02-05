@@ -6,8 +6,10 @@ use Carbon\Carbon;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use DB;
 use Event;
 use Exception;
+use Illuminate\Database\Events\SchemaLoaded;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
@@ -367,5 +369,26 @@ class SettingsTest extends TestCase
         $castProperty = SettingsProperty::get('dummy_encrypted.cast');
         $this->assertNotEquals($updatedDateTime, $castProperty);
         $this->assertEquals($updatedDateTime->format(DATE_ATOM), decrypt($castProperty));
+    }
+
+    /** @test */
+    public function it_will_remigrate_when_the_schema_was_dumped()
+    {
+        config()->set('settings.migrations_path', __DIR__ . '/Migrations');
+
+        $this->loadMigrationsFrom(__DIR__ . '/Migrations');
+
+        $this
+            ->assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_settings'])
+            ->assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
+
+        event(new SchemaLoaded(
+            DB::connection(),
+            'fake-path'
+        ));
+
+        $this
+            ->assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings'])
+            ->assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
     }
 }

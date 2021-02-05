@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use DB;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
@@ -10,27 +11,25 @@ use Spatie\LaravelSettings\Support\Crypto;
 
 class TestCase extends BaseTestCase
 {
+    public function defineEnvironment($app)
+    {
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('app.key', 'base64:yDt5+GiUDRGNCFMLd5L9L7/dIc3wg/7ZmNhNVZEL8SA=');
+    }
+
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->artisan('migrate', ['--database' => 'testing']);
+
+        include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
+        (new \CreateSettingsTable())->up();
+    }
+
     protected function getPackageProviders($app)
     {
         return [
             LaravelSettingsServiceProvider::class,
         ];
-    }
-
-    public function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('database.default', 'sqlite');
-        $app['config']->set('database.connections.sqlite', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
-        $app['config']->set('app.key', 'base64:yDt5+GiUDRGNCFMLd5L9L7/dIc3wg/7ZmNhNVZEL8SA=');
-
-
-        include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
-        (new \CreateSettingsTable())->up();
     }
 
     protected function assertDatabaseHasSetting(string $property, $value): void
