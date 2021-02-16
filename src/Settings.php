@@ -5,12 +5,20 @@ namespace Spatie\LaravelSettings;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
-use ReflectionClass;
+use Illuminate\Support\Collection;
 use ReflectionProperty;
-use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
+use Spatie\LaravelSettings\Events\SavingSettings;
+use Spatie\LaravelSettings\Events\SettingsLoaded;
+use Spatie\LaravelSettings\Events\SettingsSaved;
 
 abstract class Settings implements Arrayable, Jsonable, Responsable
 {
+    private SettingsMapper $mapper;
+
+    private SettingsConfig $config;
+
+    private bool $loaded = false;
+
     abstract public static function group(): string;
 
     public static function repository(): ?string
@@ -30,19 +38,63 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public static function fake(array $values): self
     {
-        $realProperties = SettingsRepositoryFactory::create(self::repository())->getPropertiesInGroup(static::group());
+        $settingsMapper = resolve(SettingsMapper::class);
+
+        $propertiesToLoad = $settingsMapper->initialize(static::class)
+            ->getReflectedProperties()
+            ->keys()
+            ->reject(fn(string $name) => array_key_exists($name, $values));
+
+        $mergedValues = $settingsMapper
+            ->fetchProperties(static::class, $propertiesToLoad)
+            ->merge($values)
+            ->toArray();
 
         return app()->instance(static::class, new static(
-            array_merge($realProperties, $values)
+            $settingsMapper,
+            $mergedValues
         ));
     }
 
-    public function __construct(array $properties = [])
+    public function __construct(SettingsMapper $mapper, array $values = [])
     {
-        $this->fill($properties);
+        $this->mapper = $mapper;
+        $this->config = $mapper->initialize(static::class);
+
+        foreach ($this->config->getReflectedProperties()->keys() as $name) {
+            unset($this->{$name});
+        }
+
+        if ($values) {
+            $this->loadValues($values);
+        }
     }
 
-    public function fill(array $properties): self
+    public function __get($name)
+    {
+        $this->loadValues();
+
+        return $this->{$name};
+    }
+
+    public function __set($name, $value)
+    {
+        $this->loadValues();
+
+        $this->{$name} = $value;
+    }
+
+    public function __debugInfo()
+    {
+        $this->loadValues();
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection|array $properties
+     *
+     * @return $this
+     */
+    public function fill($properties): self
     {
         foreach ($properties as $name => $payload) {
             $this->{$name} = $payload;
@@ -53,41 +105,43 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function save(): self
     {
-        return SettingsMapper::create(static::class)->save($this);
+        $properties = $this->toCollection();
+
+        event(new SavingSettings($properties, $this));
+
+        $this->fill($this->mapper->save(static::class, $properties));
+
+        event(new SettingsSaved($this));
+
+        return $this;
     }
 
     public function lock(string ...$properties)
     {
-        SettingsRepositoryFactory::create(self::repository())->lockProperties(
-            static::group(),
-            $properties
-        );
+        $this->config->lock(...$properties);
     }
 
     public function unlock(string ...$properties)
     {
-        SettingsRepositoryFactory::create(self::repository())->unlockProperties(
-            static::group(),
-            $properties
-        );
+        $this->config->unlock(...$properties);
     }
 
     public function getLockedProperties(): array
     {
-        return SettingsRepositoryFactory::create(self::repository())->getLockedProperties(
-            static::group()
-        );
+        return $this->config->getLocked()->toArray();
+    }
+
+    public function toCollection(): Collection
+    {
+        return $this->config->getReflectedProperties()
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
+                $property->getName() => $this->{$property->getName()},
+            ]);
     }
 
     public function toArray(): array
     {
-        $reflectionClass = new ReflectionClass(static::class);
-
-        return collect($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
-                $property->getName() => $this->{$property->getName()},
-            ])
-            ->toArray();
+        return $this->toCollection()->toArray();
     }
 
     public function toJson($options = 0): string
@@ -98,5 +152,21 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
     public function toResponse($request)
     {
         return response()->json($this->toJson());
+    }
+
+    private function loadValues(?array $values = null): self
+    {
+        if ($this->loaded) {
+            return $this;
+        }
+
+        $values ??= $this->mapper->load(static::class);
+
+        $this->loaded = true;
+        $this->fill($values);
+
+        event(new SettingsLoaded($this));
+
+        return $this;
     }
 }

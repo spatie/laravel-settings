@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Events;
 
+use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\Support\SettingsPropertyDataCollection;
 
@@ -9,17 +10,12 @@ class SavingSettings
 {
     public Settings $settings;
 
-    public string $settingsClass;
-
-    public SettingsPropertyDataCollection $properties;
+    public Collection $properties;
 
     public function __construct(
-        string $settingsClass,
-        SettingsPropertyDataCollection $properties,
+        Collection $properties,
         Settings $settings
     ) {
-        $this->settingsClass = $settingsClass;
-
         $this->properties = $properties;
 
         $this->settings = $settings;

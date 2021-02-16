@@ -11,6 +11,8 @@ class SettingsContainer
 {
     protected Application $app;
 
+    protected static ?Collection $settingsClasses = null;
+
     public function __construct(Application $app)
     {
         $this->app = $app;
@@ -19,32 +21,42 @@ class SettingsContainer
     public function registerBindings(): void
     {
         $this->getSettingClasses()->each(
-            fn (string $settingClass) => $this->app->singleton(
-                $settingClass,
-                fn () => SettingsMapper::create($settingClass)->load()
-            )
+            fn(string $settingClass) => $this->app->singleton($settingClass)
         );
     }
 
     public function getSettingClasses(): Collection
     {
+        if (self::$settingsClasses !== null) {
+            return self::$settingsClasses;
+        }
+
+        $cachedDiscoveredSettings = config('settings.cache_path') . '/settings.php';
+
+        if (file_exists($cachedDiscoveredSettings)) {
+            $classes = require $cachedDiscoveredSettings;
+
+            return self::$settingsClasses = collect($classes);
+        }
+
         /** @var \Spatie\LaravelSettings\Settings[] $settings */
         $settings = array_merge(
             $this->discoverSettings(),
             config('settings.settings')
         );
 
-        return collect($settings)->unique();
+        return self::$settingsClasses = collect($settings)->unique();
+    }
+
+    public function clearCache(): self
+    {
+        self::$settingsClasses = null;
+
+        return $this;
     }
 
     protected function discoverSettings(): array
     {
-        $cachedDiscoveredSettings = config('settings.cache_path') . '/settings.php';
-
-        if (file_exists($cachedDiscoveredSettings)) {
-            return require $cachedDiscoveredSettings;
-        }
-
         return (new DiscoverSettings())
             ->within(config('settings.auto_discover_settings'))
             ->useBasePath(base_path())

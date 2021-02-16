@@ -17,7 +17,7 @@ class SettingsContainerTest extends TestCase
     {
         parent::setUp();
 
-        config()->set('settings.settings', [
+        $this->setRegisteredSettings([
             DummySimpleSettings::class,
         ]);
 
@@ -32,19 +32,48 @@ class SettingsContainerTest extends TestCase
     }
 
     /** @test */
-    public function it_will_not_fetch_data_from_the_database_twice()
+    public function it_will_not_fetch_data_from_the_repository_twice()
+    {
+        DB::connection()->enableQueryLog();
+
+        $settingsA = resolve(DummySimpleSettings::class);
+        $settingsB = resolve(DummySimpleSettings::class);
+
+        $settingsA->name;
+        $settingsB->name;
+
+        $log = DB::connection()->getQueryLog();
+
+        $this->assertCount(1, $log);
+    }
+
+    /** @test */
+    public function it_wont_fetch_data_from_the_repository_when_injected_only()
     {
         DB::connection()->enableQueryLog();
 
         resolve(DummySimpleSettings::class);
-        resolve(DummySimpleSettings::class);
-        resolve(DummySimpleSettings::class);
-        resolve(DummySimpleSettings::class);
-        resolve(DummySimpleSettings::class);
 
         $log = DB::connection()->getQueryLog();
 
-        $this->assertCount(2, $log); // Properties and locks
+        $this->assertCount(0, $log);
+    }
+
+    /** @test */
+    public function settings_are_shared_between_instances()
+    {
+        $settingsA = resolve(DummySimpleSettings::class);
+        $settingsB = resolve(DummySimpleSettings::class);
+
+        $settingsA->name = 'Nina Simone';
+
+        $this->assertEquals('Nina Simone', $settingsB->name);
+
+        $settingsB->lock('name');
+
+        $settingsB->save();
+
+        $this->assertEquals('Louis Armstrong', $settingsA->name);
     }
 
     /** @test */

@@ -2,115 +2,121 @@
 
 namespace Spatie\LaravelSettings;
 
-use Exception;
-use ReflectionClass;
-use ReflectionProperty;
+use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Events\LoadingSettings;
-use Spatie\LaravelSettings\Events\SavingSettings;
-use Spatie\LaravelSettings\Events\SettingsLoaded;
-use Spatie\LaravelSettings\Events\SettingsSaved;
 use Spatie\LaravelSettings\Exceptions\MissingSettings;
-use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
-use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
-use Spatie\LaravelSettings\Support\SettingsPropertyData;
-use Spatie\LaravelSettings\Support\SettingsPropertyDataCollection;
+use Spatie\LaravelSettings\Support\Crypto;
 
 class SettingsMapper
 {
-    /** @var string|class-string */
-    protected string $settingsClass;
+    /** @var array<string, \Spatie\LaravelSettings\SettingsConfig> */
+    private array $configs = [];
 
-    /** @var array|\ReflectionProperty[] */
-    protected array $reflectionProperties;
-
-    protected SettingsRepository $repository;
-
-    protected SettingsPropertyDataCollection $properties;
-
-    public static function create(string $settingsClass)
+    public function initialize(string $settingsClass): SettingsConfig
     {
-        return new self($settingsClass);
-    }
-
-    public function __construct(string $settingsClass)
-    {
-        if (! is_subclass_of($settingsClass, Settings::class)) {
-            throw new Exception("Tried decorating {$settingsClass} which is not extending `Spatie\LaravelSettings\Settings::class`");
+        if ($this->has($settingsClass)) {
+            return $this->configs[$settingsClass];
         }
 
-        $this->settingsClass = $settingsClass;
-        $this->reflectionProperties = (new ReflectionClass($settingsClass))->getProperties(ReflectionProperty::IS_PUBLIC);
-        $this->repository = SettingsRepositoryFactory::create($settingsClass::repository());
+        return $this->configs[$settingsClass] = new SettingsConfig($settingsClass);
+    }
 
-        $this->properties = SettingsPropertyDataCollection::resolve(
-            $this->settingsClass,
-            $this->reflectionProperties,
-            $this->repository
+    public function has(string $settingsClass): bool
+    {
+        return array_key_exists($settingsClass, $this->configs);
+    }
+
+    public function load(string $settingsClass): Collection
+    {
+        $config = $this->getConfig($settingsClass);
+
+        $properties = $this->fetchProperties(
+            $settingsClass,
+            $config->getReflectedProperties()->keys()
         );
+
+        event(new LoadingSettings($settingsClass, $properties));
+
+        $this->ensureNoMissingSettings($settingsClass, $properties, 'loading');
+
+        return $properties;
     }
 
-    public function load(): Settings
+    public function save(
+        string $settingsClass,
+        Collection $properties
+    ): Collection {
+        $config = $this->getConfig($settingsClass);
+
+        $this->ensureNoMissingSettings($settingsClass, $properties, 'saving');
+
+        $lockedProperties = $this->fetchProperties(
+            $settingsClass,
+            $config->getReflectedProperties()->keys()
+        )->filter(fn($payload, string $name) => $config->isLocked($name));
+
+        $changedProperties = $properties
+            ->reject(fn($payload, string $name) => $config->isLocked($name))
+            ->each(function ($payload, string $name) use ($config) {
+                if ($cast = $config->getCast($name)) {
+                    $payload = $cast->set($payload);
+                }
+
+                if ($config->isEncrypted($name)) {
+                    $payload = Crypto::encrypt($payload);
+                }
+
+                $config->getRepository()->updatePropertyPayload(
+                    $config->getGroup(),
+                    $name,
+                    $payload
+                );
+            });
+
+        return $lockedProperties->merge($changedProperties);
+    }
+
+    public function fetchProperties(string $settingsClass, Collection $names): Collection
     {
-        /** @var \Spatie\LaravelSettings\Settings $settings */
-        $settings = new $this->settingsClass;
+        $config = $this->getConfig($settingsClass);
 
-        $this->ensureNoMissingSettings('loading');
+        return collect($config->getRepository()->getPropertiesInGroup($config->getGroup()))
+            ->filter(fn($payload, string $name) => $names->contains($name))
+            ->map(function ($payload, string $name) use ($config) {
+                if ($config->isEncrypted($name)) {
+                    $payload = Crypto::decrypt($payload);
+                }
 
-        event(new LoadingSettings($this->settingsClass, $this->properties));
+                if ($cast = $config->getCast($name)) {
+                    $payload = $cast->get($payload);
+                }
 
-        foreach ($this->properties as $property) {
-            $settings->{$property->getName()} = $property->getValue();
+                return $payload;
+            });
+    }
+
+    private function getConfig(string $settingsClass): SettingsConfig
+    {
+        if (! $this->has($settingsClass)) {
+            $this->initialize($settingsClass);
         }
 
-        event(new SettingsLoaded($settings));
-
-        return $settings;
+        return $this->configs[$settingsClass];
     }
 
-    public function save(Settings $settings): Settings
-    {
-        $this->ensureNoMissingSettings('saving');
-
-        event(new SavingSettings($this->settingsClass, $this->properties, $settings));
-
-        foreach ($this->properties as $property) {
-            if ($property->isLocked()) {
-                $settings->{$property->getName()} = $property->getValue();
-
-                continue;
-            }
-
-            $property->setValue($settings->{$property->getName()});
-
-            $this->repository->updatePropertyPayload(
-                $this->settingsClass::group(),
-                $property->getName(),
-                $property->getRawPayload()
-            );
-        }
-
-        event(new SettingsSaved($settings));
-
-        return $settings;
-    }
-
-    protected function ensureNoMissingSettings(
+    private function ensureNoMissingSettings(
+        string $settingsClass,
+        Collection $properties,
         string $operation
     ): void {
-        $requiredProperties = array_map(
-            fn (ReflectionProperty $property) => $property->getName(),
-            $this->reflectionProperties
-        );
-
-        $availableProperties = array_map(
-            fn (SettingsPropertyData $property) => $property->getName(),
-            $this->properties->toArray()
-        );
-
-        $missingSettings = array_diff($requiredProperties, $availableProperties);
+        $missingSettings = $this->configs[$settingsClass]
+            ->getReflectedProperties()
+            ->keys()
+            ->diff($properties->keys())
+            ->toArray();
 
         if (! empty($missingSettings)) {
-            throw MissingSettings::create($this->settingsClass, $missingSettings, $operation);
+            throw MissingSettings::create($settingsClass, $missingSettings, $operation);
         }
     }
 }

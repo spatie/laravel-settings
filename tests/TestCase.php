@@ -6,7 +6,9 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Support\Crypto;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class TestCase extends BaseTestCase
 {
@@ -29,6 +31,13 @@ class TestCase extends BaseTestCase
         return [
             LaravelSettingsServiceProvider::class,
         ];
+    }
+
+    protected function setRegisteredSettings(array $settings)
+    {
+        resolve(SettingsContainer::class)->clearCache();
+
+        config()->set('settings.settings', $settings);
     }
 
     protected function assertDatabaseHasSetting(string $property, $value): void
