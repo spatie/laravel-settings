@@ -25,13 +25,13 @@
         "spatie/temporary-directory": "^1.2"
     },
     "require-dev": {
+        "ext-redis": "*",
+        "mockery/mockery": "^1.4",
         "orchestra/testbench": "^5.0|^6.0",
-        "mockery/mockery" : "^1.4",
         "phpunit/phpunit": "^9.1",
         "psalm/plugin-laravel": "^1.4",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^4.2",
-        "ext-redis" : "*"
+        "vimeo/psalm": "^4.2"
     },
     "autoload": {
         "psr-4": {

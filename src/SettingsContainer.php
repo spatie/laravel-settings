@@ -4,6 +4,8 @@ namespace Spatie\LaravelSettings;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
 
@@ -20,9 +22,21 @@ class SettingsContainer
 
     public function registerBindings(): void
     {
-        $this->getSettingClasses()->each(
-            fn(string $settingClass) => $this->app->singleton($settingClass)
-        );
+        $cache = $this->app->make(SettingsCache::class);
+
+        $this->getSettingClasses()->each(function (string $settingClass) use ($cache) {
+            $settings = $settingClass;
+
+            if ($cache->has($settingClass)) {
+                try {
+                    $settings = $cache->get($settingClass);
+                } catch (CouldNotUnserializeSettings $exception) {
+                    Log::error("Could not unserialize settings class: `{$settingClass}` from cache");
+                }
+            }
+
+            $this->app->singleton($settings);
+        });
     }
 
     public function getSettingClasses(): Collection

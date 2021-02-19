@@ -36,6 +36,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ]);
         }
 
+        Event::subscribe(SettingsEventSubscriber::class);
         Event::listen(SchemaLoaded::class, fn($event) => $this->removeMigrationsWhenSchemaLoaded($event));
 
         $this->loadMigrationsFrom(config('settings.migrations_path'));
@@ -46,6 +47,12 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
         $this->app->bind(SettingsRepository::class, fn() => SettingsRepositoryFactory::create());
+        $this->app->bind(SettingsCache::class, fn() => new SettingsCache(
+            config('settings.cache.enabled', false),
+            config('settings.cache.store'),
+            config('settings.cache.prefix')
+        ));
+
         $this->app->singleton(SettingsMapper::class);
 
         $settingsContainer = resolve(SettingsContainer::class);

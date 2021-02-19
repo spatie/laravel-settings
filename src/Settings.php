@@ -7,17 +7,20 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use ReflectionProperty;
+use Serializable;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
 
-abstract class Settings implements Arrayable, Jsonable, Responsable
+abstract class Settings implements Arrayable, Jsonable, Responsable, Serializable
 {
     private SettingsMapper $mapper;
 
     private SettingsConfig $config;
 
     private bool $loaded = false;
+
+    private bool $configInitialized = false;
 
     abstract public static function group(): string;
 
@@ -36,6 +39,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         return [];
     }
 
+    /**
+     * @param array $values
+     *
+     * @return static
+     */
     public static function fake(array $values): self
     {
         $settingsMapper = resolve(SettingsMapper::class);
@@ -58,8 +66,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function __construct(SettingsMapper $mapper, array $values = [])
     {
-        $this->mapper = $mapper;
-        $this->config = $mapper->initialize(static::class);
+        $this->loadConfig($mapper);
 
         foreach ($this->config->getReflectedProperties()->keys() as $name) {
             unset($this->{$name});
@@ -105,6 +112,8 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function save(): self
     {
+        $this->loadConfig();
+
         $properties = $this->toCollection();
 
         event(new SavingSettings($properties, $this));
@@ -118,21 +127,29 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function lock(string ...$properties)
     {
+        $this->loadConfig();
+
         $this->config->lock(...$properties);
     }
 
     public function unlock(string ...$properties)
     {
+        $this->loadConfig();
+
         $this->config->unlock(...$properties);
     }
 
     public function getLockedProperties(): array
     {
+        $this->loadConfig();
+
         return $this->config->getLocked()->toArray();
     }
 
     public function toCollection(): Collection
     {
+        $this->loadConfig();
+
         return $this->config->getReflectedProperties()
             ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
@@ -154,6 +171,23 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         return response()->json($this->toJson());
     }
 
+    public function serialize(): string
+    {
+        return serialize($this->toArray());
+    }
+
+    public function unserialize($serialized): void
+    {
+        $properties = unserialize($serialized);
+
+        $this->fill($properties);
+        $this->loaded = true;
+
+        // TODO: we should be a bit smart when saving this,
+        // because at this point there is no mapper or config
+        // same with locking
+    }
+
     private function loadValues(?array $values = null): self
     {
         if ($this->loaded) {
@@ -166,6 +200,19 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->fill($values);
 
         event(new SettingsLoaded($this));
+
+        return $this;
+    }
+
+    private function loadConfig(?SettingsMapper $mapper = null): self
+    {
+        if ($this->configInitialized) {
+            return $this;
+        }
+
+        $this->mapper = $mapper ?? resolve(SettingsMapper::class);
+        $this->config = $this->mapper->initialize(static::class);
+        $this->configInitialized = true;
 
         return $this;
     }

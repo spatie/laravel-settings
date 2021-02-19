@@ -12,6 +12,15 @@ class SettingsMapper
     /** @var array<string, \Spatie\LaravelSettings\SettingsConfig> */
     private array $configs = [];
 
+    /**
+     * TODO v2
+     *
+     * - Add support for casts within migrations
+     * - Extend the create migration command?
+     * - Check if we're not using `resolve`
+     * - Check facades to be used correctly
+     */
+
     public function initialize(string $settingsClass): SettingsConfig
     {
         if ($this->has($settingsClass)) {

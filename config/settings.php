@@ -39,6 +39,13 @@ return [
         ],
     ],
 
+    // TODO: write documentation and rename cache_path?
+    'cache' => [
+        'enabled' => false,
+        'prefix' => null,
+        'store' => null,
+    ],
+
     /*
      * When the package discovers a setting with a type other than the PHP built
      * in types, it should be cast. These casts will automatically cast types

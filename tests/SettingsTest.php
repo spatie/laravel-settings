@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings\Tests;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -19,14 +20,17 @@ use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
-use Spatie\LaravelSettings\SettingsMapper;
+use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
+use Spatie\Snapshots\MatchesSnapshots;
 
 class SettingsTest extends TestCase
 {
+    use MatchesSnapshots;
+
     private SettingsMigrator $migrator;
 
     protected function setUp(): void
@@ -88,10 +92,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_cannot_get_settings_that_do_not_exist()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Rick Astley');
-            $blueprint->add('description', 'Never gonna give you up!');
-        });
+        $this->migrateDummySimpleSettings();
 
         $this->expectException(ErrorException::class);
 
@@ -189,45 +190,39 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_fake_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Rick Astley');
-            $blueprint->add('description', 'Never gonna give you up!');
-        });
+        $this->migrateDummySimpleSettings();
 
         DummySimpleSettings::fake([
-            'description' => 'Together forever',
+            'description' => 'La vie en rose',
         ]);
 
         $settings = resolve(DummySimpleSettings::class);
 
-        $this->assertEquals('Rick Astley', $settings->name);
-        $this->assertEquals('Together forever', $settings->description);
+        $this->assertEquals('Louis Armstrong', $settings->name);
+        $this->assertEquals('La vie en rose', $settings->description);
     }
 
     /** @test */
-    public function it_will_only_load_settings_from_the_repository_that_were_not_givven()
+    public function it_will_only_load_settings_from_the_repository_that_were_not_given()
     {
         $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
             $blueprint->add('name', 'Rick Astley');
         });
 
         DummySimpleSettings::fake([
-            'description' => 'Together forever',
+            'description' => 'Never gonna give you up',
         ]);
 
         $settings = resolve(DummySimpleSettings::class);
 
         $this->assertEquals('Rick Astley', $settings->name);
-        $this->assertEquals('Together forever', $settings->description);
+        $this->assertEquals('Never gonna give you up', $settings->description);
     }
 
     /** @test */
     public function it_can_lock_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class);
 
@@ -246,25 +241,18 @@ class SettingsTest extends TestCase
     /** @test */
     public function locking_and_unlocking_settings_can_be_done_between_saves()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class);
 
         $settings->lock('name');
-
         $settings->name = 'Nina Simone';
-
         $settings->save();
 
         $this->assertEquals('Louis Armstrong', $settings->name);
 
         $settings->unlock('name');
-
         $settings->name = 'Nina Simone';
-
         $settings->save();
 
         $this->assertEquals('Nina Simone', $settings->name);
@@ -273,10 +261,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_fill_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class)
             ->fill([
@@ -291,10 +276,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_save_individual_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class);
         $settings->name = 'Nina Simone';
@@ -309,10 +291,7 @@ class SettingsTest extends TestCase
     {
         Event::fake([LoadingSettings::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         resolve(DummySimpleSettings::class)->name;
 
@@ -327,10 +306,7 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_overload_the_properties_when_loading()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         Event::listen(LoadingSettings::class, function (LoadingSettings $event) {
             $event->properties->put('name', 'Nina Simone');
@@ -344,10 +320,7 @@ class SettingsTest extends TestCase
     {
         Event::fake([SettingsLoaded::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class);
         $settings->name;
@@ -364,10 +337,7 @@ class SettingsTest extends TestCase
     {
         Event::fake([SavingSettings::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class)->save();
 
@@ -382,12 +352,9 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_update_the_properties_in_an_event_when_saving()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        Event::listen(SavingSettings::class, function (SavingSettings $event){
+        Event::listen(SavingSettings::class, function (SavingSettings $event) {
             $event->properties->put('name', 'Nina Simone');
         });
 
@@ -401,10 +368,7 @@ class SettingsTest extends TestCase
     {
         Event::fake([SettingsSaved::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
         $settings = resolve(DummySimpleSettings::class)->save();
 
@@ -488,5 +452,66 @@ class SettingsTest extends TestCase
         $this
             ->assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings'])
             ->assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
+    }
+
+    /**
+     * @test
+     * @environment-setup useEnabledCache
+     */
+    public function it_can_cache_settings()
+    {
+        $this->migrateDummySimpleSettings();
+
+        $settings = resolve(DummySimpleSettings::class);
+
+        $settings->name;
+
+        $cache = resolve(SettingsCache::class);
+
+        dd($cache->get(DummySimpleSettings::class));
+    }
+    
+    /** @test */
+    public function it_will_not_contact() 
+    {
+        
+    }
+
+    /** @test */
+    public function it_will_load_settings_from_the_repository_when_a_serialized_setting_cannot_be_loaded()
+    {
+
+    }
+
+    /** @test */
+    public function it_can_serialize_settings()
+    {
+        $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
+
+        $settings = resolve(DummySettings::class);
+
+        $serialized = serialize($settings);
+
+        $this->assertMatchesSnapshot($serialized);
+
+        $unserializedSettings = unserialize($serialized);
+
+        $this->assertEquals($settings->toArray(), $unserializedSettings->toArray());
+    }
+
+    /** @test */
+    public function it_can_update_unserialized_settings()
+    {
+        $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
+
+        $settings = resolve(DummySettings::class);
+
+        $serialized = serialize($settings);
+    }
+
+    /** @test */
+    public function it_can_change_the_locks_on_unserialized_settings()
+    {
+
     }
 }
