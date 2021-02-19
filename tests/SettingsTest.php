@@ -472,15 +472,13 @@ class SettingsTest extends TestCase
     }
     
     /** @test */
-    public function it_will_not_contact() 
+    public function it_will_not_contact()
     {
-        
     }
 
     /** @test */
     public function it_will_load_settings_from_the_repository_when_a_serialized_setting_cannot_be_loaded()
     {
-
     }
 
     /** @test */
@@ -512,6 +510,5 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_change_the_locks_on_unserialized_settings()
     {
-
     }
 }

@@ -51,7 +51,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $propertiesToLoad = $settingsMapper->initialize(static::class)
             ->getReflectedProperties()
             ->keys()
-            ->reject(fn(string $name) => array_key_exists($name, $values));
+            ->reject(fn (string $name) => array_key_exists($name, $values));
 
         $mergedValues = $settingsMapper
             ->fetchProperties(static::class, $propertiesToLoad)
@@ -151,7 +151,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $this->loadConfig();
 
         return $this->config->getReflectedProperties()
-            ->mapWithKeys(fn(ReflectionProperty $property) => [
+            ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ]);
     }

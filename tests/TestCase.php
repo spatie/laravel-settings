@@ -2,16 +2,13 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use DateTimeZone;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
-use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Support\Crypto;
 
@@ -59,7 +56,8 @@ class TestCase extends BaseTestCase
         return $this;
     }
 
-    protected function migrateDummySettings(CarbonImmutable $date): self {
+    protected function migrateDummySettings(CarbonImmutable $date): self
+    {
         resolve(SettingsMigrator::class)->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($date): void {
             $blueprint->add('string', 'Ruben');
             $blueprint->add('bool', false);
