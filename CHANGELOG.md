@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 1.0.7 - 2020-02-19
+
+- fix correct 'Event' facade (#30)
+
 ## 1.0.6 - 2020-02-05
 
 -  add support for restoring settings after a Laravel schema:dump
