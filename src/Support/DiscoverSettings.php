@@ -19,7 +19,7 @@ class DiscoverSettings
 
     public function __construct()
     {
-        $this->basePath = app()->path();
+        $this->basePath = app_path();
     }
 
     public function within(array $directories): self

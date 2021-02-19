@@ -10,6 +10,8 @@ use DB;
 use Event;
 use Exception;
 use Illuminate\Database\Events\SchemaLoaded;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Str;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
@@ -374,6 +376,10 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_will_remigrate_when_the_schema_was_dumped()
     {
+        if(Str::startsWith(app()->version(), '7')){
+            $this->markTestSkipped('No support for dumping migrations in Laravel 7');
+        }
+
         config()->set('settings.migrations_path', __DIR__ . '/Migrations');
 
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');

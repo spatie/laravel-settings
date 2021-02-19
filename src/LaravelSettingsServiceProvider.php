@@ -54,7 +54,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         $migrations = collect(app(Filesystem::class)->files(config('settings.migrations_path')))
             ->mapWithKeys(function (SplFileInfo $file) {
-                preg_match('/class\s*(\w*)\s*extends/', file_get_contents($file), $found);
+                preg_match('/class\s*(\w*)\s*extends/', file_get_contents($file->getRealPath()), $found);
 
                 if (empty($found)) {
                     return null;
