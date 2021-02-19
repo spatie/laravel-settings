@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelSettings;
 
-use Event;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
