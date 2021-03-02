@@ -16,22 +16,11 @@ class SettingsContainer
      * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
-    public function __construct(\Illuminate\Contracts\Foundation\Application $app)
+    public function __construct($app)
     {
         $this->app = $app;
     }
     
-    /**
-     * Create a new manager instance.
-     *
-     * @param  \Laravel\Lumen\Application $app
-     * @return void
-     */
-    public function __construct(\Laravel\Lumen\Application $app)
-    {
-        $this->app = $app;
-    }
-
     public function registerBindings(): void
     {
         $this->getSettingClasses()->each(
