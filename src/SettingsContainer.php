@@ -2,16 +2,32 @@
 
 namespace Spatie\LaravelSettings;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
 
 class SettingsContainer
 {
-    protected Application $app;
+    protected $app;
 
-    public function __construct(Application $app)
+    /**
+     * Create a new manager instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
+    public function __construct(\Illuminate\Contracts\Foundation\Application $app)
+    {
+        $this->app = $app;
+    }
+    
+    /**
+     * Create a new manager instance.
+     *
+     * @param  \Laravel\Lumen\Application $app
+     * @return void
+     */
+    public function __construct(\Laravel\Lumen\Application $app)
     {
         $this->app = $app;
     }
