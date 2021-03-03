@@ -59,7 +59,11 @@ class SettingsPropertyDataCollection extends DataTransferObjectCollection
 
     protected static function resolveIsNullable(ReflectionProperty $reflectionProperty): bool
     {
-        return $reflectionProperty->getType()->allowsNull();
+        if($reflectionType = $reflectionProperty->getType()){
+            return $reflectionType->allowsNull();
+        }
+
+        return true;
     }
 
     protected static function resolveShouldBeEncrypted(string $name, array $encryptedProperties): bool
