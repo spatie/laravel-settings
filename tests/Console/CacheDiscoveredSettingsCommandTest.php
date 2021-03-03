@@ -31,6 +31,6 @@ class CacheDiscoveredSettingsCommandTest extends TestCase
     {
         $this->artisan('settings:discover')->assertExitCode(0);
 
-        $this->assertMatchesSnapshot(file_get_contents(config('settings.cache_path').'/settings.php'));
+        $this->assertMatchesSnapshot(file_get_contents(config('settings.discovered_settings_cache_path').'/settings.php'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Cache;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
@@ -21,6 +22,7 @@ use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
@@ -458,27 +460,46 @@ class SettingsTest extends TestCase
      * @test
      * @environment-setup useEnabledCache
      */
-    public function it_can_cache_settings()
+    public function it_will_not_contact_the_repository_when_loading_cached_settings()
     {
-        $this->migrateDummySimpleSettings();
+        resolve(SettingsCache::class)->put(new DummySimpleSettings(
+            resolve(SettingsMapper::class),
+            ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+        ));
 
-        $settings = resolve(DummySimpleSettings::class);
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
 
-        $settings->name;
+        DB::connection()->enableQueryLog();
 
-        $cache = resolve(SettingsCache::class);
+        $name = resolve(DummySimpleSettings::class)->name;
 
-        dd($cache->get(DummySimpleSettings::class));
-    }
-    
-    /** @test */
-    public function it_will_not_contact()
-    {
+        $log = DB::connection()->getQueryLog();
+
+        $this->assertEquals('Louis Armstrong', $name);
+        $this->assertCount(0, $log);
     }
 
     /** @test */
     public function it_will_load_settings_from_the_repository_when_a_serialized_setting_cannot_be_loaded()
     {
+        $this->migrateDummySimpleSettings();
+
+        Cache::put('settings.' . DummySimpleSettings::class, 'not-a-settings-class');
+
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
+
+        DB::connection()->enableQueryLog();
+
+        $name = resolve(DummySimpleSettings::class)->name;
+
+        $log = DB::connection()->getQueryLog();
+
+        $this->assertEquals('Louis Armstrong', $name);
+        $this->assertCount(1, $log);
     }
 
     /** @test */
@@ -500,15 +521,31 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_update_unserialized_settings()
     {
-        $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
+        $this->migrateDummySimpleSettings();
 
-        $settings = resolve(DummySettings::class);
+        $serialized = serialize(resolve(DummySimpleSettings::class));
 
-        $serialized = serialize($settings);
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = unserialize($serialized);
+
+        $settings->name = 'Nina Simone';
+        $settings->save();
+
+        $this->assertDatabaseHasSetting('dummy_simple.name', 'Nina Simone');
     }
 
     /** @test */
     public function it_can_change_the_locks_on_unserialized_settings()
     {
+        $this->migrateDummySimpleSettings();
+
+        $serialized = serialize(resolve(DummySimpleSettings::class));
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = unserialize($serialized);
+
+        $settings->lock('name');
+
+        $this->assertEquals(['name'], $settings->getLockedProperties());
     }
 }

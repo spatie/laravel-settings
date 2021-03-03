@@ -13,7 +13,7 @@ class ClearDiscoveredSettingsCacheCommand extends Command
 
     public function handle(Filesystem $files): void
     {
-        $files->delete(config('settings.cache_path') . '/settings.php');
+        $files->delete(config('settings.discovered_settings_cache_path') . '/settings.php');
 
         $this->info('Cached discovered settings cleared!');
     }

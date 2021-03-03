@@ -9,8 +9,10 @@ All notable changes to `laravel-settings` will be documented in this file
     - receive a `SettingsMapper` when constructed
     - faking settings will now only request non-given properties from the repository
 - rewritten `SettingsMapper` from scratch
-- Removed `SettingsPropertyData` and `ettingsPropertyDataCollection`
-- Changed signatures of `SavingSettings` and `LoadingSettings` events
+- removed `SettingsPropertyData` and `ettingsPropertyDataCollection`
+- changed signatures of `SavingSettings` and `LoadingSettings` events
+- added support for caching settings
+- renamed `cache_path` in settings.php to `discovered_settings_cache_path`
 
 ## 1.0.8 - 2020-03-03
 

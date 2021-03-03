@@ -3,7 +3,8 @@
 return [
 
     /*
-     * You can register all the settings classes here.
+     * Each settings class used in your application must be registered, you can
+     * put them (manually) here.
      */
     'settings' => [
 
@@ -16,15 +17,13 @@ return [
     'migrations_path' => database_path('settings'),
 
     /*
-     * When no repository was set for a settings class this repository will be
-     * used for loading and saving settings.
+     * When no repository was set for a settings class the following repository
+     * will be used for loading and saving settings.
      */
     'default_repository' => 'database',
 
     /*
-     * Settings will be stored and loaded from these repositories. There are
-     * two types of repositories: database and Redis. But its always
-     * possible to create your specific types of repositories.
+     * Settings will be stored and loaded from these repositories.
      */
     'repositories' => [
         'database' => [
@@ -39,17 +38,20 @@ return [
         ],
     ],
 
-    // TODO: write documentation and rename cache_path?
+    /*
+     * The contents of settings classes can be cached through your application,
+     * settings will be stored within a provided Laravel store and can have an
+     * additional prefix.
+     */
     'cache' => [
-        'enabled' => false,
-        'prefix' => null,
+        'enabled' => env('SETTINGS_CACHE_ENABLED', false),
         'store' => null,
+        'prefix' => null,
     ],
 
     /*
-     * When the package discovers a setting with a type other than the PHP built
-     * in types, it should be cast. These casts will automatically cast types
-     * when they occur in a settings class.
+     * These global casts will be automatically used whenever a property within
+     * your settings class isn't a default PHP type.
      */
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
@@ -66,8 +68,8 @@ return [
     ],
 
     /*
-     * When in production, it is advised to cache the automatically discovered
-     * and registered setting classes will be cached in this path.
+     * Automatically discovered settings classes can be cached so they don't
+     * need to be searched each time the application boors up.
      */
-    'cache_path' => storage_path('app/laravel-settings'),
+    'discovered_settings_cache_path' => storage_path('app/laravel-settings'),
 ];

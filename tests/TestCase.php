@@ -37,9 +37,13 @@ class TestCase extends BaseTestCase
 
     protected function setRegisteredSettings(array $settings): self
     {
-        resolve(SettingsContainer::class)->clearCache();
+        $settingsContainer = resolve(SettingsContainer::class);
+
+        $settingsContainer->clearCache();
 
         config()->set('settings.settings', $settings);
+
+        $settingsContainer->registerBindings();
 
         return $this;
     }

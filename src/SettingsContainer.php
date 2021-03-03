@@ -25,17 +25,17 @@ class SettingsContainer
         $cache = $this->app->make(SettingsCache::class);
 
         $this->getSettingClasses()->each(function (string $settingClass) use ($cache) {
-            $settings = $settingClass;
-
-            if ($cache->has($settingClass)) {
-                try {
-                    $settings = $cache->get($settingClass);
-                } catch (CouldNotUnserializeSettings $exception) {
-                    Log::error("Could not unserialize settings class: `{$settingClass}` from cache");
+            $this->app->singleton($settingClass, function ($app) use ($cache, $settingClass) {
+                if ($cache->has($settingClass)) {
+                    try {
+                        return $cache->get($settingClass);
+                    } catch (CouldNotUnserializeSettings $exception) {
+                        Log::error("Could not unserialize settings class: `{$settingClass}` from cache");
+                    }
                 }
-            }
 
-            $this->app->singleton($settings);
+                return new $settingClass($app->make(SettingsMapper::class));
+            });
         });
     }
 
@@ -45,7 +45,7 @@ class SettingsContainer
             return self::$settingsClasses;
         }
 
-        $cachedDiscoveredSettings = config('settings.cache_path') . '/settings.php';
+        $cachedDiscoveredSettings = config('settings.discovered_settings_cache_path') . '/settings.php';
 
         if (file_exists($cachedDiscoveredSettings)) {
             $classes = require $cachedDiscoveredSettings;

@@ -30,9 +30,8 @@ class SettingsConfig
 
     private SettingsRepository $repository;
 
-    public function __construct(
-        string $settingsClass
-    ) {
+    public function __construct(string $settingsClass)
+    {
         if (! is_subclass_of($settingsClass, Settings::class)) {
             throw new Exception("Tried decorating {$settingsClass} which is not extending `Spatie\LaravelSettings\Settings::class`");
         }
@@ -41,10 +40,10 @@ class SettingsConfig
 
         $this->reflectionProperties = collect(
             (new ReflectionClass($settingsClass))->getProperties(ReflectionProperty::IS_PUBLIC)
-        )->mapWithKeys(fn (ReflectionProperty $property) => [$property->getName() => $property]);
+        )->mapWithKeys(fn(ReflectionProperty $property) => [$property->getName() => $property]);
 
         $this->casts = $this->reflectionProperties
-            ->map(fn (ReflectionProperty $reflectionProperty) => SettingsCastFactory::resolve(
+            ->map(fn(ReflectionProperty $reflectionProperty) => SettingsCastFactory::resolve(
                 $reflectionProperty,
                 $this->settingsClass::casts()
             ));
@@ -52,6 +51,11 @@ class SettingsConfig
         $this->encrypted = collect($this->settingsClass::encrypted());
 
         $this->repository = SettingsRepositoryFactory::create($this->settingsClass::repository());
+    }
+
+    public function getName(): string
+    {
+        return $this->settingsClass;
     }
 
     public function getReflectedProperties(): Collection

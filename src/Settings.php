@@ -51,7 +51,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $propertiesToLoad = $settingsMapper->initialize(static::class)
             ->getReflectedProperties()
             ->keys()
-            ->reject(fn (string $name) => array_key_exists($name, $values));
+            ->reject(fn(string $name) => array_key_exists($name, $values));
 
         $mergedValues = $settingsMapper
             ->fetchProperties(static::class, $propertiesToLoad)
@@ -72,7 +72,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
             unset($this->{$name});
         }
 
-        if ($values) {
+        if (! empty($values)) {
             $this->loadValues($values);
         }
     }
@@ -112,8 +112,6 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
     public function save(): self
     {
-        $this->loadConfig();
-
         $properties = $this->toCollection();
 
         event(new SavingSettings($properties, $this));
@@ -150,8 +148,9 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
     {
         $this->loadConfig();
 
-        return $this->config->getReflectedProperties()
-            ->mapWithKeys(fn (ReflectionProperty $property) => [
+        return $this->config
+            ->getReflectedProperties()
+            ->mapWithKeys(fn(ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
             ]);
     }
@@ -182,10 +181,6 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
         $this->fill($properties);
         $this->loaded = true;
-
-        // TODO: we should be a bit smart when saving this,
-        // because at this point there is no mapper or config
-        // same with locking
     }
 
     private function loadValues(?array $values = null): self
