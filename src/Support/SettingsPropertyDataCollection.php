@@ -59,7 +59,7 @@ class SettingsPropertyDataCollection extends DataTransferObjectCollection
 
     protected static function resolveIsNullable(ReflectionProperty $reflectionProperty): bool
     {
-        if($reflectionType = $reflectionProperty->getType()){
+        if ($reflectionType = $reflectionProperty->getType()) {
             return $reflectionType->allowsNull();
         }
 
