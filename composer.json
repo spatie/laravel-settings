@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "illuminate/database": "^7.0|^8.0",
+        "illuminate/database": "^7.0|^8.24.0",
         "doctrine/dbal" : "^2.6|^3",
         "phpdocumentor/type-resolver": "^1.4",
         "spatie/data-transfer-object": "^2.0",
