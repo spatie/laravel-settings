@@ -56,7 +56,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
         $this->app->singleton(SettingsMapper::class);
 
-        $settingsContainer = resolve(SettingsContainer::class);
+        $settingsContainer = app(SettingsContainer::class);
         $settingsContainer->registerBindings();
     }
 

@@ -46,7 +46,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
      */
     public static function fake(array $values): self
     {
-        $settingsMapper = resolve(SettingsMapper::class);
+        $settingsMapper = app(SettingsMapper::class);
 
         $propertiesToLoad = $settingsMapper->initialize(static::class)
             ->getReflectedProperties()
@@ -205,7 +205,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
             return $this;
         }
 
-        $this->mapper = $mapper ?? resolve(SettingsMapper::class);
+        $this->mapper = $mapper ?? app(SettingsMapper::class);
         $this->config = $this->mapper->initialize(static::class);
         $this->configInitialized = true;
 
