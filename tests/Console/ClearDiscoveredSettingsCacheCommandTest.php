@@ -28,10 +28,10 @@ class ClearDiscoveredSettingsCacheCommandTest extends TestCase
     {
         $this->artisan('settings:discover')->assertExitCode(0);
 
-        $this->assertFileExists(config('settings.cache_path').'/settings.php');
+        $this->assertFileExists(config('settings.discovered_settings_cache_path').'/settings.php');
 
         $this->artisan('settings:clear-discovered')->assertExitCode(0);
 
-        $this->assertFileDoesNotExist(config('settings.cache_path').'/settings.php');
+        $this->assertFileDoesNotExist(config('settings.discovered_settings_cache_path').'/settings.php');
     }
 }

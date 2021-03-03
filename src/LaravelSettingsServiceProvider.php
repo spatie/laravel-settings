@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearCachedSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
@@ -33,9 +34,11 @@ class LaravelSettingsServiceProvider extends ServiceProvider
                 MakeSettingsMigrationCommand::class,
                 CacheDiscoveredSettingsCommand::class,
                 ClearDiscoveredSettingsCacheCommand::class,
+                ClearCachedSettingsCommand::class,
             ]);
         }
 
+        Event::subscribe(SettingsEventSubscriber::class);
         Event::listen(SchemaLoaded::class, fn ($event) => $this->removeMigrationsWhenSchemaLoaded($event));
 
         $this->loadMigrationsFrom(config('settings.migrations_path'));
@@ -45,9 +48,18 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->app->singleton(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
+        $this->app->bind(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
 
-        resolve(SettingsContainer::class)->registerBindings();
+        $this->app->bind(SettingsCache::class, fn () => new SettingsCache(
+            config('settings.cache.enabled', false),
+            config('settings.cache.store'),
+            config('settings.cache.prefix')
+        ));
+
+        $this->app->singleton(SettingsMapper::class);
+
+        $settingsContainer = app(SettingsContainer::class);
+        $settingsContainer->registerBindings();
     }
 
     private function removeMigrationsWhenSchemaLoaded(SchemaLoaded $event)

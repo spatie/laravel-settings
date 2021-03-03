@@ -89,10 +89,12 @@ php artisan vendor:publish --provider="Spatie\LaravelSettings\LaravelSettingsSer
 This is the contents of the published config file:
 
 ```php
+
 return [
 
     /*
-     * You can register all the settings classes here.
+     * Each settings class used in your application must be registered, you can
+     * put them (manually) here.
      */
     'settings' => [
 
@@ -102,22 +104,17 @@ return [
      * When you create a new settings migration via the `make:settings-migration`
      * command the package will store these migrations in this directory.
      */
-
     'migrations_path' => database_path('settings'),
 
     /*
-     * When no repository was set for a settings class this repository will be
-     * used for loading and saving settings.
+     * When no repository was set for a settings class the following repository
+     * will be used for loading and saving settings.
      */
-
     'default_repository' => 'database',
 
     /*
-     * Settings will be stored and loaded from these repositories. There are
-     * Two types of repositories: database and Redis. But its always
-     * possible to create your specific types of repositories.
+     * Settings will be stored and loaded from these repositories.
      */
-
     'repositories' => [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
@@ -132,11 +129,20 @@ return [
     ],
 
     /*
-     * When the package discovers a setting with a type other than the PHP built
-     * in types, it should be cast. These casts will automatically cast types
-     * when they occur in a settings class.
+     * The contents of settings classes can be cached through your application,
+     * settings will be stored within a provided Laravel store and can have an
+     * additional prefix.
      */
+    'cache' => [
+        'enabled' => env('SETTINGS_CACHE_ENABLED', false),
+        'store' => null,
+        'prefix' => null,
+    ],
 
+    /*
+     * These global casts will be automatically used whenever a property within
+     * your settings class isn't a default PHP type.
+     */
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
@@ -147,20 +153,16 @@ return [
      * The package will look for settings in these paths and automatically
      * register them.
      */
-
     'auto_discover_settings' => [
         app()->path(),
     ],
 
     /*
-     * When in production, it is advised to cache the automatically discovered
-     * and registered setting classes will be cached in this path.
+     * Automatically discovered settings classes can be cached so they don't
+     * need to be searched each time the application boors up.
      */
-
-    'cache_path' => storage_path('app/laravel-settings'),
+    'discovered_settings_cache_path' => storage_path('app/laravel-settings'),
 ];
-
-
 ```
 
 ## Usage
@@ -190,7 +192,8 @@ Now, you will have to add this settings class to the `settings.php` config file 
 
 ```php
     /*
-     * You can register all the settings classes here.
+     * Each settings class used in your application must be registered, you can
+     * put them (manually) here.
      */
     'settings' => [
         GeneralSettings::class
@@ -316,7 +319,7 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method, but this can be added if required. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
+We haven't added a `down` method, but this can be added if disered. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
@@ -703,6 +706,30 @@ DateSettings::fake([
 
 Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
 
+### Caching settings
+
+It takes a small amount of time to load a settings class from a repository. When you've got many settings classes, these added small amounts of time can grow quickly out of hand. The package has built-in support for caching stored settings using the Laravel cache.
+
+You should first enable the cache within the `settings.php` config file:
+
+```php
+'cache' => [
+    'enabled' => env('SETTINGS_CACHE_ENABLED', false),
+    'store' => null,
+    'prefix' => null,
+],
+```
+
+We suggest you enable caching in production by adding `SETTINGS_CACHE_ENABLED=true` to your `.env` file. It is also possible to define a store for the cache, which should be one of the stores you defined in the `cache.php` config file. If no store were defined, the default cache store would be taken. To avoid conflicts within the cache, you can also define a prefix that will be added to each cache entry.
+
+That's it. The package is now smart enough to cache the settings the first time they're loaded. Whenever the settings are edited, the package will refresh the settings.
+
+You can always clear the cached settings with the following command:
+
+```bash
+php artisan settings:clear-cache
+```
+
 ### Auto discovering settings classes
 
 Each settings class you create should be added to the `settings` array within the `settings.php` config file. When you've got a lot of settings, this can be quickly forgotten.
@@ -966,6 +993,15 @@ All these functions should be implemented to interact with the type of storage y
 It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
 
 Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
+
+### Events
+
+The package will emit a series of events when loading/saving settings classes:
+
+- `LoadingSettings` whenever settings are loaded from the repository but not yet inserted in the settings class
+- `LoadedSettings` after settings are loaded into the settings class
+- `SavingSettings` whenever settings are saved to the repository but are not yet cast or encrypted
+- `SavedSettings` after settings are stored within the repository
 
 ## Testing
 

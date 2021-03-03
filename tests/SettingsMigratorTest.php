@@ -13,7 +13,7 @@ class SettingsMigratorTest extends TestCase
 {
     private SettingsMigrator $settingsMigrator;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 

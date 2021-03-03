@@ -2,13 +2,15 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Cache;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use DB;
+use ErrorException;
 use Event;
-use Exception;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Support\Str;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -19,14 +21,18 @@ use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
+use Spatie\Snapshots\MatchesSnapshots;
 
 class SettingsTest extends TestCase
 {
+    use MatchesSnapshots;
+
     private SettingsMigrator $migrator;
 
     protected function setUp(): void
@@ -61,7 +67,7 @@ class SettingsTest extends TestCase
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
-        $settings = SettingsMapper::create(DummySettings::class)->load();
+        $settings = resolve(DummySettings::class);
 
         $this->assertEquals('Ruben', $settings->string);
         $this->assertEquals(false, $settings->bool);
@@ -82,15 +88,17 @@ class SettingsTest extends TestCase
     {
         $this->expectException(MissingSettings::class);
 
-        SettingsMapper::create(DummySettings::class)->load();
+        resolve(DummySettings::class)->int;
     }
 
     /** @test */
-    public function it_cannot_load_a_non_settings_class(): void
+    public function it_cannot_get_settings_that_do_not_exist()
     {
-        $this->expectException(Exception::class);
+        $this->migrateDummySimpleSettings();
 
-        SettingsMapper::create(DummyDto::class)->load();
+        $this->expectException(ErrorException::class);
+
+        resolve(DummySimpleSettings::class)->band;
     }
 
     /** @test */
@@ -122,7 +130,7 @@ class SettingsTest extends TestCase
         });
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
-        $settings = SettingsMapper::create(DummySettings::class)->load();
+        $settings = resolve(DummySettings::class);
 
         $settings->fill([
             'string' => 'Brent',
@@ -165,7 +173,9 @@ class SettingsTest extends TestCase
     {
         $this->expectException(MissingSettings::class);
 
-        $settings = new DummySettings([
+        $settings = resolve(DummySettings::class);
+
+        $settings->fill([
             'string' => 'Brent',
             'bool' => true,
             'int' => 69,
@@ -182,30 +192,41 @@ class SettingsTest extends TestCase
     /** @test */
     public function it_can_fake_settings()
     {
+        $this->migrateDummySimpleSettings();
+
+        DummySimpleSettings::fake([
+            'description' => 'La vie en rose',
+        ]);
+
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertEquals('Louis Armstrong', $settings->name);
+        $this->assertEquals('La vie en rose', $settings->description);
+    }
+
+    /** @test */
+    public function it_will_only_load_settings_from_the_repository_that_were_not_given()
+    {
         $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
             $blueprint->add('name', 'Rick Astley');
-            $blueprint->add('description', 'Never gonna give you up!');
         });
 
         DummySimpleSettings::fake([
-            'description' => 'Together forever',
+            'description' => 'Never gonna give you up',
         ]);
 
         $settings = resolve(DummySimpleSettings::class);
 
         $this->assertEquals('Rick Astley', $settings->name);
-        $this->assertEquals('Together forever', $settings->description);
+        $this->assertEquals('Never gonna give you up', $settings->description);
     }
 
     /** @test */
     public function it_can_lock_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
+        $settings = resolve(DummySimpleSettings::class);
 
         $settings->lock('description');
 
@@ -220,19 +241,47 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function locking_and_unlocking_settings_can_be_done_between_saves()
+    {
+        $this->migrateDummySimpleSettings();
+
+        $settings = resolve(DummySimpleSettings::class);
+
+        $settings->lock('name');
+        $settings->name = 'Nina Simone';
+        $settings->save();
+
+        $this->assertEquals('Louis Armstrong', $settings->name);
+
+        $settings->unlock('name');
+        $settings->name = 'Nina Simone';
+        $settings->save();
+
+        $this->assertEquals('Nina Simone', $settings->name);
+    }
+
+    /** @test */
     public function it_can_fill_settings()
     {
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
+        $settings = resolve(DummySimpleSettings::class)
+            ->fill([
+                'name' => 'Nina Simone',
+            ])
+            ->save();
 
-        $settings->fill([
-            'name' => 'Nina Simone',
-        ]);
+        $this->assertEquals('Nina Simone', $settings->name);
+        $this->assertEquals('Hello Dolly', $settings->description);
+    }
 
+    /** @test */
+    public function it_can_save_individual_settings()
+    {
+        $this->migrateDummySimpleSettings();
+
+        $settings = resolve(DummySimpleSettings::class);
+        $settings->name = 'Nina Simone';
         $settings->save();
 
         $this->assertEquals('Nina Simone', $settings->name);
@@ -244,12 +293,9 @@ class SettingsTest extends TestCase
     {
         Event::fake([LoadingSettings::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        SettingsMapper::create(DummySimpleSettings::class)->load();
+        resolve(DummySimpleSettings::class)->name;
 
         Event::assertDispatched(LoadingSettings::class, function (LoadingSettings $event) {
             $this->assertEquals(DummySimpleSettings::class, $event->settingsClass);
@@ -260,16 +306,26 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_overload_the_properties_when_loading()
+    {
+        $this->migrateDummySimpleSettings();
+
+        Event::listen(LoadingSettings::class, function (LoadingSettings $event) {
+            $event->properties->put('name', 'Nina Simone');
+        });
+
+        $this->assertEquals('Nina Simone', resolve(DummySimpleSettings::class)->name);
+    }
+
+    /** @test */
     public function it_will_emit_an_event_when_loaded_settings()
     {
         Event::fake([SettingsLoaded::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        $settings = SettingsMapper::create(DummySimpleSettings::class)->load();
+        $settings = resolve(DummySimpleSettings::class);
+        $settings->name;
 
         Event::assertDispatched(SettingsLoaded::class, function (SettingsLoaded $event) use ($settings) {
             $this->assertEquals($settings, $event->settings);
@@ -283,17 +339,11 @@ class SettingsTest extends TestCase
     {
         Event::fake([SavingSettings::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        $settings = SettingsMapper::create(DummySimpleSettings::class)
-            ->load()
-            ->save();
+        $settings = resolve(DummySimpleSettings::class)->save();
 
         Event::assertDispatched(SavingSettings::class, function (SavingSettings $event) use ($settings) {
-            $this->assertEquals(DummySimpleSettings::class, $event->settingsClass);
             $this->assertCount(2, $event->properties);
             $this->assertEquals($settings, $event->settings);
 
@@ -302,18 +352,27 @@ class SettingsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_update_the_properties_in_an_event_when_saving()
+    {
+        $this->migrateDummySimpleSettings();
+
+        Event::listen(SavingSettings::class, function (SavingSettings $event) {
+            $event->properties->put('name', 'Nina Simone');
+        });
+
+        $settings = resolve(DummySimpleSettings::class)->save();
+
+        $this->assertEquals('Nina Simone', $settings->name);
+    }
+
+    /** @test */
     public function it_will_emit_an_event_when_saved_settings()
     {
         Event::fake([SettingsSaved::class]);
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+        $this->migrateDummySimpleSettings();
 
-        $settings = SettingsMapper::create(DummySimpleSettings::class)
-            ->load()
-            ->save();
+        $settings = resolve(DummySimpleSettings::class)->save();
 
         Event::assertDispatched(SettingsSaved::class, function (SettingsSaved $event) use ($settings) {
             $this->assertEquals($settings, $event->settings);
@@ -345,7 +404,7 @@ class SettingsTest extends TestCase
         $this->assertEquals($dateTime->format(DATE_ATOM), decrypt($castProperty));
 
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings $settings */
-        $settings = SettingsMapper::create(DummyEncryptedSettings::class)->load();
+        $settings = resolve(DummyEncryptedSettings::class);
 
         $this->assertEquals('Hello', $settings->string);
         $this->assertNull($settings->nullable);
@@ -395,5 +454,123 @@ class SettingsTest extends TestCase
         $this
             ->assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings'])
             ->assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
+    }
+
+    /**
+     * @test
+     * @environment-setup useEnabledCache
+     */
+    public function it_will_not_contact_the_repository_when_loading_cached_settings()
+    {
+        resolve(SettingsCache::class)->put(new DummySimpleSettings(
+            resolve(SettingsMapper::class),
+            ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+        ));
+
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
+
+        DB::connection()->enableQueryLog();
+
+        $name = resolve(DummySimpleSettings::class)->name;
+
+        $log = DB::connection()->getQueryLog();
+
+        $this->assertEquals('Louis Armstrong', $name);
+        $this->assertCount(0, $log);
+    }
+
+    /**
+     * @test
+     * @environment-setup useEnabledCache
+     */
+    public function it_can_clear_a_settings_cache()
+    {
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
+
+        resolve(SettingsCache::class)->put(new DummySimpleSettings(
+            resolve(SettingsMapper::class),
+            ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+        ));
+
+        cache()->put('other_cache_entry', 'do-not-delete-this');
+
+        $this->assertTrue(cache()->has('settings.'.DummySimpleSettings::class));
+
+        resolve(SettingsCache::class)->clear();
+
+        $this->assertTrue(cache()->has('other_cache_entry'));
+        $this->assertFalse(cache()->has('settings.'.DummySimpleSettings::class));
+    }
+
+    /** @test */
+    public function it_will_load_settings_from_the_repository_when_a_serialized_setting_cannot_be_loaded()
+    {
+        $this->migrateDummySimpleSettings();
+
+        Cache::put('settings.' . DummySimpleSettings::class, 'not-a-settings-class');
+
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
+
+        DB::connection()->enableQueryLog();
+
+        $name = resolve(DummySimpleSettings::class)->name;
+
+        $log = DB::connection()->getQueryLog();
+
+        $this->assertEquals('Louis Armstrong', $name);
+        $this->assertCount(1, $log);
+    }
+
+    /** @test */
+    public function it_can_serialize_settings()
+    {
+        $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
+
+        $settings = resolve(DummySettings::class);
+
+        $serialized = serialize($settings);
+
+        $this->assertMatchesSnapshot($serialized);
+
+        $unserializedSettings = unserialize($serialized);
+
+        $this->assertEquals($settings->toArray(), $unserializedSettings->toArray());
+    }
+
+    /** @test */
+    public function it_can_update_unserialized_settings()
+    {
+        $this->migrateDummySimpleSettings();
+
+        $serialized = serialize(resolve(DummySimpleSettings::class));
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = unserialize($serialized);
+
+        $settings->name = 'Nina Simone';
+        $settings->save();
+
+        $this->assertDatabaseHasSetting('dummy_simple.name', 'Nina Simone');
+    }
+
+    /** @test */
+    public function it_can_change_the_locks_on_unserialized_settings()
+    {
+        $this->migrateDummySimpleSettings();
+
+        $serialized = serialize(resolve(DummySimpleSettings::class));
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = unserialize($serialized);
+
+        $settings->lock('name');
+
+        $this->assertEquals(['name'], $settings->getLockedProperties());
     }
 }

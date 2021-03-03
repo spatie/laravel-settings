@@ -12,6 +12,6 @@ abstract class SettingsMigration extends Migration
 
     public function __construct()
     {
-        $this->migrator = resolve(SettingsMigrator::class);
+        $this->migrator = app(SettingsMigrator::class);
     }
 }

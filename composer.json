@@ -18,20 +18,20 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "illuminate/database": "^7.0|^8.0",
+        "illuminate/database": "^7.0|^8.24.0",
         "doctrine/dbal" : "^2.6|^3",
         "phpdocumentor/type-resolver": "^1.4",
         "spatie/data-transfer-object": "^2.0",
         "spatie/temporary-directory": "^1.2"
     },
     "require-dev": {
+        "ext-redis": "*",
+        "mockery/mockery": "^1.4",
         "orchestra/testbench": "^5.0|^6.0",
-        "mockery/mockery" : "^1.4",
         "phpunit/phpunit": "^9.1",
         "psalm/plugin-laravel": "^1.4",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^4.2",
-        "ext-redis" : "*"
+        "vimeo/psalm": "^4.2"
     },
     "autoload": {
         "psr-4": {
@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "psalm": "vendor/bin/psalm",
+        "psalm": "vendor/bin/psalm --no-diff",
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },

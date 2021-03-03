@@ -13,6 +13,21 @@
     </projectFiles>
 
     <issueHandlers>
+        <UnusedClosureParam>
+            <errorLevel type="suppress">
+                <file name="src/SettingsMapper.php"/>
+            </errorLevel>
+        </UnusedClosureParam>
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <file name="src/SettingsConfig.php"/>
+            </errorLevel>
+        </InvalidReturnType>
+        <InvalidReturnStatement>
+            <errorLevel type="suppress">
+                <file name="src/SettingsConfig.php"/>
+            </errorLevel>
+        </InvalidReturnStatement>
     </issueHandlers>
 
     <plugins>

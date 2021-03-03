@@ -17,9 +17,11 @@ class CacheDiscoveredSettingsCommand extends Command
     {
         $this->info('Caching registered settings...');
 
-        $container->getSettingClasses()
+        $container
+            ->clearCache()
+            ->getSettingClasses()
             ->pipe(function (Collection $settingClasses) use ($files) {
-                $cachePath = config('settings.cache_path');
+                $cachePath = config('settings.discovered_settings_cache_path');
 
                 $files->makeDirectory($cachePath, 0755, true, true);
 
