@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 1.0.8 - 2020-02-19
+
+- fix for properties without defined type
+
 ## 1.0.7 - 2020-02-19
 
 - fix correct 'Event' facade (#30)
