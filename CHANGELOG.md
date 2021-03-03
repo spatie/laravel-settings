@@ -2,7 +2,7 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
-## 1.0.8 - 2020-02-19
+## 1.0.8 - 2020-03-03
 
 - fix for properties without defined type
 
