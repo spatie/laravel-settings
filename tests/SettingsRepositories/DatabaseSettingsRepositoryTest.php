@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
-use Spatie\LaravelSettings\Support\BatchedSettingsGroup;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 

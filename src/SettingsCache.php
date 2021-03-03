@@ -74,8 +74,8 @@ class SettingsCache
     {
         app(SettingsContainer::class)
             ->getSettingClasses()
-            ->map(fn(string $class) => $this->resolveCacheKey($class))
-            ->pipe(fn(Collection $keys) => Cache::store($this->store)->deleteMultiple($keys));
+            ->map(fn (string $class) => $this->resolveCacheKey($class))
+            ->pipe(fn (Collection $keys) => Cache::store($this->store)->deleteMultiple($keys));
     }
 
     private function resolveCacheKey(string $settingsClass): string

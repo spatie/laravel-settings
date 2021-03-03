@@ -40,10 +40,10 @@ class SettingsConfig
 
         $this->reflectionProperties = collect(
             (new ReflectionClass($settingsClass))->getProperties(ReflectionProperty::IS_PUBLIC)
-        )->mapWithKeys(fn(ReflectionProperty $property) => [$property->getName() => $property]);
+        )->mapWithKeys(fn (ReflectionProperty $property) => [$property->getName() => $property]);
 
         $this->casts = $this->reflectionProperties
-            ->map(fn(ReflectionProperty $reflectionProperty) => SettingsCastFactory::resolve(
+            ->map(fn (ReflectionProperty $reflectionProperty) => SettingsCastFactory::resolve(
                 $reflectionProperty,
                 $this->settingsClass::casts()
             ));
