@@ -481,6 +481,31 @@ class SettingsTest extends TestCase
         $this->assertCount(0, $log);
     }
 
+    /**
+     * @test
+     * @environment-setup useEnabledCache
+     */
+    public function it_can_clear_a_settings_cache()
+    {
+        $this->setRegisteredSettings([
+            DummySimpleSettings::class,
+        ]);
+
+        resolve(SettingsCache::class)->put(new DummySimpleSettings(
+            resolve(SettingsMapper::class),
+            ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+        ));
+
+        cache()->put('other_cache_entry', 'do-not-delete-this');
+
+        $this->assertTrue(cache()->has('settings.'.DummySimpleSettings::class));
+
+        resolve(SettingsCache::class)->clear();
+
+        $this->assertTrue(cache()->has('other_cache_entry'));
+        $this->assertFalse(cache()->has('settings.'.DummySimpleSettings::class));
+    }
+
     /** @test */
     public function it_will_load_settings_from_the_repository_when_a_serialized_setting_cannot_be_loaded()
     {

@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings;
 
 use Cache;
+use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
 use Spatie\LaravelSettings\Exceptions\SettingsCacheDisabled;
 
@@ -67,6 +68,14 @@ class SettingsCache
             $this->resolveCacheKey(get_class($settings)),
             $serialized
         );
+    }
+
+    public function clear(): void
+    {
+        app(SettingsContainer::class)
+            ->getSettingClasses()
+            ->map(fn(string $class) => $this->resolveCacheKey($class))
+            ->pipe(fn(Collection $keys) => Cache::store($this->store)->deleteMultiple($keys));
     }
 
     private function resolveCacheKey(string $settingsClass): string

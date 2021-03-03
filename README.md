@@ -319,7 +319,7 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method, but this can be added if required. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
+We haven't added a `down` method, but this can be added if disered. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
@@ -706,6 +706,30 @@ DateSettings::fake([
 
 Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
 
+### Caching settings
+
+It takes a small amount of time to load a settings class from a repository. When you've got many settings classes, these added small amounts of time can grow quickly out of hand. The package has built-in support for caching stored settings using the Laravel cache.
+
+You should first enable the cache within the `settings.php` config file:
+
+```php
+'cache' => [
+    'enabled' => env('SETTINGS_CACHE_ENABLED', false),
+    'store' => null,
+    'prefix' => null,
+],
+```
+
+We suggest you enable caching in production by adding `SETTINGS_CACHE_ENABLED=true` to your `.env` file. It is also possible to define a store for the cache, which should be one of the stores you defined in the `cache.php` config file. If no store were defined, the default cache store would be taken. To avoid conflicts within the cache, you can also define a prefix that will be added to each cache entry.
+
+That's it. The package is now smart enough to cache the settings the first time they're loaded. Whenever the settings are edited, the package will refresh the settings.
+
+You can always clear the cached settings with the following command:
+
+```bash
+php artisan settings:clear-cache
+```
+
 ### Auto discovering settings classes
 
 Each settings class you create should be added to the `settings` array within the `settings.php` config file. When you've got a lot of settings, this can be quickly forgotten.
@@ -969,6 +993,15 @@ All these functions should be implemented to interact with the type of storage y
 It is required to return raw values again in the `getPropertiesInGroup` and `getPropertyPayload` methods.
 
 Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
+
+### Events
+
+The package will emit a series of events when loading/saving settings classes:
+
+- `LoadingSettings` whenever settings are loaded from the repository but not yet inserted in the settings class
+- `LoadedSettings` after settings are loaded into the settings class
+- `SavingSettings` whenever settings are saved to the repository but are not yet cast or encrypted
+- `SavedSettings` after settings are stored within the repository
 
 ## Testing
 

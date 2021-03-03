@@ -7,6 +7,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
+use Spatie\LaravelSettings\Console\ClearCachedSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
@@ -33,6 +34,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
                 MakeSettingsMigrationCommand::class,
                 CacheDiscoveredSettingsCommand::class,
                 ClearDiscoveredSettingsCacheCommand::class,
+                ClearCachedSettingsCommand::class
             ]);
         }
 
