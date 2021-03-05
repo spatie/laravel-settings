@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings;
 
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -11,21 +12,21 @@ use Spatie\LaravelSettings\Support\DiscoverSettings;
 
 class SettingsContainer
 {
-    protected Application $app;
+    protected Container $container;
 
     protected static ?Collection $settingsClasses = null;
 
-    public function __construct(Application $app)
+    public function __construct(Container $container)
     {
-        $this->app = $app;
+        $this->container = $container;
     }
 
     public function registerBindings(): void
     {
-        $cache = $this->app->make(SettingsCache::class);
+        $cache = $this->container->make(SettingsCache::class);
 
         $this->getSettingClasses()->each(function (string $settingClass) use ($cache) {
-            $this->app->singleton($settingClass, function ($app) use ($cache, $settingClass) {
+            $this->container->singleton($settingClass, function ($app) use ($cache, $settingClass) {
                 if ($cache->has($settingClass)) {
                     try {
                         return $cache->get($settingClass);

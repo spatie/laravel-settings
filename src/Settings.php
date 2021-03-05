@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
@@ -58,7 +59,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
             ->merge($values)
             ->toArray();
 
-        return app()->instance(static::class, new static(
+        return app(Container::class)->instance(static::class, new static(
             $settingsMapper,
             $mergedValues
         ));

@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "psalm": "vendor/bin/psalm --no-diff",
+        "psalm": "vendor/bin/psalm --no-diff --no-cache",
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },

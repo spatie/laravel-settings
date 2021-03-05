@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.0.1 - 2020-03-05
+
+- add support for lumen
+
 ## 2.0.0 - 2020-03-03
 
 - settings classes:
