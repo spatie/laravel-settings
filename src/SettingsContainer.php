@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Container\Container;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
