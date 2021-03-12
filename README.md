@@ -388,7 +388,7 @@ When you're working on a big settings class with many properties, it can be a bi
 ```php
 public function up(): void
 {
-    $this->settingsMigrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
+    $this->migrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
         $blueprint->add('timzone', 'Europe/Brussels');
         
         $blueprint->rename('timezone', 'local_timezone');
