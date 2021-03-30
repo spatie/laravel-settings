@@ -11,11 +11,16 @@ class SavingSettings
 
     public Collection $properties;
 
+    public Collection $old;
+
     public function __construct(
         Collection $properties,
+        Collection $old,
         Settings $settings
     ) {
         $this->properties = $properties;
+
+        $this->old = $old;
 
         $this->settings = $settings;
     }
