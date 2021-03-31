@@ -23,7 +23,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
     private bool $configInitialized = false;
 
-    protected $originalSettingProperties;
+    protected ?Collection $originalValues = null;
 
     abstract public static function group(): string;
 
@@ -117,11 +117,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
     {
         $properties = $this->toCollection();
 
-        event(new SavingSettings($properties, $this->originalSettingProperties, $this));
+        event(new SavingSettings($properties, $this->originalValues, $this));
 
         $values = $this->mapper->save(static::class, $properties);
         $this->fill($values);
-        $this->originalSettingProperties = $values;
+        $this->originalValues = $values;
 
         event(new SettingsSaved($this));
 
@@ -185,6 +185,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $properties = unserialize($serialized);
 
         $this->fill($properties);
+        $this->originalValues = collect($properties);
         $this->loaded = true;
     }
 
@@ -198,7 +199,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
         $this->loaded = true;
         $this->fill($values);
-        $this->originalSettingProperties = $values;
+        $this->originalValues = collect($values);
 
         event(new SettingsLoaded($this));
 

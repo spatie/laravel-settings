@@ -341,10 +341,15 @@ class SettingsTest extends TestCase
 
         $this->migrateDummySimpleSettings();
 
-        $settings = resolve(DummySimpleSettings::class)->save();
+        $settings = resolve(DummySimpleSettings::class);
+        $settings->name = 'New Name';
+        $settings->save();
 
         Event::assertDispatched(SavingSettings::class, function (SavingSettings $event) use ($settings) {
             $this->assertCount(2, $event->properties);
+            $this->assertEquals('New Name', $event->settings->name);
+            $this->assertCount(2, $event->originalValues);
+            $this->assertEquals('Louis Armstrong', $event->originalValues['name']);
             $this->assertEquals($settings, $event->settings);
 
             return true;
