@@ -21,7 +21,6 @@ use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
-use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;

@@ -48,10 +48,10 @@ class PropertyReflector
             'float',
             'bool',
             'mixed',
-            'array'
+            'array',
         ];
 
-        if(in_array($reflectionType->getName(), $builtInTypes)){
+        if (in_array($reflectionType->getName(), $builtInTypes)) {
             return null;
         }
 
@@ -108,7 +108,7 @@ class PropertyReflector
 
         $other = current(array_filter(
             iterator_to_array($compound->getIterator()),
-            fn(Type $type) => ! $type instanceof Null_
+            fn (Type $type) => ! $type instanceof Null_
         ));
 
         return new Nullable(self::reflectDocblock($reflectionProperty, (string) $other));

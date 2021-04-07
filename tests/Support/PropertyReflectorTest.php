@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests\Support;
 
-use Arr;
 use Closure;
 use DateTime;
 use Exception;
