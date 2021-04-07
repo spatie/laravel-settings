@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.1 - 2020-04-07
+
+- add better support for nullable types in docblocks
+
 ## 2.1.0 - 2020-04-07
 
 - add casts to migrations (#53)
