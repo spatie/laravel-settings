@@ -9,10 +9,8 @@ use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
-use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
-use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class SettingsMigratorTest extends TestCase
 {
@@ -217,8 +215,9 @@ class SettingsMigratorTest extends TestCase
 
         $timezoneBrussels = new DateTimeZone('Europe/Brussels');
 
-        $this->settingsMigrator->update('dummy.nullable_date_time_zone', function(DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
+        $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
             $this->assertEquals($timezoneMontreal, $savedTimezone);
+
             return $timezoneBrussels;
         });
 

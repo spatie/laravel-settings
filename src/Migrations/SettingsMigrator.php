@@ -177,8 +177,8 @@ class SettingsMigrator
     {
         return app(SettingsContainer::class)
             ->getSettingClasses()
-            ->mapWithKeys(fn(string $settingsClass) => [
-                $settingsClass::group() => new SettingsConfig($settingsClass)
+            ->mapWithKeys(fn (string $settingsClass) => [
+                $settingsClass::group() => new SettingsConfig($settingsClass),
             ]);
     }
 }
