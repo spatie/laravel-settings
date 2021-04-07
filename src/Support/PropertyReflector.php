@@ -6,10 +6,11 @@ use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\AbstractList;
-use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Float_;
 use phpDocumentor\Reflection\Types\Integer;
+use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
 use phpDocumentor\Reflection\Types\String_;
@@ -37,11 +38,20 @@ class PropertyReflector
                 : null;
         }
 
-        if ($reflectionType->isBuiltin()) {
+        if (! $reflectionType instanceof ReflectionNamedType) {
             return null;
         }
 
-        if (! $reflectionType instanceof ReflectionNamedType) {
+        $builtInTypes = [
+            'int',
+            'string',
+            'float',
+            'bool',
+            'mixed',
+            'array'
+        ];
+
+        if(in_array($reflectionType->getName(), $builtInTypes)){
             return null;
         }
 
@@ -58,30 +68,49 @@ class PropertyReflector
     ): Type {
         $resolvedType = (new TypeResolver())->resolve($type);
 
-        if ($resolvedType instanceof Nullable) {
-            return new Nullable(self::reflectDocblock(
-                $reflectionProperty,
-                (string) $resolvedType->getActualType()
-            ));
-        }
+        $isValidPrimitive = $resolvedType instanceof Boolean
+            || $resolvedType instanceof Float_
+            || $resolvedType instanceof Integer
+            || $resolvedType instanceof String_
+            || $resolvedType instanceof Object_;
 
-        if ($resolvedType instanceof Object_) {
+        if ($isValidPrimitive) {
             return $resolvedType;
         }
 
-        if ($resolvedType instanceof AbstractList) {
-            $isValid = $resolvedType->getValueType() instanceof Boolean
-                || $resolvedType->getValueType() instanceof Array_
-                || $resolvedType->getValueType() instanceof Float_
-                || $resolvedType->getValueType() instanceof Integer
-                || $resolvedType->getValueType() instanceof String_
-                || $resolvedType->getValueType() instanceof Object_;
+        if ($resolvedType instanceof Compound) {
+            return self::reflectCompound($reflectionProperty, $resolvedType);
+        }
 
-            if ($isValid) {
-                return $resolvedType;
-            }
+        if ($resolvedType instanceof Nullable) {
+            return new Nullable(self::reflectDocblock($reflectionProperty, (string) $resolvedType->getActualType()));
+        }
+
+        if ($resolvedType instanceof AbstractList) {
+            $listType = get_class($resolvedType);
+
+            return new $listType(
+                self::reflectDocblock($reflectionProperty, (string) $resolvedType->getValueType()),
+                $resolvedType->getKeyType()
+            );
         }
 
         throw CouldNotResolveDocblockType::create($type, $reflectionProperty);
+    }
+
+    private static function reflectCompound(
+        ReflectionProperty $reflectionProperty,
+        Compound $compound
+    ): Nullable {
+        if ($compound->getIterator()->count() !== 2 || ! $compound->contains(new Null_())) {
+            throw CouldNotResolveDocblockType::create($compound, $reflectionProperty);
+        }
+
+        $other = current(array_filter(
+            iterator_to_array($compound->getIterator()),
+            fn(Type $type) => ! $type instanceof Null_
+        ));
+
+        return new Nullable(self::reflectDocblock($reflectionProperty, (string) $other));
     }
 }

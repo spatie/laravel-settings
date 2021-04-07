@@ -2,12 +2,14 @@
 
 namespace Spatie\LaravelSettings\Tests\Support;
 
+use Arr;
 use Closure;
 use DateTime;
 use Exception;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Float_;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Nullable;
@@ -128,7 +130,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Integer()),
+            new Array_(new Integer(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
 
@@ -148,7 +150,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Integer()),
+            new Array_(new Integer(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
     }
@@ -162,7 +164,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Integer()),
+            new Array_(new Integer(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
 
@@ -172,7 +174,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new String_()),
+            new Array_(new String_(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
 
@@ -182,7 +184,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Float_()),
+            new Array_(new Float_(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
 
@@ -192,7 +194,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Boolean()),
+            new Array_(new Boolean(), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
 
@@ -202,7 +204,7 @@ class PropertyReflectorTest extends TestCase
         });
 
         $this->assertEquals(
-            new Array_(new Object_(new Fqsen('\\' . DateTime::class))),
+            new Array_(new Object_(new Fqsen('\\' . DateTime::class)), new Compound([new String_(), new Integer()])),
             PropertyReflector::resolveType($reflection)
         );
     }
@@ -243,6 +245,70 @@ class PropertyReflectorTest extends TestCase
 
         $this->assertEquals(
             new Nullable(new Object_(new Fqsen('\\' . DateTime::class))),
+            PropertyReflector::resolveType($reflection)
+        );
+
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var ?int */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Nullable(new Integer()),
+            PropertyReflector::resolveType($reflection)
+        );
+
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var ?int[] */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Array_(new Nullable(new Integer()), new Compound([new String_(), new Integer()])),
+            PropertyReflector::resolveType($reflection)
+        );
+    }
+
+    /** @test */
+    public function it_can_handle_a_compound_nullable()
+    {
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var DateTime|null */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Nullable(new Object_(new Fqsen('\\' . DateTime::class))),
+            PropertyReflector::resolveType($reflection)
+        );
+
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var int|null */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Nullable(new Integer()),
+            PropertyReflector::resolveType($reflection)
+        );
+
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var null|int */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Nullable(new Integer()),
+            PropertyReflector::resolveType($reflection)
+        );
+
+        $reflection = $this->fakeReflection(fn () => new class {
+            /** @var int[]|null */
+            public $property;
+        });
+
+        $this->assertEquals(
+            new Nullable(new Array_(new Integer(), new Compound([new String_(), new Integer()]))),
             PropertyReflector::resolveType($reflection)
         );
     }

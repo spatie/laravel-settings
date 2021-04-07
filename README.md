@@ -560,8 +560,14 @@ class DateSettings extends Settings
     /** @var \DateTime  */
     public $birth_date;
     
-    /** @var ?int  */
+    /** @var ?null  */
     public $a_nullable_int;
+    
+    /** @var int|null  */
+    public $another_nullable_int;
+    
+    /** @var int[]|null  */
+    public $an_array_of_ints_or_null;
     
     public static function group(): string
     {
