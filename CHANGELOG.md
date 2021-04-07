@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.0 - 2020-04-07
+
+- add casts to migrations (#53)
+- add original properties to `SavingSettings` event (#57)
+
 ## 2.0.1 - 2020-03-05
 
 - add support for lumen
