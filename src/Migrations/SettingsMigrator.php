@@ -3,10 +3,14 @@
 namespace Spatie\LaravelSettings\Migrations;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
+use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
+use Spatie\LaravelSettings\SettingsConfig;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 use Spatie\LaravelSettings\Support\Crypto;
 
@@ -130,12 +134,18 @@ class SettingsMigrator
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
-        return $this->repository->getPropertyPayload($group, $name);
+        $payload = $this->repository->getPropertyPayload($group, $name);
+
+        return optional($this->getCast($group, $name))->get($payload) ?: $payload;
     }
 
     protected function createProperty(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
+
+        if (is_object($payload)) {
+            $payload = optional($this->getCast($group, $name))->set($payload) ?: $payload;
+        }
 
         $this->repository->createProperty($group, $name, $payload);
     }
@@ -143,6 +153,10 @@ class SettingsMigrator
     protected function updatePropertyPayload(string $property, $payload): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
+
+        if (is_object($payload)) {
+            $payload = optional($this->getCast($group, $name))->set($payload) ?: $payload;
+        }
 
         $this->repository->updatePropertyPayload($group, $name, $payload);
     }
@@ -152,5 +166,19 @@ class SettingsMigrator
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         $this->repository->deleteProperty($group, $name);
+    }
+
+    protected function getCast(string $group, string $name): ?SettingsCast
+    {
+        return optional($this->settingsGroups()->get($group))->getCast($name);
+    }
+
+    protected function settingsGroups(): Collection
+    {
+        return app(SettingsContainer::class)
+            ->getSettingClasses()
+            ->mapWithKeys(fn(string $settingsClass) => [
+                $settingsClass::group() => new SettingsConfig($settingsClass)
+            ]);
     }
 }

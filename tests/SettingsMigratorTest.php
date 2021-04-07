@@ -2,12 +2,17 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use DateTimeZone;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
+use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class SettingsMigratorTest extends TestCase
 {
@@ -195,5 +200,28 @@ class SettingsMigratorTest extends TestCase
         $this->settingsMigrator->decrypt('user.name');
 
         $this->assertDatabaseHasSetting('user.name', 'Brent Roose');
+    }
+
+    /** @test */
+    public function it_can_cast_on_migration()
+    {
+        $this->setRegisteredSettings([
+            DummySettings::class,
+        ]);
+
+        $timezoneMontreal = new DateTimeZone('America/Montreal');
+
+        $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
+
+        $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneMontreal));
+
+        $timezoneBrussels = new DateTimeZone('Europe/Brussels');
+
+        $this->settingsMigrator->update('dummy.nullable_date_time_zone', function(DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
+            $this->assertEquals($timezoneMontreal, $savedTimezone);
+            return $timezoneBrussels;
+        });
+
+        $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
     }
 }
