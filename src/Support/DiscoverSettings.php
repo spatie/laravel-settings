@@ -60,8 +60,8 @@ class DiscoverSettings
         $files = (new Finder())->files()->in($this->directories);
 
         return collect($files)
-            ->reject(fn(SplFileInfo $file) => in_array($file->getPathname(), $this->ignoredFiles))
-            ->map(fn(SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
+            ->reject(fn (SplFileInfo $file) => in_array($file->getPathname(), $this->ignoredFiles))
+            ->map(fn (SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
             ->filter(function (string $settingsClass) {
                 try {
                     return is_subclass_of($settingsClass, Settings::class);
