@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.2 - 2020-04-08
+
+- skip classes with errors when discovering settings
+
 ## 2.1.1 - 2020-04-07
 
 - add better support for nullable types in docblocks

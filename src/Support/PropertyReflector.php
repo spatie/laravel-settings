@@ -103,7 +103,7 @@ class PropertyReflector
         Compound $compound
     ): Nullable {
         if ($compound->getIterator()->count() !== 2 || ! $compound->contains(new Null_())) {
-            throw CouldNotResolveDocblockType::create($compound, $reflectionProperty);
+            throw CouldNotResolveDocblockType::create((string) $compound, $reflectionProperty);
         }
 
         $other = current(array_filter(
