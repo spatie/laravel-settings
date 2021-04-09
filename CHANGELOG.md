@@ -2,24 +2,24 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
-## 2.1.2 - 2020-04-08
+## 2.1.2 - 2021-04-08
 
 - skip classes with errors when discovering settings
 
-## 2.1.1 - 2020-04-07
+## 2.1.1 - 2021-04-07
 
 - add better support for nullable types in docblocks
 
-## 2.1.0 - 2020-04-07
+## 2.1.0 - 2021-04-07
 
 - add casts to migrations (#53)
 - add original properties to `SavingSettings` event (#57)
 
-## 2.0.1 - 2020-03-05
+## 2.0.1 - 2021-03-05
 
 - add support for lumen
 
-## 2.0.0 - 2020-03-03
+## 2.0.0 - 2021-03-03
 
 - settings classes:
     - properties won't be loaded when constructed but when requested
@@ -31,23 +31,23 @@ All notable changes to `laravel-settings` will be documented in this file
 - added support for caching settings
 - renamed `cache_path` in settings.php to `discovered_settings_cache_path`
 
-## 1.0.8 - 2020-03-03
+## 1.0.8 - 2021-03-03
 
 - fix for properties without defined type
 
-## 1.0.7 - 2020-02-19
+## 1.0.7 - 2021-02-19
 
 - fix correct 'Event' facade (#30)
 
-## 1.0.6 - 2020-02-05
+## 1.0.6 - 2021-02-05
 
 - add support for restoring settings after a Laravel schema:dump
 
-## 1.0.5 - 2020-01-29
+## 1.0.5 - 2021-01-29
 
 - bump the `doctrine/dbal` dependency
 
-## 1.0.4 - 2020-01-08
+## 1.0.4 - 2021-01-08
 
 - add support for getting the locked settings
 
