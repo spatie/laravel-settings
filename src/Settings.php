@@ -62,14 +62,13 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
             ->toArray();
 
         return app(Container::class)->instance(static::class, new static(
-            $settingsMapper,
             $mergedValues
         ));
     }
 
-    public function __construct(SettingsMapper $mapper, array $values = [])
+    public function __construct(array $values = [])
     {
-        $this->loadConfig($mapper);
+        $this->ensureConfigIsLoaded();
 
         foreach ($this->config->getReflectedProperties()->keys() as $name) {
             unset($this->{$name});
@@ -120,6 +119,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         event(new SavingSettings($properties, $this->originalValues, $this));
 
         $values = $this->mapper->save(static::class, $properties);
+
         $this->fill($values);
         $this->originalValues = $values;
 
@@ -130,28 +130,28 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
     public function lock(string ...$properties)
     {
-        $this->loadConfig();
+        $this->ensureConfigIsLoaded();
 
         $this->config->lock(...$properties);
     }
 
     public function unlock(string ...$properties)
     {
-        $this->loadConfig();
+        $this->ensureConfigIsLoaded();
 
         $this->config->unlock(...$properties);
     }
 
     public function getLockedProperties(): array
     {
-        $this->loadConfig();
+        $this->ensureConfigIsLoaded();
 
         return $this->config->getLocked()->toArray();
     }
 
     public function toCollection(): Collection
     {
-        $this->loadConfig();
+        $this->ensureConfigIsLoaded();
 
         return $this->config
             ->getReflectedProperties()
@@ -182,11 +182,10 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
     public function unserialize($serialized): void
     {
-        $properties = unserialize($serialized);
+        $values = unserialize($serialized);
 
-        $this->fill($properties);
-        $this->originalValues = collect($properties);
-        $this->loaded = true;
+        $this->loaded = false;
+        $this->loadValues($values);
     }
 
     private function loadValues(?array $values = null): self
@@ -198,6 +197,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $values ??= $this->mapper->load(static::class);
 
         $this->loaded = true;
+
         $this->fill($values);
         $this->originalValues = collect($values);
 
@@ -206,13 +206,13 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         return $this;
     }
 
-    private function loadConfig(?SettingsMapper $mapper = null): self
+    private function ensureConfigIsLoaded(): self
     {
         if ($this->configInitialized) {
             return $this;
         }
 
-        $this->mapper = $mapper ?? app(SettingsMapper::class);
+        $this->mapper = app(SettingsMapper::class);
         $this->config = $this->mapper->initialize(static::class);
         $this->configInitialized = true;
 

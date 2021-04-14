@@ -21,6 +21,7 @@ use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\SettingsMapper;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
@@ -468,7 +469,6 @@ class SettingsTest extends TestCase
     public function it_will_not_contact_the_repository_when_loading_cached_settings()
     {
         resolve(SettingsCache::class)->put(new DummySimpleSettings(
-            resolve(SettingsMapper::class),
             ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
         ));
 
@@ -497,18 +497,17 @@ class SettingsTest extends TestCase
         ]);
 
         resolve(SettingsCache::class)->put(new DummySimpleSettings(
-            resolve(SettingsMapper::class),
             ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
         ));
 
         cache()->put('other_cache_entry', 'do-not-delete-this');
 
-        $this->assertTrue(cache()->has('settings.'.DummySimpleSettings::class));
+        $this->assertTrue(cache()->has('settings.' . DummySimpleSettings::class));
 
         resolve(SettingsCache::class)->clear();
 
         $this->assertTrue(cache()->has('other_cache_entry'));
-        $this->assertFalse(cache()->has('settings.'.DummySimpleSettings::class));
+        $this->assertFalse(cache()->has('settings.' . DummySimpleSettings::class));
     }
 
     /** @test */
@@ -540,8 +539,6 @@ class SettingsTest extends TestCase
         $settings = resolve(DummySettings::class);
 
         $serialized = serialize($settings);
-
-        $this->assertMatchesSnapshot($serialized);
 
         $unserializedSettings = unserialize($serialized);
 
