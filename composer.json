@@ -22,7 +22,7 @@
         "doctrine/dbal" : "^2.6|^3",
         "phpdocumentor/type-resolver": "^1.4",
         "spatie/data-transfer-object": "^2.0",
-        "spatie/temporary-directory": "^1.2"
+        "spatie/temporary-directory": "^1.2|^2.0"
     },
     "require-dev": {
         "ext-redis": "*",
