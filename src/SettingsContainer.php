@@ -72,7 +72,7 @@ class SettingsContainer
     protected function discoverSettings(): array
     {
         return (new DiscoverSettings())
-            ->within(config('settings.auto_discover_settings'))
+            ->within(config('settings.auto_discover_settings', []))
             ->useBasePath(base_path())
             ->ignoringFiles(Composer::getAutoloadedFiles(base_path('composer.json')))
             ->discover();
