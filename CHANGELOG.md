@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.3 - 2021-04-28
+
+- added fallback for settings.auto_discover_settings (#63)
+- add support for spatie/data-transfer-object v3 (#62)
+
 ## 2.1.2 - 2021-04-08
 
 - skip classes with errors when discovering settings
