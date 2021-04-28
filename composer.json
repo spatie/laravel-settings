@@ -21,7 +21,7 @@
         "illuminate/database": "^7.0|^8.24.0",
         "doctrine/dbal" : "^2.6|^3",
         "phpdocumentor/type-resolver": "^1.4",
-        "spatie/data-transfer-object": "^2.0",
+        "spatie/data-transfer-object": "^2.0|^3.0",
         "spatie/temporary-directory": "^1.2|^2.0"
     },
     "require-dev": {
