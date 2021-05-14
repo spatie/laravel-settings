@@ -56,7 +56,7 @@ class SettingsContainer
         /** @var \Spatie\LaravelSettings\Settings[] $settings */
         $settings = array_merge(
             $this->discoverSettings(),
-            config('settings.settings')
+            config('settings.settings', [])
         );
 
         return self::$settingsClasses = collect($settings)->unique();

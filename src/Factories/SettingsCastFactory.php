@@ -79,7 +79,7 @@ class SettingsCastFactory
 
         $className = self::getObjectClassName($type);
 
-        foreach (config('settings.global_casts') as $base => $cast) {
+        foreach (config('settings.global_casts', []) as $base => $cast) {
             if (self::shouldCast($className, $base)) {
                 return new $cast($className);
             }
