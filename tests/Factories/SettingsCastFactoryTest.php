@@ -200,13 +200,13 @@ class SettingsCastFactoryTest extends TestCase
             /** @var int */
             public $int;
 
-            /** @var ?int  */
+            /** @var ?int */
             public $a_nullable_int;
 
-            /** @var int|null  */
+            /** @var int|null */
             public $another_nullable_int;
 
-            /** @var int[]|null  */
+            /** @var int[]|null */
             public $an_array_of_ints_or_null;
         };
 

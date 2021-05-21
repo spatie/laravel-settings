@@ -138,7 +138,6 @@ class RedisSettingsRepositoryTest extends TestCase
         $this->assertFalse($this->client->hExists('test', 'a'));
     }
 
-
     /** @test */
     public function it_can_lock_settings()
     {
