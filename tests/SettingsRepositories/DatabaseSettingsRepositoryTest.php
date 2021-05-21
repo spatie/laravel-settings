@@ -269,7 +269,7 @@ class DatabaseSettingsRepositoryTest extends TestCase
                 },
             ], [
                 function () {
-                    $model = new class extends SettingsProperty {
+                    $model = new class() extends SettingsProperty {
                         public function getConnectionName()
                         {
                             return 'other';

@@ -560,7 +560,7 @@ class DateSettings extends Settings
     /** @var \DateTime  */
     public $birth_date;
     
-    /** @var ?null  */
+    /** @var ?int  */
     public $a_nullable_int;
     
     /** @var int|null  */

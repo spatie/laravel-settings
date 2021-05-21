@@ -5,8 +5,12 @@ namespace Spatie\LaravelSettings\Factories;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\Types\AbstractList;
+use phpDocumentor\Reflection\Types\Boolean;
+use phpDocumentor\Reflection\Types\Float_;
+use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Object_;
+use phpDocumentor\Reflection\Types\String_;
 use ReflectionProperty;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
 use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
@@ -65,6 +69,14 @@ class SettingsCastFactory
     protected static function createDefaultCast(
         Type $type
     ): ?SettingsCast {
+        $noCastRequired = self::isTypeWithNoCastRequired($type)
+            || ($type instanceof AbstractList && self::isTypeWithNoCastRequired($type->getValueType()))
+            || ($type instanceof Nullable && self::isTypeWithNoCastRequired($type->getActualType()));
+
+        if ($noCastRequired) {
+            return null;
+        }
+
         if ($type instanceof AbstractList) {
             return new ArraySettingsCast(self::createDefaultCast($type->getValueType()));
         }
@@ -86,6 +98,14 @@ class SettingsCastFactory
         }
 
         return null;
+    }
+
+    protected static function isTypeWithNoCastRequired(Type $type): bool
+    {
+        return $type instanceof Integer
+            || $type instanceof Boolean
+            || $type instanceof Float_
+            || $type instanceof String_;
     }
 
     protected static function shouldCast(string $type, string $base): bool

@@ -16,7 +16,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_will_not_resolve_a_cast_for_built_in_types()
     {
-        $fake = new class {
+        $fake = new class() {
             public int $integer;
         };
 
@@ -30,7 +30,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_resolve_a_global_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             public DateTime $datetime;
         };
 
@@ -44,7 +44,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_resolve_a_global_cast_as_docblock()
     {
-        $fake = new class {
+        $fake = new class() {
             /** @var DateTime */
             public $datetime;
         };
@@ -59,7 +59,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_no_type_and_no_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             public $noType;
         };
 
@@ -73,7 +73,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_a_global_cast_with_an_array()
     {
-        $fake = new class {
+        $fake = new class() {
             /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
             public array $dto_array;
         };
@@ -88,7 +88,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_a_global_cast_with_an_array_without_array_type()
     {
-        $fake = new class {
+        $fake = new class() {
             /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
             public $dto_array;
         };
@@ -103,7 +103,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_a_plain_array_without_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             public array $array;
         };
 
@@ -117,7 +117,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_a_nullable_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             public ?DateTime $array;
         };
 
@@ -131,7 +131,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_have_a_nullable_docblock_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             /** @var ?\DateTime */
             public $array;
         };
@@ -148,7 +148,7 @@ class SettingsCastFactoryTest extends TestCase
     {
         $this->withoutGlobalCasts();
 
-        $fake = new class {
+        $fake = new class() {
             public DateTime $datetime;
         };
 
@@ -164,7 +164,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_create_a_local_cast_with_class_identifier_and_arguments()
     {
-        $fake = new class {
+        $fake = new class() {
             public $dto;
         };
 
@@ -180,7 +180,7 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_can_create_a_local_cast_with_an_already_constructed_cast()
     {
-        $fake = new class {
+        $fake = new class() {
             public DummyDto $dto;
         };
 
@@ -191,6 +191,29 @@ class SettingsCastFactoryTest extends TestCase
         ]);
 
         $this->assertEquals(new DtoCast(DummyDto::class), $cast);
+    }
+
+    /** @test */
+    public function it_will_not_resolve_a_cast_for_a_primitive_type()
+    {
+        $fake = new class() {
+            /** @var int */
+            public $int;
+
+            /** @var ?int  */
+            public $a_nullable_int;
+
+            /** @var int|null  */
+            public $another_nullable_int;
+
+            /** @var int[]|null  */
+            public $an_array_of_ints_or_null;
+        };
+
+        $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'int'), []));
+        $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'a_nullable_int'), []));
+        $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'another_nullable_int'), []));
+        $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'an_array_of_ints_or_null'), []));
     }
 
     private function withoutGlobalCasts()

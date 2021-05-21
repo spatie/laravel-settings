@@ -25,7 +25,7 @@ class DatabaseSettingsRepository implements SettingsRepository
          * @var \Spatie\LaravelSettings\Models\SettingsProperty $temp
          * @psalm-suppress UndefinedClass
          */
-        $temp = new $this->propertyModel;
+        $temp = new $this->propertyModel();
 
         return DB::connection($this->connection ?? $temp->getConnectionName())
             ->table($temp->getTable())

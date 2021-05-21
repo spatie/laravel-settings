@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.5 - 2021-05-21
+
+- fix some casting problems
+- update php-cs-fixer
+
 ## 2.1.4 - 2021-04-28
 
 - added fallback for settings.auto_discover_settings (#63)
