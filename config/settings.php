@@ -29,6 +29,7 @@ return [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
             'model' => null,
+            'table' => null,
             'connection' => null,
         ],
         'redis' => [

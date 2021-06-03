@@ -119,6 +119,7 @@ return [
         'database' => [
             'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
             'model' => null,
+            'table' => null,
             'connection' => null,
         ],
         'redis' => [
@@ -931,6 +932,7 @@ There are two types of repositories included in the package, the `redis` and `da
 The database repository has two optional configuration options:
 
 - `model` the Eloquent model used to load/save properties to the database
+- `table` the table used in the database
 - `connection` the connection to use when interacting with the database
 
 #### Redis repository

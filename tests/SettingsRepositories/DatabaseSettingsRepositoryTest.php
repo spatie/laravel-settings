@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
 use Closure;
+use DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
@@ -256,6 +257,30 @@ class DatabaseSettingsRepositoryTest extends TestCase
         $this->assertEquals([
             'a' => 'Alpha',
         ], $otherRepository->getPropertiesInGroup('test'));
+    }
+
+    /** @test */
+    public function it_can_have_a_different_table_name()
+    {
+        Schema::create('spatie_settings', function (Blueprint $table): void {
+            $table->id();
+
+            $table->string('group')->index();
+            $table->string('name');
+            $table->boolean('locked');
+            $table->json('payload');
+
+            $table->timestamps();
+        });
+
+        $repository = new DatabaseSettingsRepository([
+            'table' => 'spatie_settings'
+        ]);
+
+        $repository->createProperty('test', 'a', 'Alpha');
+
+        $this->assertEquals(1, DB::table('spatie_settings')->count());
+        $this->assertEquals(0, DB::table('settings')->count());
     }
 
     public function configurationsProvider(): array

@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.6 - 2021-06-03
+
+- add support for defining the database connection table
+
 ## 2.1.5 - 2021-05-21
 
 - fix some casting problems
