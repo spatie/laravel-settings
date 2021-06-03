@@ -108,11 +108,11 @@ class DatabaseSettingsRepository implements SettingsRepository
     {
         $model = new $this->propertyModel;
 
-        if($this->connection){
+        if ($this->connection) {
             $model->setConnection($this->connection);
         }
 
-        if($this->table){
+        if ($this->table) {
             $model->setTable($this->table);
         }
 

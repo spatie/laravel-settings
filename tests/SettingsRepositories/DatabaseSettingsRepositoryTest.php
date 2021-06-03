@@ -274,7 +274,7 @@ class DatabaseSettingsRepositoryTest extends TestCase
         });
 
         $repository = new DatabaseSettingsRepository([
-            'table' => 'spatie_settings'
+            'table' => 'spatie_settings',
         ]);
 
         $repository->createProperty('test', 'a', 'Alpha');
