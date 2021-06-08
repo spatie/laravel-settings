@@ -1002,6 +1002,16 @@ It is required to return raw values again in the `getPropertiesInGroup` and `get
 
 Each repository's constructor will receive a `$config` array that the user-defined for the repository within the application `settings.php` config file. It is possible to add other dependencies to the constructor. They will be injected when the repository is created.
 
+#### Refreshing settings
+
+You can refresh the values and locked properties within the settings class. This can be useful if you change something within your repository and want to see it reflected within your settings:
+
+```php
+$settings->refresh();
+```
+
+You should only refresh settings when the repository values were changed when the settings class was already loaded.
+
 ### Events
 
 The package will emit a series of events when loading/saving settings classes:

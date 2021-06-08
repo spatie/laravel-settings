@@ -22,6 +22,7 @@ use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
@@ -570,6 +571,50 @@ class SettingsTest extends TestCase
         $settings = unserialize($serialized);
 
         $settings->lock('name');
+
+        $this->assertEquals(['name'], $settings->getLockedProperties());
+    }
+
+    /** @test */
+    public function it_can_refresh_the_settings_properties()
+    {
+        $this->migrateDummySimpleSettings(
+            'Louis Armstrong',
+            'What a wonderful world'
+        );
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertEquals('Louis Armstrong', $settings->name);
+        $this->assertEquals('What a wonderful world', $settings->description);
+
+        $repository = $settings->getRepository();
+
+        $repository->updatePropertyPayload('dummy_simple', 'name', 'Rick Astley');
+        $repository->updatePropertyPayload('dummy_simple', 'description', 'Never gonna give you up');
+
+        $settings->refresh();
+
+        $this->assertEquals('Rick Astley', $settings->name);
+        $this->assertEquals('Never gonna give you up', $settings->description);
+    }
+
+    /** @test */
+    public function it_can_refresh_the_settings_locks()
+    {
+        $this->migrateDummySimpleSettings();
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertEmpty($settings->getLockedProperties());
+
+        $repository = $settings->getRepository();
+
+        $repository->lockProperties('dummy_simple', ['name']);
+
+        $settings->refresh();
 
         $this->assertEquals(['name'], $settings->getLockedProperties());
     }

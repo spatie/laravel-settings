@@ -12,6 +12,7 @@ use Serializable;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
+use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 abstract class Settings implements Arrayable, Jsonable, Responsable, Serializable
 {
@@ -186,6 +187,23 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
 
         $this->loaded = false;
         $this->loadValues($values);
+    }
+
+    public function getRepository(): SettingsRepository
+    {
+        $this->ensureConfigIsLoaded();
+
+        return $this->config->getRepository();
+    }
+
+    public function refresh(): self
+    {
+        $this->config->clearCachedLockedProperties();
+
+        $this->loaded = false;
+        $this->loadValues();
+
+        return $this;
     }
 
     private function loadValues(?array $values = null): self
