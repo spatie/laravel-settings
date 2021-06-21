@@ -60,7 +60,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $mergedValues = $settingsMapper
             ->fetchProperties(static::class, $propertiesToLoad)
             ->merge($values)
-            ->toArray();
+            ->all();
 
         return app(Container::class)->instance(static::class, new static(
             $mergedValues
