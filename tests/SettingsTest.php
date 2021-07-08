@@ -617,4 +617,16 @@ class SettingsTest extends TestCase
 
         $this->assertEquals(['name'], $settings->getLockedProperties());
     }
+
+    /** @test */
+    public function it_can_check_if_a_property_has_been_set_if_properties_are_not_loaded()
+    {
+        $this->migrateDummySimpleSettings();
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertFalse(empty($settings->name));
+        $this->assertTrue(empty($settings->non_existing));
+    }
 }

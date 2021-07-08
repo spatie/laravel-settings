@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings;
 
+use ArrayAccess;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -97,6 +98,13 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
     public function __debugInfo()
     {
         $this->loadValues();
+    }
+
+    public function __isset($name)
+    {
+        $this->loadValues();
+
+        return isset($this->{$name});
     }
 
     /**

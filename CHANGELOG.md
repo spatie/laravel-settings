@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.9 - 2021-07-08
+
+- fix `empty` call not working when properties weren't loaded
+
 ## 2.1.8 - 2021-06-21
 
 - fix fake settings not working with `Arrayable`
