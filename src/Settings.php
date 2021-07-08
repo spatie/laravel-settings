@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings;
 
-use ArrayAccess;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
