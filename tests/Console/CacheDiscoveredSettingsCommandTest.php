@@ -5,6 +5,7 @@ namespace Spatie\LaravelSettings\Tests\Console;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsEloquent;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\Snapshots\MatchesSnapshots;
 
@@ -21,6 +22,7 @@ class CacheDiscoveredSettingsCommandTest extends TestCase
         $this->app['config']->set('settings.settings', [
             DummySettings::class,
             DummySimpleSettings::class,
+            DummySettingsEloquent::class
         ]);
 
         $this->container = app(SettingsContainer::class);

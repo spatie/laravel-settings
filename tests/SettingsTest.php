@@ -25,6 +25,7 @@ use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsEloquent;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\Snapshots\MatchesSnapshots;
 
@@ -622,11 +623,23 @@ class SettingsTest extends TestCase
     public function it_can_check_if_a_property_has_been_set_if_properties_are_not_loaded()
     {
         $this->migrateDummySimpleSettings();
-
         /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
         $settings = resolve(DummySimpleSettings::class);
 
-        $this->assertFalse(empty($settings->name));
+        $this->assertEquals($settings->name, 'Louis Armstrong');
+        $this->assertTrue(empty($settings->non_existing));
+    }
+
+
+    /** @test */
+    public function it_can_use_settings_eloquent()
+    {
+        $this->migrateDummySettingsEloquent();
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettingsEloquent $settings */
+        $settings = resolve(DummySettingsEloquent::class);
+        // Check GetMuttur
+        $this->assertEquals($settings->full_name, 'Louis Armstrong');
+
         $this->assertTrue(empty($settings->non_existing));
     }
 }

@@ -137,4 +137,21 @@ class TestCase extends BaseTestCase
             "The setting {$group}.{$name} should not exist in the database"
         );
     }
+
+
+    protected function migrateDummySettingsEloquent(
+        string $fname = 'Louis',
+        string $lname = 'Armstrong',
+        string $description = 'Hello Dolly'
+    ): self {
+        resolve(SettingsMigrator::class)->inGroup('settings_eloquent', function (SettingsBlueprint $blueprint)
+            use ($description, $fname, $lname): void {
+            $blueprint->add('fname', $fname);
+            $blueprint->add('lname', $lname);
+            $blueprint->add('description', $description);
+            $blueprint->add('timestamps', now());
+        });
+
+        return $this;
+    }
 }
