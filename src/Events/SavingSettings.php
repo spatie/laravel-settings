@@ -3,7 +3,7 @@
 namespace Spatie\LaravelSettings\Events;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelSettings\Settings;
+use Spatie\LaravelSettings\Interfaces\Settings;
 
 class SavingSettings
 {

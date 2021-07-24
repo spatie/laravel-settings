@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelSettings\Events;
 
-use Spatie\LaravelSettings\Settings;
+use Spatie\LaravelSettings\Interfaces\Settings;
 
 class SettingsLoaded
 {
