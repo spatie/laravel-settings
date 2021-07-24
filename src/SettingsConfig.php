@@ -32,16 +32,22 @@ class SettingsConfig
 
     public function __construct(string $settingsClass)
     {
-        if (! is_subclass_of($settingsClass, Settings::class)) {
-            throw new Exception("Tried decorating {$settingsClass} which is not extending `Spatie\LaravelSettings\Settings::class`");
+        if (! is_subclass_of($settingsClass, Settings::class) && !is_subclass_of($settingsClass, SettingsEloquent::class)) {
+                throw new Exception("Tried decorating {$settingsClass} which is not extending `Spatie\LaravelSettings\Settings::class`");
         }
-
+        $exceptProperties = [
+            'snakeAttributes' => 0,
+            'encrypter' => 0,
+            'manyMethods' => 0,
+            'incrementing' => 0,
+            'preventsLazyLoading' => 0,
+            'exists'=> 0,
+         'wasRecentlyCreated' => 0];
         $this->settingsClass = $settingsClass;
-
         $this->reflectionProperties = collect(
             (new ReflectionClass($settingsClass))->getProperties(ReflectionProperty::IS_PUBLIC)
-        )->mapWithKeys(fn (ReflectionProperty $property) => [$property->getName() => $property]);
-
+        )->mapWithKeys(fn (ReflectionProperty $property) => [$property->getName() => $property])
+        ->diffKeys($exceptProperties);
         $this->casts = $this->reflectionProperties
             ->map(fn (ReflectionProperty $reflectionProperty) => SettingsCastFactory::resolve(
                 $reflectionProperty,

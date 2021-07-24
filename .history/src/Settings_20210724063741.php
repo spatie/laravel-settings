@@ -2,14 +2,14 @@
 
 namespace Spatie\LaravelSettings;
 
+use App\Model;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Spatie\LaravelSettings\Traits\SettingsTrait;
-use Spatie\LaravelSettings\Interfaces\Settings as InterfacesSettings;
 use Serializable;
 
-abstract class Settings implements Arrayable, Jsonable, Responsable, Serializable, InterfacesSettings
+abstract class Settings extends Model implements Arrayable, Jsonable, Responsable, Serializable
 {
     use SettingsTrait;
 

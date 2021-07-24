@@ -6,6 +6,7 @@ use Cache;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
 use Spatie\LaravelSettings\Exceptions\SettingsCacheDisabled;
+use Spatie\LaravelSettings\Interfaces\Settings;
 
 class SettingsCache
 {
