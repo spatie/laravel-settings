@@ -8,8 +8,9 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Spatie\LaravelSettings\Traits\SettingsTrait;
 use Serializable;
+use Spatie\LaravelSettings\Interfaces\Settings;
 
-abstract class SettingsEloquent extends Model implements Arrayable, Jsonable, Responsable, Serializable
+abstract class SettingsEloquent extends Model implements Arrayable, Jsonable, Responsable, Serializable, Settings
 {
     use SettingsTrait;
 
