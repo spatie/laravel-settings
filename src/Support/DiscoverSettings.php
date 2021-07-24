@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\Support;
 
 use Illuminate\Support\Str;
 use Spatie\LaravelSettings\Settings;
+use Spatie\LaravelSettings\SettingsEloquent;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Throwable;
@@ -58,13 +59,12 @@ class DiscoverSettings
         }
 
         $files = (new Finder())->files()->in($this->directories);
-
         return collect($files)
             ->reject(fn (SplFileInfo $file) => in_array($file->getPathname(), $this->ignoredFiles))
             ->map(fn (SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
             ->filter(function (string $settingsClass) {
                 try {
-                    return is_subclass_of($settingsClass, Settings::class);
+                    return (is_subclass_of($settingsClass, Settings::class) || is_subclass_of($settingsClass, SettingsEloquent::class));
                 } catch (Throwable $e) {
                     return false;
                 }
