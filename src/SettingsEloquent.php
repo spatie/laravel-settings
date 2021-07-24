@@ -2,15 +2,17 @@
 
 namespace Spatie\LaravelSettings;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Spatie\LaravelSettings\Traits\SettingsTrait;
 use Serializable;
 
-abstract class Settings implements Arrayable, Jsonable, Responsable, Serializable
+abstract class SettingsEloquent extends Model implements Arrayable, Jsonable, Responsable, Serializable
 {
     use SettingsTrait;
+
 
     abstract public static function group(): string;
 
@@ -42,4 +44,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $this->loadValues($values);
     }
 
+    public function __get($name)
+    {
+        $this->loadValues();
+
+        // return $this->$name;
+        return $this->getAttribute($name);
+    }
 }
