@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.10 - 2021-08-17
+
+- add support for `null` in DateTime casts
+
 ## 2.1.9 - 2021-07-08
 
 - fix `empty` call not working when properties weren't loaded
