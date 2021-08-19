@@ -1017,9 +1017,9 @@ You should only refresh settings when the repository values were changed when th
 The package will emit a series of events when loading/saving settings classes:
 
 - `LoadingSettings` whenever settings are loaded from the repository but not yet inserted in the settings class
-- `LoadedSettings` after settings are loaded into the settings class
+- `SettingsLoaded` after settings are loaded into the settings class
 - `SavingSettings` whenever settings are saved to the repository but are not yet cast or encrypted
-- `SavedSettings` after settings are stored within the repository
+- `SettingsSaved` after settings are stored within the repository
 
 ## Testing
 
