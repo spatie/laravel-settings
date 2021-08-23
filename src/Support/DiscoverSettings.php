@@ -3,10 +3,10 @@
 namespace Spatie\LaravelSettings\Support;
 
 use Illuminate\Support\Str;
+use ReflectionClass;
 use Spatie\LaravelSettings\Settings;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
-use ReflectionClass;
 use Throwable;
 
 class DiscoverSettings
@@ -65,7 +65,7 @@ class DiscoverSettings
             ->map(fn (SplFileInfo $file) => $this->fullQualifiedClassNameFromFile($file))
             ->filter(function (string $settingsClass) {
                 try {
-                    return is_subclass_of($settingsClass, Settings::class) && 
+                    return is_subclass_of($settingsClass, Settings::class) &&
                         (new ReflectionClass($settingsClass))->isInstantiable();
                 } catch (Throwable $e) {
                     return false;
