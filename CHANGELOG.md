@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.11 - 2021-08-23
+
+- ignore abstract classes when discovering settings (#84)
+
 ## 2.1.10 - 2021-08-17
 
 - add support for `null` in DateTime casts
