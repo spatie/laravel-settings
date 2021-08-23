@@ -66,7 +66,7 @@ class DiscoverSettings
             ->filter(function (string $settingsClass) {
                 try {
                     return is_subclass_of($settingsClass, Settings::class) && 
-                        !(new ReflectionClass($settingsClass))->isAbstract();
+                        (new ReflectionClass($settingsClass))->isInstantiable();
                 } catch (Throwable $e) {
                     return false;
                 }
