@@ -618,6 +618,27 @@ class SettingsTest extends TestCase
         $this->assertEquals(['name'], $settings->getLockedProperties());
     }
 
+    public function it_can_check_if_a_setting_is_locked_or_unlocked()
+    {
+        $this->migrateDummySimpleSettings();
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+        $settings = resolve(DummySimpleSettings::class);
+
+        $this->assertEmpty($settings->getLockedProperties());
+
+        $repository = $settings->getRepository();
+
+        $repository->lockProperties('dummy_simple', ['name']);
+
+        $settings->refresh();
+
+        $this->assertEquals(['name'], $settings->getLockedProperties());
+
+        $this->assertEquals(true, $settings->isLocked('name'));
+        $this->assertEquals(false, $settings->isUnlocked('name'));
+    }
+
     /** @test */
     public function it_can_check_if_a_property_has_been_set_if_properties_are_not_loaded()
     {

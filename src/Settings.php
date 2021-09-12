@@ -150,6 +150,16 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         $this->config->unlock(...$properties);
     }
 
+    public function isLocked(string $property): bool
+    {
+        return in_array($property, $this->getLockedProperties());
+    }
+
+    public function isUnlocked(string $property): bool
+    {
+        return ! $this->isLocked($property);
+    }
+
     public function getLockedProperties(): array
     {
         $this->ensureConfigIsLoaded();
