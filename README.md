@@ -102,9 +102,12 @@ return [
 
     /*
      * When you create a new settings migration via the `make:settings-migration`
-     * command the package will store these migrations in this directory.
+     * command the package will store these migrations in first path by default or if specified in 
+     * the provided path.
      */
-    'migrations_path' => database_path('settings'),
+    'migrations_paths' => [
+        database_path('settings'),
+    ]
 
     /*
      * When no repository was set for a settings class the following repository

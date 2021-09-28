@@ -1,0 +1,11 @@
+ <?php
+
+ use Spatie\LaravelSettings\Migrations\SettingsMigration;
+
+ class CreateNewTestSettingsMigration extends SettingsMigration
+ {
+     public function up(): void
+     {
+
+     }
+ }

@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 class MakeSettingsMigrationCommand extends Command
 {
-    protected $signature = 'make:settings-migration {name : The name of the migration}';
+    protected $signature = 'make:settings-migration {name : The name of the migration} {path? : Path to write migration file to}';
 
     protected $description = 'Create a new settings migration file';
 
@@ -25,8 +25,11 @@ class MakeSettingsMigrationCommand extends Command
     public function handle(): void
     {
         $name = trim($this->input->getArgument('name'));
+        $path = trim($this->input->getArgument('path'));
 
-        $path = config('settings.migrations_path');
+        if (empty($path)) {
+            $path = config('settings.migrations_paths')[0];
+        }
 
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 

@@ -41,7 +41,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         Event::subscribe(SettingsEventSubscriber::class);
         Event::listen(SchemaLoaded::class, fn ($event) => $this->removeMigrationsWhenSchemaLoaded($event));
 
-        $this->loadMigrationsFrom(config('settings.migrations_path'));
+        $this->loadMigrationsFrom(config('settings.migrations_paths'));
     }
 
     public function register(): void
@@ -64,7 +64,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
     private function removeMigrationsWhenSchemaLoaded(SchemaLoaded $event)
     {
-        $migrations = collect(app(Filesystem::class)->files(config('settings.migrations_path')))
+        $migrations = collect(app(Filesystem::class)->files(config('settings.migrations_paths')))
             ->mapWithKeys(function (SplFileInfo $file) {
                 preg_match('/class\s*(\w*)\s*extends/', file_get_contents($file->getRealPath()), $found);
 
