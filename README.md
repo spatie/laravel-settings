@@ -625,6 +625,18 @@ Unlocking settings can be done as such:
 $dateSettings->unlock('birth_date', 'name', 'email');
 ```
 
+Checking if a setting is currently locked can be done as such:
+
+```php
+$dateSettings->isLocked('birth_date');
+```
+
+Checking if a setting is currently unlocked can be done as such:
+
+```php
+$dateSettings->isUnlocked('birth_date');
+```
+
 ### Encrypting properties
 
 Some properties in your settings class can be confidential, like API keys, for example. It is possible to encrypt some of your properties, so it won't be possible to read them when your repository data was compromised.
