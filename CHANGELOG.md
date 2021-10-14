@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.1.12 - 2021-10-14
+
+- add possibility to check if setting is locked or unlocked (#89)
+
 ## 2.1.11 - 2021-08-23
 
 - ignore abstract classes when discovering settings (#84)
