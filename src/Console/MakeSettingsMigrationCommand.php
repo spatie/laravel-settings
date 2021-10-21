@@ -25,8 +25,11 @@ class MakeSettingsMigrationCommand extends Command
     public function handle(): void
     {
         $name = trim($this->input->getArgument('name'));
-        $path = trim($this->input->getArgument('path'));
+        // Get path from cli argument or fallback to the old settings.migrations_path configuration.
+        $path = trim($this->input->getArgument('path'))
+            ?? config('settings.migrations_path');
 
+        // If path is still empty we get the first path from new settings.migrations_paths config
         if (empty($path)) {
             $path = config('settings.migrations_paths')[0];
         }
