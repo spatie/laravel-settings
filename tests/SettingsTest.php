@@ -442,7 +442,7 @@ class SettingsTest extends TestCase
             $this->markTestSkipped('No support for dumping migrations in Laravel 7');
         }
 
-        config()->set('settings.migrations_paths', __DIR__ . '/Migrations');
+        config()->set('settings.migrations_paths', [__DIR__ . '/Migrations']);
 
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
 

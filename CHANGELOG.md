@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.2.0 - 2021-10-22
+
+- add support for multiple migration paths (#92)
+
 ## 2.1.12 - 2021-10-14
 
 - add possibility to check if setting is locked or unlocked (#89)

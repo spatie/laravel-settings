@@ -25,13 +25,11 @@ class MakeSettingsMigrationCommand extends Command
     public function handle(): void
     {
         $name = trim($this->input->getArgument('name'));
-        // Get path from cli argument or fallback to the old settings.migrations_path configuration.
-        $path = trim($this->input->getArgument('path'))
-            ?? config('settings.migrations_path');
+        $path = trim($this->input->getArgument('path'));
 
         // If path is still empty we get the first path from new settings.migrations_paths config
         if (empty($path)) {
-            $path = config('settings.migrations_paths')[0];
+            $path = $this->resolveMigrationPaths()[0];
         }
 
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
@@ -80,5 +78,12 @@ EOT;
     protected function getPath($name, $path): string
     {
         return $path . '/' . date('Y_m_d_His') . '_' . Str::snake($name) . '.php';
+    }
+
+    protected function resolveMigrationPaths(): array
+    {
+        return ! empty(config('settings.migrations_path'))
+            ? [config('settings.migrations_path')]
+            : config('settings.migrations_paths');
     }
 }
