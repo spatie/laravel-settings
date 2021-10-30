@@ -323,7 +323,7 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method, but this can be added if disered. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
+We haven't added a `down` method, but this can be added if desired. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
