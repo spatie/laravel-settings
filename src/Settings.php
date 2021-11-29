@@ -14,7 +14,7 @@ use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
-abstract class Settings implements Arrayable, Jsonable, Responsable, Serializable
+abstract class Settings implements Arrayable, Jsonable, Responsable
 {
     private SettingsMapper $mapper;
 
@@ -106,6 +106,17 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
         return isset($this->{$name});
     }
 
+    public function __serialize(): array
+    {
+        return $this->toArray();
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->loaded = false;
+        $this->loadValues($data);
+    }
+
     /**
      * @param \Illuminate\Support\Collection|array $properties
      *
@@ -191,19 +202,6 @@ abstract class Settings implements Arrayable, Jsonable, Responsable, Serializabl
     public function toResponse($request)
     {
         return response()->json($this->toJson());
-    }
-
-    public function serialize(): string
-    {
-        return serialize($this->toArray());
-    }
-
-    public function unserialize($serialized): void
-    {
-        $values = unserialize($serialized);
-
-        $this->loaded = false;
-        $this->loadValues($values);
     }
 
     public function getRepository(): SettingsRepository
