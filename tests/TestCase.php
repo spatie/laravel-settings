@@ -141,9 +141,9 @@ class TestCase extends BaseTestCase
     protected function skipIfPHPLowerThen(string $version)
     {
         [$currentMajor, $currentMinor] = explode('.', phpversion());
-        [$major, $minor] = explode('.', phpversion());
+        [$major, $minor] = explode('.', $version);
 
-        if ($currentMajor < $major && $currentMinor < $minor) {
+        if($currentMajor < $major || ($currentMajor === $major && $currentMinor < $minor)){
             $this->markTestSkipped("PHP version {$version} required for this test");
         }
     }

@@ -224,6 +224,8 @@ class SettingsCastFactoryTest extends TestCase
     /** @test */
     public function it_will_resolve_an_enum_cast_for_native_enums()
     {
+        $this->skipIfPHPLowerThen('8.1');
+
         $fake = new class() {
             public DummyUnitEnum $unit;
             public DummyIntEnum $int;
