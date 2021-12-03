@@ -71,7 +71,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
     {
         $this->ensureConfigIsLoaded();
 
-        foreach ($this->config->getReflectedProperties()->keys() as $name) {
+        foreach ($this->config->getReflectedProperties() as $name => $property) {
+            if(method_exists($property, 'isReadOnly') && $property->isReadOnly()){
+                continue;
+            }
+
             unset($this->{$name});
         }
 

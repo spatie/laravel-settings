@@ -13,6 +13,7 @@ use phpDocumentor\Reflection\Types\Object_;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionProperty;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
+use Spatie\LaravelSettings\SettingsCasts\EnumCast;
 use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
 use Spatie\LaravelSettings\Support\PropertyReflector;
 
@@ -90,6 +91,10 @@ class SettingsCastFactory
         }
 
         $className = self::getObjectClassName($type);
+
+        if (enum_exists($className)) {
+            return new EnumCast($className);
+        }
 
         foreach (config('settings.global_casts', []) as $base => $cast) {
             if (self::shouldCast($className, $base)) {

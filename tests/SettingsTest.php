@@ -21,11 +21,17 @@ use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\SettingsContainer;
+use Spatie\LaravelSettings\Tests\Fakes\FakeSettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyUnitEnum;
 use Spatie\Snapshots\MatchesSnapshots;
 
 class SettingsTest extends TestCase
@@ -649,5 +655,41 @@ class SettingsTest extends TestCase
 
         $this->assertFalse(empty($settings->name));
         $this->assertTrue(empty($settings->non_existing));
+    }
+
+    /** @test */
+    public function it_has_support_for_native_enums()
+    {
+        $this->skipIfPHPLowerThen('8.1');
+
+        $settings = new class extends Settings {
+            public DummyUnitEnum $unit;
+
+            public DummyIntEnum $int;
+
+            public DummyStringEnum $string;
+
+            public static function group(): string
+            {
+                return 'enums';
+            }
+        };
+
+        FakeSettingsContainer::setUp()->addSettingsClass(get_class($settings));
+
+        resolve(SettingsMigrator::class)->inGroup('enums', function (SettingsBlueprint $blueprint): void {
+            $blueprint->add('unit', DummyUnitEnum::Y);
+            $blueprint->add('int', DummyIntEnum::THREE);
+            $blueprint->add('string', DummyStringEnum::ARCHIVED);
+        });
+
+        $this->assertEquals($settings->unit, DummyUnitEnum::Y);
+        $this->assertInstanceOf(DummyUnitEnum::class, $settings->unit);
+
+        $this->assertEquals($settings->int, DummyIntEnum::THREE);
+        $this->assertInstanceOf(DummyIntEnum::class, $settings->int);
+
+        $this->assertEquals($settings->string, DummyStringEnum::ARCHIVED);
+        $this->assertInstanceOf(DummyStringEnum::class, $settings->string);
     }
 }

@@ -6,6 +6,7 @@ use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class DiscoversSettingsTest extends TestCase
@@ -26,6 +27,7 @@ class DiscoversSettingsTest extends TestCase
             DummySimpleSettings::class,
             DummySettings::class,
             DummyEncryptedSettings::class,
+            DummySettingsWithImportedType::class
         ], $discovered);
     }
 }

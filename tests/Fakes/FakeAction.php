@@ -1,6 +1,8 @@
 <?php
 
-namespace Spatie\LaravelSettings\Tests\TestClasses;
+namespace Spatie\LaravelSettings\Tests\Fakes;
+
+use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
 class FakeAction
 {

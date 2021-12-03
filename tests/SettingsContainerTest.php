@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsContainer;
+use Spatie\LaravelSettings\Tests\Fakes\FakeAction;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
-use Spatie\LaravelSettings\Tests\TestClasses\FakeAction;
 
 class SettingsContainerTest extends TestCase
 {

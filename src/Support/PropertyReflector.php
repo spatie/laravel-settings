@@ -3,11 +3,13 @@
 namespace Spatie\LaravelSettings\Support;
 
 use phpDocumentor\Reflection\Fqsen;
+use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\Type;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\AbstractList;
 use phpDocumentor\Reflection\Types\Boolean;
 use phpDocumentor\Reflection\Types\Compound;
+use phpDocumentor\Reflection\Types\ContextFactory;
 use phpDocumentor\Reflection\Types\Float_;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Null_;
@@ -71,11 +73,14 @@ class PropertyReflector
         $isValidPrimitive = $resolvedType instanceof Boolean
             || $resolvedType instanceof Float_
             || $resolvedType instanceof Integer
-            || $resolvedType instanceof String_
-            || $resolvedType instanceof Object_;
+            || $resolvedType instanceof String_;
 
         if ($isValidPrimitive) {
             return $resolvedType;
+        }
+
+        if ($resolvedType instanceof Object_) {
+            return self::reflectObject($reflectionProperty, $resolvedType);
         }
 
         if ($resolvedType instanceof Compound) {
@@ -108,9 +113,26 @@ class PropertyReflector
 
         $other = current(array_filter(
             iterator_to_array($compound->getIterator()),
-            fn (Type $type) => ! $type instanceof Null_
+            fn(Type $type) => ! $type instanceof Null_
         ));
 
         return new Nullable(self::reflectDocblock($reflectionProperty, (string) $other));
+    }
+
+    private static function reflectObject(
+        ReflectionProperty $reflectionProperty,
+        Object_ $object
+    ): Object_ {
+        if (class_exists((string) $object->getFqsen())) {
+            return $object;
+        }
+
+        $context = (new ContextFactory)->createFromReflector($reflectionProperty);
+
+        $className = ltrim((string) $object->getFqsen(), '\\');
+
+        $fqsen = (new FqsenResolver)->resolve($className, $context);
+
+        return new Object_($fqsen);
     }
 }

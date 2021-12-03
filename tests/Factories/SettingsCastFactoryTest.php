@@ -8,8 +8,13 @@ use Spatie\LaravelSettings\Factories\SettingsCastFactory;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
 use Spatie\LaravelSettings\SettingsCasts\DtoCast;
+use Spatie\LaravelSettings\SettingsCasts\EnumCast;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyUnitEnum;
 
 class SettingsCastFactoryTest extends TestCase
 {
@@ -214,6 +219,35 @@ class SettingsCastFactoryTest extends TestCase
         $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'a_nullable_int'), []));
         $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'another_nullable_int'), []));
         $this->assertNull(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'an_array_of_ints_or_null'), []));
+    }
+
+    /** @test */
+    public function it_will_resolve_an_enum_cast_for_native_enums()
+    {
+        $fake = new class() {
+            public DummyUnitEnum $unit;
+            public DummyIntEnum $int;
+            public DummyStringEnum $string;
+
+            /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum */
+            public $annotated;
+        };
+
+        $this->assertEquals(new EnumCast(DummyUnitEnum::class), SettingsCastFactory::resolve(new ReflectionProperty($fake, 'unit'), []));
+        $this->assertEquals(new EnumCast(DummyIntEnum::class), SettingsCastFactory::resolve(new ReflectionProperty($fake, 'int'), []));
+        $this->assertEquals(new EnumCast(DummyStringEnum::class), SettingsCastFactory::resolve(new ReflectionProperty($fake, 'string'), []));
+
+        $this->assertEquals(new EnumCast(DummyStringEnum::class), SettingsCastFactory::resolve(new ReflectionProperty($fake, 'annotated'), []));
+    }
+
+    /** @test */
+    public function it_will_resolve_imported_annotated_casts()
+    {
+        $reflectionProperty = new ReflectionProperty(DummySettingsWithImportedType::class, 'dto_array');
+
+        $cast = SettingsCastFactory::resolve($reflectionProperty, []);
+
+        $this->assertEquals(new ArraySettingsCast(new DtoCast(DummyDto::class)), $cast);
     }
 
     private function withoutGlobalCasts()

@@ -137,4 +137,14 @@ class TestCase extends BaseTestCase
             "The setting {$group}.{$name} should not exist in the database"
         );
     }
+
+    protected function skipIfPHPLowerThen(string $version)
+    {
+        [$currentMajor, $currentMinor] = explode('.', phpversion());
+        [$major, $minor] = explode('.', phpversion());
+
+        if($currentMajor < $major && $currentMinor < $minor){
+            $this->markTestSkipped("PHP version {$version} required for this test");
+        }
+    }
 }
