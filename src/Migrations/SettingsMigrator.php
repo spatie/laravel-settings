@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
-use Spatie\LaravelSettings\Factories\SettingsCastFactory;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
 use Spatie\LaravelSettings\SettingsConfig;

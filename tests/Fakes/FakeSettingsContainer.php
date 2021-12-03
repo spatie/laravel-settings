@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests\Fakes;
 
-use Illuminate\Container\Container;
 use Spatie\LaravelSettings\SettingsContainer;
 
 class FakeSettingsContainer extends SettingsContainer
@@ -16,11 +15,11 @@ class FakeSettingsContainer extends SettingsContainer
     {
         $container = new self();
 
-        app()->bind(SettingsContainer::class, fn() => $container);
+        app()->bind(SettingsContainer::class, fn () => $container);
 
         $container->clearCache();
 
-        if($container::$settingsClasses === null){
+        if ($container::$settingsClasses === null) {
             $container::$settingsClasses = collect();
         }
 

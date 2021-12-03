@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Collection;
 use ReflectionProperty;
-use Serializable;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
@@ -72,7 +71,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->ensureConfigIsLoaded();
 
         foreach ($this->config->getReflectedProperties() as $name => $property) {
-            if(method_exists($property, 'isReadOnly') && $property->isReadOnly()){
+            if (method_exists($property, 'isReadOnly') && $property->isReadOnly()) {
                 continue;
             }
 
