@@ -608,7 +608,7 @@ When you want to disable the ability to update the value of a setting, you can a
 $dateSettings->lock('birth_date');
 ```
 
-It is now impossible to update the value of `birth_date`. When trying to overwrite `birthdate` and saving settings, the package will load the old value of `birthdate` from the repository, and it looks like nothing happened.
+It is now impossible to update the value of `birth_date`. When trying to overwrite `birth_date` and saving settings, the package will load the old value of `birth_date` from the repository, and it looks like nothing happened.
 
 You can also lock multiple settings at once:
 
@@ -722,7 +722,7 @@ In tests, it is sometimes desired that some settings classes can be quickly used
 
 ```php
 DateSettings::fake([
-    'birthdate_date' => new DateTime('16-05-1994')
+    'birth_date' => new DateTime('16-05-1994')
 ]);
 ```
 
