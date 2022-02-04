@@ -29,7 +29,7 @@ class DiscoversSettingsTest extends TestCase
             DummySettings::class,
             DummyEncryptedSettings::class,
             DummySettingsWithImportedType::class,
-            DummySettingsWithCast::class
+            DummySettingsWithCast::class,
         ], $discovered);
     }
 }
