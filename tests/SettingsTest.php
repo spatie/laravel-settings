@@ -12,6 +12,8 @@ use DB;
 use ErrorException;
 use Event;
 use Illuminate\Database\Events\SchemaLoaded;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
@@ -23,11 +25,13 @@ use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\Fakes\FakeSettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyUnitEnum;
@@ -690,5 +694,26 @@ class SettingsTest extends TestCase
 
         $this->assertEquals($settings->string, DummyStringEnum::ARCHIVED);
         $this->assertInstanceOf(DummyStringEnum::class, $settings->string);
+    }
+
+    /**
+     * @test
+     * @environment-setup useEnabledCache
+     */
+    public function it_supports_complex_types_with_casts_when_caching_Settings()
+    {
+        $collection = collect(['A', 'B', 'C']);
+
+        resolve(SettingsMigrator::class)->inGroup(DummySettingsWithCast::group(), function (SettingsBlueprint $blueprint) use ($collection): void {
+            $blueprint->add('collection', $collection);
+        });
+
+        resolve(SettingsCache::class)->put(resolve(DummySettingsWithCast::class));
+
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast $cachedSettings */
+        $cachedSettings = resolve(SettingsCache::class)->get(DummySettingsWithCast::class);
+
+        $this->assertInstanceOf(Collection::class, $cachedSettings->collection);
+        $this->assertEquals($collection, $cachedSettings->collection);
     }
 }

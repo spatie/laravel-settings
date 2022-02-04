@@ -111,7 +111,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function __serialize(): array
     {
-        return $this->toArray();
+        return $this->toCollection()->all();
     }
 
     public function __unserialize(array $data): void

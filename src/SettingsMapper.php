@@ -5,6 +5,7 @@ namespace Spatie\LaravelSettings;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettings;
+use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\Support\Crypto;
 
 class SettingsMapper
