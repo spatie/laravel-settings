@@ -13,13 +13,13 @@ use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 
 class SettingsConfig
 {
-    /** @var string|\Spatie\LaravelSettings\Settings */
+    /** @var class-string<\Spatie\LaravelSettings\Settings> */
     private string $settingsClass;
 
-    /** @var array<string, ?\Spatie\LaravelSettings\SettingsCasts\SettingsCast>|\Illuminate\Support\Collection */
+    /** @var Collection<string, ?\Spatie\LaravelSettings\SettingsCasts\SettingsCast> */
     private Collection $casts;
 
-    /** @var array<string, \ReflectionProperty>|\Illuminate\Support\Collection */
+    /** @var Collection<string, \ReflectionProperty> */
     private Collection $reflectionProperties;
 
     /** @var string[]|\Illuminate\Support\Collection */

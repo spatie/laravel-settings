@@ -1,0 +1,32 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Property 'group' does not exist in Spatie\\\\LaravelSettings\\\\Models\\\\SettingsProperty model\\.$#"
+			count: 1
+			path: src/Models/SettingsProperty.php
+
+		-
+			message: "#^Property 'name' does not exist in Spatie\\\\LaravelSettings\\\\Models\\\\SettingsProperty model\\.$#"
+			count: 1
+			path: src/Models/SettingsProperty.php
+
+		-
+			message: "#^Property Spatie\\\\LaravelSettings\\\\SettingsConfig\\:\\:\\$casts \\(Illuminate\\\\Support\\\\Collection\\<string, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\) does not accept Illuminate\\\\Support\\\\Collection\\<int, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\.$#"
+			count: 1
+			path: src/SettingsConfig.php
+
+		-
+			message: "#^Property Spatie\\\\LaravelSettings\\\\SettingsConfig\\:\\:\\$reflectionProperties \\(Illuminate\\\\Support\\\\Collection\\<string, ReflectionProperty\\>\\) does not accept Illuminate\\\\Support\\\\Collection\\<int, ReflectionProperty\\>\\.$#"
+			count: 1
+			path: src/SettingsConfig.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$name\\.$#"
+			count: 1
+			path: src/SettingsRepositories/DatabaseSettingsRepository.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$payload\\.$#"
+			count: 1
+			path: src/SettingsRepositories/DatabaseSettingsRepository.php
+

@@ -26,7 +26,7 @@ class DatabaseSettingsRepository implements SettingsRepository
         return $this->getBuilder()
             ->where('group', $group)
             ->get(['name', 'payload'])
-            ->mapWithKeys(function ($object) {
+            ->mapWithKeys(function (object $object) {
                 return [$object->name => json_decode($object->payload, true)];
             })
             ->toArray();

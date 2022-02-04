@@ -29,9 +29,11 @@
         "mockery/mockery": "^1.4",
         "orchestra/testbench": "^6.23|^7.0",
         "phpunit/phpunit": "^9.5",
-        "psalm/plugin-laravel": "^1.5",
         "spatie/phpunit-snapshot-assertions": "^4.2",
-        "vimeo/psalm": "^4.13"
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "nunomaduro/larastan": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -44,7 +46,7 @@
         }
     },
     "scripts": {
-        "psalm": "vendor/bin/psalm --no-diff --no-cache",
+        "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },

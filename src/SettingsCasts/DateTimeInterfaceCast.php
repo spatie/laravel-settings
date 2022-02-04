@@ -43,11 +43,7 @@ class DateTimeInterfaceCast implements SettingsCast
         throw new Exception("Could not cast DateTime type `{$this->type}`");
     }
 
-    /**
-     * @param DateTimeInterface $payload
-     *
-     * @return null|string
-     */
+    /** @param DateTimeInterface|null $payload */
     public function set($payload): ?string
     {
         return $payload !== null

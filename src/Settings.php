@@ -66,7 +66,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         ));
     }
 
-    public function __construct(array $values = [])
+    final public function __construct(array $values = [])
     {
         $this->ensureConfigIsLoaded();
 
