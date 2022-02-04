@@ -2,6 +2,13 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.3.1 - 2022-02-04
+
+- Add support for Laravel 9
+- Fix cache implementation with casts
+- Remove Psalm
+- Add PHPStan
+
 ## 2.2.0 - 2021-10-22
 
 - add support for multiple migration paths (#92)
@@ -68,9 +75,10 @@ All notable changes to `laravel-settings` will be documented in this file
 ## 2.0.0 - 2021-03-03
 
 - settings classes:
-    - properties won't be loaded when constructed but when requested
-    - receive a `SettingsMapper` when constructed
-    - faking settings will now only request non-given properties from the repository
+- - properties won't be loaded when constructed but when requested
+- - receive a `SettingsMapper` when constructed
+- - faking settings will now only request non-given properties from the repository
+- 
 - rewritten `SettingsMapper` from scratch
 - removed `SettingsPropertyData` and `ettingsPropertyDataCollection`
 - changed signatures of `SavingSettings` and `LoadingSettings` events
