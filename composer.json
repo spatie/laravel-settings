@@ -18,7 +18,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
-        "illuminate/database": "^8.73",
+        "illuminate/database": "^8.73|^9.0",
         "doctrine/dbal": "^2.13|^3.2",
         "phpdocumentor/type-resolver": "^1.5",
         "spatie/data-transfer-object": "^2.8|^3.7",
@@ -27,7 +27,7 @@
     "require-dev": {
         "ext-redis": "*",
         "mockery/mockery": "^1.4",
-        "orchestra/testbench": "^6.23",
+        "orchestra/testbench": "^6.23|^7.0",
         "phpunit/phpunit": "^9.5",
         "psalm/plugin-laravel": "^1.5",
         "spatie/phpunit-snapshot-assertions": "^4.2",
