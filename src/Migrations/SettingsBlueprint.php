@@ -25,7 +25,7 @@ class SettingsBlueprint
         );
     }
 
-    public function add(string $name, $value, bool $encrypted = false): void
+    public function add(string $name, mixed $value = null, bool $encrypted = false): void
     {
         $this->migrator->add($this->prependWithGroup($name), $value, $encrypted);
     }
@@ -40,7 +40,7 @@ class SettingsBlueprint
         $this->migrator->update($this->prependWithGroup($name), $closure, $encrypted);
     }
 
-    public function addEncrypted(string $name, $value): void
+    public function addEncrypted(string $name, mixed $value = null): void
     {
         $this->migrator->addEncrypted($this->prependWithGroup($name), $value);
     }
