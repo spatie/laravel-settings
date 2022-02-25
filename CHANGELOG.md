@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.3.2 - 2022-02-25
+
+- Allow migrations without a value (#113)
+
 ## 2.3.1 - 2022-02-04
 
 - Add support for Laravel 9
@@ -76,8 +80,11 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - settings classes:
 - - properties won't be loaded when constructed but when requested
+- 
 - - receive a `SettingsMapper` when constructed
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - rewritten `SettingsMapper` from scratch
 - removed `SettingsPropertyData` and `ettingsPropertyDataCollection`
