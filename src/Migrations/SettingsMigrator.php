@@ -48,7 +48,7 @@ class SettingsMigrator
         $this->deleteProperty($from);
     }
 
-    public function add(string $property, $value, bool $encrypted = false): void
+    public function add(string $property, $value = null, bool $encrypted = false): void
     {
         if ($this->checkIfPropertyExists($property)) {
             throw SettingAlreadyExists::whenAdding($property);
@@ -87,7 +87,7 @@ class SettingsMigrator
         $this->updatePropertyPayload($property, $updatedPayload);
     }
 
-    public function addEncrypted(string $property, $value): void
+    public function addEncrypted(string $property, $value = null): void
     {
         $this->add($property, $value, true);
     }
