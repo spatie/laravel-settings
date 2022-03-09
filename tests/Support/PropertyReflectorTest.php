@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests\Support;
 
-use Closure;
 use DateTime;
 use Exception;
 use phpDocumentor\Reflection\Fqsen;

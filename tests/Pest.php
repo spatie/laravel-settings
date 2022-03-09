@@ -1,10 +1,10 @@
 <?php
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 uses(TestCase::class)->in(__DIR__);
 

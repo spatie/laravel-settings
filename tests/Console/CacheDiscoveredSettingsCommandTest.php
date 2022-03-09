@@ -2,13 +2,13 @@
 
 namespace Spatie\LaravelSettings\Tests\Console;
 
+use function Orchestra\Testbench\artisan;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
-use Spatie\Snapshots\MatchesSnapshots;
 
-use function Orchestra\Testbench\artisan;
 use function Spatie\Snapshots\assertMatchesSnapshot;
+use Spatie\Snapshots\MatchesSnapshots;
 
 uses(MatchesSnapshots::class);
 

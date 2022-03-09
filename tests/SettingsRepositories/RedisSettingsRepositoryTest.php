@@ -3,9 +3,9 @@
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
-use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
-
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
+
+use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
 
 beforeEach(function () {
     $this->client = resolve(RedisManager::class)->client();

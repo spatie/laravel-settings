@@ -2,12 +2,13 @@
 
 namespace Spatie\LaravelSettings\Tests\Console;
 
+use function Orchestra\Testbench\artisan;
+use function PHPUnit\Framework\assertFileDoesNotExist;
+use function PHPUnit\Framework\assertFileExists;
+
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
-
-use function Orchestra\Testbench\artisan;
-use function PHPUnit\Framework\{assertFileExists, assertFileDoesNotExist};
 
 beforeEach(function () {
     $this->app['config']->set('settings.settings', [

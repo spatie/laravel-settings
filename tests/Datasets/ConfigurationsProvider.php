@@ -1,7 +1,7 @@
 <?php
 
-use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 
 dataset('configurationsProvider', [
     fn () => new DatabaseSettingsRepository([
@@ -18,5 +18,5 @@ dataset('configurationsProvider', [
         return new DatabaseSettingsRepository([
             'model' => get_class($model),
         ]);
-    }
+    },
 ]);

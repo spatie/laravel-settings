@@ -14,6 +14,8 @@ use Event;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
@@ -32,10 +34,9 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
+
 use Spatie\LaravelSettings\Tests\TestClasses\DummyUnitEnum;
 use Spatie\Snapshots\MatchesSnapshots;
-
-use function Pest\Laravel\{assertDatabaseHas, assertDatabaseMissing};
 
 uses(MatchesSnapshots::class);
 
