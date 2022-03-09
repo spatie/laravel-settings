@@ -10,26 +10,23 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
-class DiscoversSettingsTest extends TestCase
-{
-    /** @test */
-    public function it_can_get_all_classes_that_are_settings()
-    {
-        $pathToComposerJson = __DIR__.'/../composer.json';
+use function PHPUnit\Framework\assertEqualsCanonicalizing;
 
-        $discovered = (new DiscoverSettings())
-            ->within([__DIR__.'/TestClasses'])
-            ->useBasePath(realpath(__DIR__.'/../'))
-            ->useRootNamespace('Spatie\LaravelSettings\\')
-            ->ignoringFiles(Composer::getAutoloadedFiles($pathToComposerJson))
-            ->discover();
+it('can get all classes that are settings', function () {
+    $pathToComposerJson = __DIR__.'/../composer.json';
 
-        $this->assertEqualsCanonicalizing([
-            DummySimpleSettings::class,
-            DummySettings::class,
-            DummyEncryptedSettings::class,
-            DummySettingsWithImportedType::class,
-            DummySettingsWithCast::class,
-        ], $discovered);
-    }
-}
+    $discovered = (new DiscoverSettings())
+        ->within([__DIR__.'/TestClasses'])
+        ->useBasePath(realpath(__DIR__.'/../'))
+        ->useRootNamespace('Spatie\LaravelSettings\\')
+        ->ignoringFiles(Composer::getAutoloadedFiles($pathToComposerJson))
+        ->discover();
+
+    assertEqualsCanonicalizing([
+        DummySimpleSettings::class,
+        DummySettings::class,
+        DummyEncryptedSettings::class,
+        DummySettingsWithImportedType::class,
+        DummySettingsWithCast::class,
+    ], $discovered);
+});

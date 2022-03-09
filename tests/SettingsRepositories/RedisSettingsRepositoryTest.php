@@ -4,226 +4,191 @@ namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
 use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
-use Spatie\LaravelSettings\Tests\TestCase;
 
-class RedisSettingsRepositoryTest extends TestCase
-{
-    private RedisSettingsRepository $repository;
+use function PHPUnit\Framework\assertEqualsCanonicalizing;
 
-    /** @var mixed|\Redis */
-    private $client;
+beforeEach(function () {
+    $this->client = resolve(RedisManager::class)->client();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $this->client->flushAll();
 
-        $this->client = resolve(RedisManager::class)->client();
+    $this->repository = resolve(RedisSettingsRepository::class, [
+        'config' => [],
+    ]);
+});
 
-        $this->client->flushAll();
+it('can get the properties in a group', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
 
-        $this->repository = resolve(RedisSettingsRepository::class, [
-            'config' => [],
-        ]);
-    }
+    $this->repository->createProperty('not-test', 'a', 'Alpha');
 
-    /** @test */
-    public function it_can_get_the_properties_in_a_group(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    $properties = $this->repository->getPropertiesInGroup('test');
 
-        $this->repository->createProperty('not-test', 'a', 'Alpha');
-
-        $properties = $this->repository->getPropertiesInGroup('test');
-
-        $this->assertCount(5, $properties);
-        $this->assertEquals([
+    expect($properties)
+        ->toHaveCount(5)
+        ->toEqual([
             'a' => 'Alpha',
             'b' => true,
             'c' => ['night', 'day'],
             'd' => null,
             'e' => 42,
-        ], $properties);
-    }
-
-    /** @test */
-    public function it_can_check_if_a_property_exists(): void
-    {
-        $this->repository->createProperty('test', 'a', 'a');
-
-        $this->assertTrue($this->repository->checkIfPropertyExists('test', 'a'));
-        $this->assertFalse($this->repository->checkIfPropertyExists('test', 'b'));
-    }
-
-    /** @test */
-    public function it_can_get_the_property_payload(): void
-    {
-        $this->client->hMSet('test', [
-            'a' => json_encode('Alpha'),
-            'b' => json_encode(true),
-            'c' => json_encode(['night', 'day']),
-            'd' => json_encode(null),
-            'e' => json_encode(42),
         ]);
+});
 
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(true, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(['night', 'day'], $this->repository->getPropertyPayload('test', 'c'));
-        $this->assertEquals(null, $this->repository->getPropertyPayload('test', 'd'));
-        $this->assertEquals(42, $this->repository->getPropertyPayload('test', 'e'));
-    }
+it('can check if a property exists', function () {
+    $this->repository->createProperty('test', 'a', 'a');
 
-    /** @test */
-    public function it_can_create_a_property(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    expect($this->repository->checkIfPropertyExists('test', 'a'))->toBeTrue();
+    expect($this->repository->checkIfPropertyExists('test', 'b'))->toBeFalse();
+});
 
-        $this->assertEquals(5, $this->client->hLen('test'));
+it('can get the property payload', function () {
+    $this->client->hMSet('test', [
+        'a' => json_encode('Alpha'),
+        'b' => json_encode(true),
+        'c' => json_encode(['night', 'day']),
+        'd' => json_encode(null),
+        'e' => json_encode(42),
+    ]);
 
-        $values = $this->client->hVals('test');
-        $keys = $this->client->hKeys('test');
+    expect($this->repository->getPropertyPayload('test', 'a'))->toEqual('Alpha');
+    expect($this->repository->getPropertyPayload('test', 'b'))->toBeTrue();
+    expect($this->repository->getPropertyPayload('test', 'c'))->toEqual(['night', 'day']);
+    expect($this->repository->getPropertyPayload('test', 'd'))->toBeNull();
+    expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(42);
+});
 
-        $this->assertEquals('a', $keys[0]);
-        $this->assertEquals('Alpha', json_decode($values[0]));
+it('can create a property', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
 
-        $this->assertEquals('b', $keys[1]);
-        $this->assertEquals(true, json_decode($values[1]));
+    expect($this->client->hLen('test'))->toEqual(5);
 
-        $this->assertEquals('c', $keys[2]);
-        $this->assertEquals(['night', 'day'], json_decode($values[2], true));
+    $values = $this->client->hVals('test');
+    $keys = $this->client->hKeys('test');
 
-        $this->assertEquals('d', $keys[3]);
-        $this->assertEquals(null, json_decode($values[3], true));
+    expect($keys[0])->toEqual('a');
+    expect(json_decode($values[0]))->toEqual('Alpha');
 
-        $this->assertEquals('e', $keys[4]);
-        $this->assertEquals(42, json_decode($values[4], true));
-    }
+    expect($keys[1])->toEqual('b');
+    expect(json_decode($values[1]))->toBeTrue();
 
-    /** @test */
-    public function it_can_update_a_property_payload(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    expect($keys[2])->toEqual('c');
+    expect(json_decode($values[2], true))->toEqual(['night', 'day']);
 
-        $this->repository->updatePropertyPayload('test', 'a', null);
-        $this->repository->updatePropertyPayload('test', 'b', false);
-        $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
-        $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
-        $this->repository->updatePropertyPayload('test', 'e', 69);
+    expect($keys[3])->toEqual('d');
+    expect(json_decode($values[3], true))->toEqual(null);
 
-        $this->assertEquals(null, $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(false, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(['light', 'dark'], $this->repository->getPropertyPayload('test', 'c'));
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'd'));
-        $this->assertEquals(69, $this->repository->getPropertyPayload('test', 'e'));
-    }
+    expect($keys[4])->toEqual('e');
+    expect(json_decode($values[4], true))->toEqual(42);
+});
 
-    /** @test */
-    public function it_can_delete_a_property(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
+it('can update a property payload', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
 
-        $this->repository->deleteProperty('test', 'a');
+    $this->repository->updatePropertyPayload('test', 'a', null);
+    $this->repository->updatePropertyPayload('test', 'b', false);
+    $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
+    $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
+    $this->repository->updatePropertyPayload('test', 'e', 69);
 
-        $this->assertFalse($this->client->hExists('test', 'a'));
-    }
+    expect($this->repository->getPropertyPayload('test', 'a'))->toBeNull();
+    expect($this->repository->getPropertyPayload('test', 'b'))->toBeFalse();
+    expect($this->repository->getPropertyPayload('test', 'c'))->toEqual(['light', 'dark']);
+    expect($this->repository->getPropertyPayload('test', 'd'))->toEqual('Alpha');
+    expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(69);
+});
 
-    /** @test */
-    public function it_can_lock_settings()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
+it('can delete a property', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
 
-        $this->repository->lockProperties('test', ['a', 'c']);
+    $this->repository->deleteProperty('test', 'a');
 
-        $this->assertEqualsCanonicalizing(['a', 'c'], $this->client->sMembers('locks.test'));
-    }
+    expect($this->client->hExists('test', 'a'))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_unlock_settings()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
+it('can lock settings', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
 
-        $this->repository->lockProperties('test', ['a', 'b', 'c']);
+    $this->repository->lockProperties('test', ['a', 'c']);
 
-        $this->repository->unlockProperties('test', ['a', 'c']);
+    assertEqualsCanonicalizing(['a', 'c'], $this->client->sMembers('locks.test'));
+});
 
-        $this->assertEqualsCanonicalizing(['b'], $this->client->sMembers('locks.test'));
-    }
+it('can unlock settings', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
 
-    /** @test */
-    public function it_can_get_the_locked_properties()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
+    $this->repository->lockProperties('test', ['a', 'b', 'c']);
 
-        $this->repository->lockProperties('test', ['a', 'c']);
+    $this->repository->unlockProperties('test', ['a', 'c']);
 
-        $lockedProperties = $this->repository->getLockedProperties('test');
+    assertEqualsCanonicalizing(['b'], $this->client->sMembers('locks.test'));
+});
 
-        $this->assertCount(2, $lockedProperties);
-        $this->assertContains('a', $lockedProperties);
-        $this->assertContains('c', $lockedProperties);
-    }
+it('can get the locked properties', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
 
-    /** @test */
-    public function it_can_use_a_prefix()
-    {
-        $this->repository = resolve(RedisSettingsRepository::class, [
-            'config' => ['prefix' => 'spatie'],
-        ]);
+    $this->repository->lockProperties('test', ['a', 'c']);
 
-        $this->repository->createProperty('test', 'a', 'Alpha');
+    $lockedProperties = $this->repository->getLockedProperties('test');
 
-        $this->assertEquals([
-            'a' => json_encode('Alpha'),
-        ], $this->client->hGetAll('spatie.test'));
+    expect($lockedProperties)
+        ->toHaveCount(2)
+        ->toContain('a')
+        ->toContain('c');
+});
 
-        $this->assertEquals([
-            'a' => 'Alpha',
-        ], $this->repository->getPropertiesInGroup('test'));
+it('can use a prefix', function () {
+    $this->repository = resolve(RedisSettingsRepository::class, [
+        'config' => ['prefix' => 'spatie'],
+    ]);
 
-        $this->assertTrue($this->repository->checkIfPropertyExists('test', 'a'));
+    $this->repository->createProperty('test', 'a', 'Alpha');
 
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
+    expect($this->client->hGetAll('spatie.test'))
+        ->toEqual(['a' => json_encode('Alpha')]);
 
-        $this->repository->updatePropertyPayload('test', 'a', 'Alpha Updated');
+    expect($this->repository->getPropertiesInGroup('test'))
+        ->toEqual(['a' => 'Alpha']);
 
-        $this->assertEquals(
-            json_encode('Alpha Updated'),
-            $this->client->hGet('spatie.test', 'a')
-        );
+    expect($this->repository->checkIfPropertyExists('test', 'a'))->toBeTrue();
 
-        $this->repository->lockProperties('test', ['a']);
+    expect($this->repository->getPropertyPayload('test', 'a'))->toEqual('Alpha');
 
-        $this->assertEquals(['a'], $this->repository->getLockedProperties('test'));
+    $this->repository->updatePropertyPayload('test', 'a', 'Alpha Updated');
 
-        $this->assertEquals(
-            ['a'],
-            $this->client->sMembers('spatie.locks.test')
-        );
+    expect($this->client->hGet('spatie.test', 'a'))
+        ->toEqual(json_encode('Alpha Updated'));
 
-        $this->repository->unlockProperties('test', ['a']);
+    $this->repository->lockProperties('test', ['a']);
 
-        $this->assertEmpty($this->client->sMembers('spatie.locks.test'));
+    expect($this->repository->getLockedProperties('test'))->toEqual(['a']);
 
-        $this->repository->deleteProperty('test', 'a');
+    expect($this->client->sMembers('spatie.locks.test'))->toEqual(['a']);
 
-        $this->assertEmpty($this->repository->getPropertiesInGroup('test'));
-        $this->assertEmpty($this->client->hGetAll('spatie.test'));
-    }
-}
+    $this->repository->unlockProperties('test', ['a']);
+
+    expect($this->client->sMembers('spatie.locks.test'))->toBeEmpty();
+
+    $this->repository->deleteProperty('test', 'a');
+
+    expect($this->repository->getPropertiesInGroup('test'))->toBeEmpty();
+    expect($this->client->hGetAll('spatie.test'))->toBeEmpty();
+});

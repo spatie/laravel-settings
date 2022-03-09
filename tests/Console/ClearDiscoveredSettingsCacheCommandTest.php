@@ -3,35 +3,27 @@
 namespace Spatie\LaravelSettings\Tests\Console;
 
 use Spatie\LaravelSettings\SettingsContainer;
-use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
-class ClearDiscoveredSettingsCacheCommandTest extends TestCase
-{
-    private SettingsContainer $settingsContainer;
+use function Orchestra\Testbench\artisan;
+use function PHPUnit\Framework\{assertFileExists, assertFileDoesNotExist};
 
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    $this->app['config']->set('settings.settings', [
+        DummySettings::class,
+        DummySimpleSettings::class,
+    ]);
 
-        $this->app['config']->set('settings.settings', [
-            DummySettings::class,
-            DummySimpleSettings::class,
-        ]);
+    $this->settingsContainer = app(SettingsContainer::class);
+});
 
-        $this->settingsContainer = app(SettingsContainer::class);
-    }
+it('can clear the registered settings', function () {
+    artisan($this, 'settings:discover')->assertExitCode(0);
 
-    /** @test */
-    public function it_can_clear_the_registered_settings()
-    {
-        $this->artisan('settings:discover')->assertExitCode(0);
+    assertFileExists(config('settings.discovered_settings_cache_path').'/settings.php');
 
-        $this->assertFileExists(config('settings.discovered_settings_cache_path').'/settings.php');
+    artisan($this, 'settings:clear-discovered')->assertExitCode(0);
 
-        $this->artisan('settings:clear-discovered')->assertExitCode(0);
-
-        $this->assertFileDoesNotExist(config('settings.discovered_settings_cache_path').'/settings.php');
-    }
-}
+    assertFileDoesNotExist(config('settings.discovered_settings_cache_path').'/settings.php');
+});

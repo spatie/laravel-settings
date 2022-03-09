@@ -83,11 +83,6 @@ class TestCase extends BaseTestCase
         return $this;
     }
 
-    protected function useEnabledCache($app)
-    {
-        $app['config']->set('settings.cache.enabled', true);
-    }
-
     protected function assertDatabaseHasSetting(string $property, $value): void
     {
         [$group, $name] = explode('.', $property);

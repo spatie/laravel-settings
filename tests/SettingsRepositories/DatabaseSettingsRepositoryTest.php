@@ -2,347 +2,250 @@
 
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
-use Closure;
 use DB;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
-use Spatie\LaravelSettings\Tests\TestCase;
-use Spatie\TemporaryDirectory\TemporaryDirectory;
 
-class DatabaseSettingsRepositoryTest extends TestCase
-{
-    private DatabaseSettingsRepository $repository;
+beforeEach(function () {
+    $this->repository = new DatabaseSettingsRepository(config('settings.repositories.database'));
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('can get the properties in a group', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
 
-        $this->repository = new DatabaseSettingsRepository(config('settings.repositories.database'));
-    }
+    $this->repository->createProperty('not-test', 'a', 'Alpha');
 
-    /** @test */
-    public function it_can_get_the_properties_in_a_group(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    $properties = $this->repository->getPropertiesInGroup('test');
 
-        $this->repository->createProperty('not-test', 'a', 'Alpha');
-
-        $properties = $this->repository->getPropertiesInGroup('test');
-
-        $this->assertCount(5, $properties);
-        $this->assertEquals([
+    expect($properties)
+        ->toHaveCount(5)
+        ->toEqual([
             'a' => 'Alpha',
             'b' => true,
             'c' => ['night', 'day'],
             'd' => null,
             'e' => 42,
-        ], $properties);
-    }
-
-    /** @test */
-    public function it_can_check_if_a_property_exists(): void
-    {
-        $this->repository->createProperty('test', 'a', 'a');
-
-        $this->assertTrue($this->repository->checkIfPropertyExists('test', 'a'));
-        $this->assertFalse($this->repository->checkIfPropertyExists('test', 'b'));
-    }
-
-    /** @test */
-    public function it_can_get_the_property_payload(): void
-    {
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'a',
-            'payload' => json_encode('Alpha'),
-            'locked' => false,
         ]);
+});
 
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'b',
-            'payload' => json_encode(true),
-            'locked' => false,
-        ]);
+it('can check if a property exists', function () {
+    $this->repository->createProperty('test', 'a', 'a');
 
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'c',
-            'payload' => json_encode(['night', 'day']),
-            'locked' => false,
-        ]);
+    expect($this->repository->checkIfPropertyExists('test', 'a'))->toBeTrue();
+    expect($this->repository->checkIfPropertyExists('test', 'b'))->toBeFalse();
+});
 
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'd',
-            'payload' => json_encode(null),
-            'locked' => false,
-        ]);
+it('can get the property payload', function () {
+    SettingsProperty::create([
+        'group' => 'test',
+        'name' => 'a',
+        'payload' => json_encode('Alpha'),
+        'locked' => false,
+    ]);
 
-        SettingsProperty::create([
-            'group' => 'test',
-            'name' => 'e',
-            'payload' => json_encode(42),
-            'locked' => false,
-        ]);
+    SettingsProperty::create([
+        'group' => 'test',
+        'name' => 'b',
+        'payload' => json_encode(true),
+        'locked' => false,
+    ]);
 
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(true, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(['night', 'day'], $this->repository->getPropertyPayload('test', 'c'));
-        $this->assertEquals(null, $this->repository->getPropertyPayload('test', 'd'));
-        $this->assertEquals(42, $this->repository->getPropertyPayload('test', 'e'));
+    SettingsProperty::create([
+        'group' => 'test',
+        'name' => 'c',
+        'payload' => json_encode(['night', 'day']),
+        'locked' => false,
+    ]);
+
+    SettingsProperty::create([
+        'group' => 'test',
+        'name' => 'd',
+        'payload' => json_encode(null),
+        'locked' => false,
+    ]);
+
+    SettingsProperty::create([
+        'group' => 'test',
+        'name' => 'e',
+        'payload' => json_encode(42),
+        'locked' => false,
+    ]);
+
+    expect($this->repository->getPropertyPayload('test', 'a'))->toEqual('Alpha');
+    expect($this->repository->getPropertyPayload('test', 'b'))->toBeTrue();
+    expect($this->repository->getPropertyPayload('test', 'c'))->toEqual(['night', 'day']);
+    expect($this->repository->getPropertyPayload('test', 'd'))->toBeNull();
+    expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(42);
+});
+
+it('can create a property', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
+
+    $properties = SettingsProperty::all();
+
+    expect($properties)
+        ->toHaveCount(5);
+
+    expect($properties[0]->group)->toEqual('test');
+    expect($properties[0]->name)->toEqual('a');
+    expect(json_decode($properties[0]->payload))->toEqual('Alpha');
+
+    expect($properties[1]->group)->toEqual('test');
+    expect($properties[1]->name)->toEqual('b');
+    expect(json_decode($properties[1]->payload))->toBeTrue();
+
+    expect($properties[2]->group)->toEqual('test');
+    expect($properties[2]->name)->toEqual('c');
+    expect(json_decode($properties[2]->payload, true))->toEqual(['night', 'day']);
+
+    expect($properties[3]->group)->toEqual('test');
+    expect($properties[3]->name)->toEqual('d');
+    expect(json_decode($properties[3]->payload, true))->toBeNull();
+
+    expect($properties[4]->group)->toEqual('test');
+    expect($properties[4]->name)->toEqual('e');
+    expect(json_decode($properties[4]->payload, true))->toEqual(42);
+});
+
+it('can update a property payload', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
+
+    $this->repository->updatePropertyPayload('test', 'a', null);
+    $this->repository->updatePropertyPayload('test', 'b', false);
+    $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
+    $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
+    $this->repository->updatePropertyPayload('test', 'e', 69);
+
+    expect($this->repository->getPropertyPayload('test', 'a'))->toBeNull();
+    expect($this->repository->getPropertyPayload('test', 'b'))->toBeFalse();
+    expect($this->repository->getPropertyPayload('test', 'c'))->toEqual(['light', 'dark']);
+    expect($this->repository->getPropertyPayload('test', 'd'))->toEqual('Alpha');
+    expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(69);
+});
+
+it('can delete a property', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+
+    $this->repository->deleteProperty('test', 'a');
+
+    $this->assertDatabaseDoesNotHaveSetting('test.a');
+});
+
+it('can lock settings', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
+
+    $propertyA = getSettingsProperty('test', 'a');
+    $propertyB = getSettingsProperty('test', 'b');
+    $propertyC = getSettingsProperty('test', 'c');
+
+    $this->repository->lockProperties('test', ['a', 'c']);
+
+    expect($propertyA->refresh()->locked)->toBeTrue();
+    expect($propertyB->refresh()->locked)->toBeFalse();
+    expect($propertyC->refresh()->locked)->toBeTrue();
+});
+
+it('can unlock settings', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
+
+    $propertyA = getSettingsProperty('test', 'a');
+    $propertyB = getSettingsProperty('test', 'b');
+    $propertyC = getSettingsProperty('test', 'c');
+
+    foreach ([$propertyA, $propertyB, $propertyC] as $property) {
+        $property->update(['locked' => true]);
     }
 
-    /** @test */
-    public function it_can_create_a_property(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    $this->repository->unlockProperties('test', ['a', 'c']);
 
-        $properties = SettingsProperty::all();
+    expect($propertyA->refresh()->locked)->toBeFalse();
+    expect($propertyB->refresh()->locked)->toBeTrue();
+    expect($propertyC->refresh()->locked)->toBeFalse();
+});
 
-        $this->assertCount(5, $properties);
+it('can get the locked properties', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', 'Beta');
+    $this->repository->createProperty('test', 'c', 'Gamma');
 
-        $this->assertEquals('test', $properties[0]->group);
-        $this->assertEquals('a', $properties[0]->name);
-        $this->assertEquals('Alpha', json_decode($properties[0]->payload));
+    getSettingsProperty('test', 'a')->update(['locked' => true]);
+    getSettingsProperty('test', 'c')->update(['locked' => true]);
 
-        $this->assertEquals('test', $properties[1]->group);
-        $this->assertEquals('b', $properties[1]->name);
-        $this->assertEquals(true, json_decode($properties[1]->payload));
+    $lockedProperties = $this->repository->getLockedProperties('test');
 
-        $this->assertEquals('test', $properties[2]->group);
-        $this->assertEquals('c', $properties[2]->name);
-        $this->assertEquals(['night', 'day'], json_decode($properties[2]->payload, true));
+    expect($lockedProperties)
+        ->toHaveCount(2)
+        ->toContain('a')
+        ->toContain('c');
+});
 
-        $this->assertEquals('test', $properties[3]->group);
-        $this->assertEquals('d', $properties[3]->name);
-        $this->assertEquals(null, json_decode($properties[3]->payload, true));
+it('can have different configuration options', function ($repositoryFactory) {
+    prepareOtherConnection();
 
-        $this->assertEquals('test', $properties[4]->group);
-        $this->assertEquals('e', $properties[4]->name);
-        $this->assertEquals(42, json_decode($properties[4]->payload, true));
-    }
+    $otherRepository = $repositoryFactory;
 
-    /** @test */
-    public function it_can_update_a_property_payload(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', true);
-        $this->repository->createProperty('test', 'c', ['night', 'day']);
-        $this->repository->createProperty('test', 'd', null);
-        $this->repository->createProperty('test', 'e', 42);
+    $otherRepository->createProperty('test', 'a', 'Alpha');
 
-        $this->repository->updatePropertyPayload('test', 'a', null);
-        $this->repository->updatePropertyPayload('test', 'b', false);
-        $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
-        $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
-        $this->repository->updatePropertyPayload('test', 'e', 69);
+    expect($this->repository->getPropertiesInGroup('test'))->toBeEmpty();
+    expect($otherRepository->getPropertiesInGroup('test'))->toEqual(['a' => 'Alpha']);
 
-        $this->assertEquals(null, $this->repository->getPropertyPayload('test', 'a'));
-        $this->assertEquals(false, $this->repository->getPropertyPayload('test', 'b'));
-        $this->assertEquals(['light', 'dark'], $this->repository->getPropertyPayload('test', 'c'));
-        $this->assertEquals('Alpha', $this->repository->getPropertyPayload('test', 'd'));
-        $this->assertEquals(69, $this->repository->getPropertyPayload('test', 'e'));
-    }
+    $otherRepository->createProperty('test', 'b', 'Beta');
+    $otherRepository->updatePropertyPayload('test', 'b', 'Beta updated');
 
-    /** @test */
-    public function it_can_delete_a_property(): void
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
+    expect($otherRepository->getPropertyPayload('test', 'b'))->toEqual('Beta updated');
 
-        $this->repository->deleteProperty('test', 'a');
+    $otherRepository->lockProperties('test', ['b']);
 
-        $this->assertDatabaseDoesNotHaveSetting('test.a');
-    }
+    expect($otherRepository->getLockedProperties('test'))->toEqual(['b']);
 
-    /** @test */
-    public function it_can_lock_settings()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
+    $otherRepository->unlockProperties('test', ['b']);
 
-        $propertyA = $this->getSettingsProperty('test', 'a');
-        $propertyB = $this->getSettingsProperty('test', 'b');
-        $propertyC = $this->getSettingsProperty('test', 'c');
+    expect($otherRepository->getLockedProperties('test'))->toBeEmpty();
 
-        $this->repository->lockProperties('test', ['a', 'c']);
+    $otherRepository->deleteProperty('test', 'b');
 
-        $this->assertTrue($propertyA->refresh()->locked);
-        $this->assertFalse($propertyB->refresh()->locked);
-        $this->assertTrue($propertyC->refresh()->locked);
-    }
+    expect($otherRepository->getPropertiesInGroup('test'))->toEqual([
+        'a' => 'Alpha',
+    ]);
+})
+->with('configurationsProvider');
 
-    /** @test */
-    public function it_can_unlock_settings()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
+it('can have a different table name', function () {
+    Schema::create('spatie_settings', function (Blueprint $table): void {
+        $table->id();
 
-        $propertyA = $this->getSettingsProperty('test', 'a');
-        $propertyB = $this->getSettingsProperty('test', 'b');
-        $propertyC = $this->getSettingsProperty('test', 'c');
+        $table->string('group')->index();
+        $table->string('name');
+        $table->boolean('locked');
+        $table->json('payload');
 
-        foreach ([$propertyA, $propertyB, $propertyC] as $property) {
-            $property->update(['locked' => true]);
-        }
+        $table->timestamps();
+    });
 
-        $this->repository->unlockProperties('test', ['a', 'c']);
+    $repository = new DatabaseSettingsRepository([
+        'table' => 'spatie_settings',
+    ]);
 
-        $this->assertFalse($propertyA->refresh()->locked);
-        $this->assertTrue($propertyB->refresh()->locked);
-        $this->assertFalse($propertyC->refresh()->locked);
-    }
+    $repository->createProperty('test', 'a', 'Alpha');
 
-    /** @test */
-    public function it_can_get_the_locked_properties()
-    {
-        $this->repository->createProperty('test', 'a', 'Alpha');
-        $this->repository->createProperty('test', 'b', 'Beta');
-        $this->repository->createProperty('test', 'c', 'Gamma');
-
-        $this->getSettingsProperty('test', 'a')->update(['locked' => true]);
-        $this->getSettingsProperty('test', 'c')->update(['locked' => true]);
-
-        $lockedProperties = $this->repository->getLockedProperties('test');
-
-        $this->assertCount(2, $lockedProperties);
-        $this->assertContains('a', $lockedProperties);
-        $this->assertContains('c', $lockedProperties);
-    }
-
-    /**
-     * @test
-     * @dataProvider configurationsProvider
-     *
-     * @param \Closure $repositoryFactory
-     */
-    public function it_can_have_different_configuration_options(Closure $repositoryFactory)
-    {
-        $this->prepareOtherConnection();
-
-        $otherRepository = $repositoryFactory();
-
-        $otherRepository->createProperty('test', 'a', 'Alpha');
-
-        $this->assertEmpty($this->repository->getPropertiesInGroup('test'));
-        $this->assertEquals(['a' => 'Alpha'], $otherRepository->getPropertiesInGroup('test'));
-
-        $otherRepository->createProperty('test', 'b', 'Beta');
-        $otherRepository->updatePropertyPayload('test', 'b', 'Beta updated');
-
-        $this->assertEquals('Beta updated', $otherRepository->getPropertyPayload('test', 'b'));
-
-        $otherRepository->lockProperties('test', ['b']);
-
-        $this->assertEquals(['b'], $otherRepository->getLockedProperties('test'));
-
-        $otherRepository->unlockProperties('test', ['b']);
-
-        $this->assertEmpty($otherRepository->getLockedProperties('test'));
-
-        $otherRepository->deleteProperty('test', 'b');
-
-        $this->assertEquals([
-            'a' => 'Alpha',
-        ], $otherRepository->getPropertiesInGroup('test'));
-    }
-
-    /** @test */
-    public function it_can_have_a_different_table_name()
-    {
-        Schema::create('spatie_settings', function (Blueprint $table): void {
-            $table->id();
-
-            $table->string('group')->index();
-            $table->string('name');
-            $table->boolean('locked');
-            $table->json('payload');
-
-            $table->timestamps();
-        });
-
-        $repository = new DatabaseSettingsRepository([
-            'table' => 'spatie_settings',
-        ]);
-
-        $repository->createProperty('test', 'a', 'Alpha');
-
-        $this->assertEquals(1, DB::table('spatie_settings')->count());
-        $this->assertEquals(0, DB::table('settings')->count());
-    }
-
-    public function configurationsProvider(): array
-    {
-        return [
-            [
-                function () {
-                    return new DatabaseSettingsRepository([
-                        'connection' => 'other',
-                    ]);
-                },
-            ], [
-                function () {
-                    $model = new class() extends SettingsProperty {
-                        public function getConnectionName()
-                        {
-                            return 'other';
-                        }
-                    };
-
-                    return new DatabaseSettingsRepository([
-                        'model' => get_class($model),
-                    ]);
-                },
-            ],
-        ];
-    }
-
-    private function getSettingsProperty(string $group, string $name): SettingsProperty
-    {
-        /** @var \Spatie\LaravelSettings\Models\SettingsProperty $settingsProperty */
-        $settingsProperty = SettingsProperty::query()
-            ->where('group', $group)
-            ->where('name', $name)
-            ->first();
-
-        return $settingsProperty;
-    }
-
-    private function prepareOtherConnection()
-    {
-        $tempDir = (new TemporaryDirectory())->create();
-
-        file_put_contents($tempDir->path('database.sqlite'), '');
-
-        config()->set('database.connections.other', [
-            'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', $tempDir->path('database.sqlite')),
-            'prefix' => '',
-            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-        ]);
-
-        Schema::connection('other')->create('settings', function (Blueprint $table): void {
-            $table->id();
-
-            $table->string('group')->index();
-            $table->string('name');
-            $table->boolean('locked');
-            $table->json('payload');
-
-            $table->timestamps();
-        });
-    }
-}
+    expect(DB::table('spatie_settings')->count())->toEqual(1);
+    expect(DB::table('settings')->count())->toEqual(0);
+});

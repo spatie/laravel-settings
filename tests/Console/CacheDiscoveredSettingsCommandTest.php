@@ -3,34 +3,26 @@
 namespace Spatie\LaravelSettings\Tests\Console;
 
 use Spatie\LaravelSettings\SettingsContainer;
-use Spatie\LaravelSettings\Tests\TestCase;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\Snapshots\MatchesSnapshots;
 
-class CacheDiscoveredSettingsCommandTest extends TestCase
-{
-    use MatchesSnapshots;
+use function Orchestra\Testbench\artisan;
+use function Spatie\Snapshots\assertMatchesSnapshot;
 
-    private SettingsContainer $container;
+uses(MatchesSnapshots::class);
 
-    public function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    $this->app['config']->set('settings.settings', [
+        DummySettings::class,
+        DummySimpleSettings::class,
+    ]);
 
-        $this->app['config']->set('settings.settings', [
-            DummySettings::class,
-            DummySimpleSettings::class,
-        ]);
+    $this->container = app(SettingsContainer::class);
+});
 
-        $this->container = app(SettingsContainer::class);
-    }
+it('can cache the registered sessions', function () {
+    artisan($this, 'settings:discover')->assertExitCode(0);
 
-    /** @test */
-    public function it_can_cache_the_registered_sessions()
-    {
-        $this->artisan('settings:discover')->assertExitCode(0);
-
-        $this->assertMatchesSnapshot(file_get_contents(config('settings.discovered_settings_cache_path').'/settings.php'));
-    }
-}
+    assertMatchesSnapshot(file_get_contents(config('settings.discovered_settings_cache_path').'/settings.php'));
+});

@@ -2,25 +2,20 @@
 
 namespace Spatie\LaravelSettings\Tests\Console;
 
-use Spatie\LaravelSettings\Tests\TestCase;
+use function Orchestra\Testbench\artisan;
 
-class MakeSettingsMigrationCommandTest extends TestCase
-{
-    /** @test */
-    public function it_creates_a_new_test_settings_migration_on_specified_path()
-    {
-        $tmpDir = sys_get_temp_dir();
+it('creates a new test settings migration on specified path', function () {
+    $tmpDir = sys_get_temp_dir();
 
-        $this->artisan('make:settings-migration', [
-            'name' => 'CreateNewTestSettingsMigration',
-            'path' => $tmpDir,
-        ])->assertExitCode(0);
+    artisan($this, 'make:settings-migration', [
+        'name' => 'CreateNewTestSettingsMigration',
+        'path' => $tmpDir,
+    ])->assertExitCode(0);
 
-        $tmpList = glob(sprintf('%s/*_create_new_test_settings_migration.php', $tmpDir));
+    $tmpList = glob(sprintf('%s/*_create_new_test_settings_migration.php', $tmpDir));
 
-        $this->assertCount(1, $tmpList);
+    expect($tmpList)->toHaveCount(1);
 
-        // Remove test file.
-        unlink($tmpList[0]);
-    }
-}
+    // Remove test file.
+    unlink($tmpList[0]);
+});
