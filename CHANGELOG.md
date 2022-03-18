@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.3.3 - 2022-03-18
+
+- fix debug info method
+- convert PHPUnit to Pest (#118)
+
 ## 2.3.2 - 2022-02-25
 
 - Allow migrations without a value (#113)
@@ -81,9 +86,12 @@ All notable changes to `laravel-settings` will be documented in this file
 - settings classes:
 - - properties won't be loaded when constructed but when requested
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - rewritten `SettingsMapper` from scratch
