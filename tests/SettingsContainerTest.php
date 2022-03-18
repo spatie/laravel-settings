@@ -9,82 +9,70 @@ use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\Fakes\FakeAction;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
-class SettingsContainerTest extends TestCase
-{
-    private SettingsMigrator $migrator;
+beforeEach(function () {
+    $this->setRegisteredSettings([
+        DummySimpleSettings::class,
+    ]);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $this->migrator = resolve(SettingsMigrator::class);
 
-        $this->setRegisteredSettings([
-            DummySimpleSettings::class,
-        ]);
+    $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('name', 'Louis Armstrong');
+        $blueprint->add('description', 'Hello Dolly');
+    });
 
-        $this->migrator = resolve(SettingsMigrator::class);
+    resolve(SettingsContainer::class)->registerBindings();
+});
 
-        $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('name', 'Louis Armstrong');
-            $blueprint->add('description', 'Hello Dolly');
-        });
+it('will not fetch data from the repository twice', function () {
+    DB::connection()->enableQueryLog();
 
-        resolve(SettingsContainer::class)->registerBindings();
-    }
+    $settingsA = resolve(DummySimpleSettings::class);
+    $settingsB = resolve(DummySimpleSettings::class);
 
-    /** @test */
-    public function it_will_not_fetch_data_from_the_repository_twice()
-    {
-        DB::connection()->enableQueryLog();
+    $settingsA->name;
+    $settingsB->name;
 
-        $settingsA = resolve(DummySimpleSettings::class);
-        $settingsB = resolve(DummySimpleSettings::class);
+    $log = DB::connection()->getQueryLog();
 
-        $settingsA->name;
-        $settingsB->name;
+    expect($log)->toHaveCount(1);
+});
 
-        $log = DB::connection()->getQueryLog();
+it('wont fetch data from the repository when injected only', function () {
+    DB::connection()->enableQueryLog();
 
-        $this->assertCount(1, $log);
-    }
+    resolve(DummySimpleSettings::class);
 
-    /** @test */
-    public function it_wont_fetch_data_from_the_repository_when_injected_only()
-    {
-        DB::connection()->enableQueryLog();
+    $log = DB::connection()->getQueryLog();
 
-        resolve(DummySimpleSettings::class);
+    expect($log)->toHaveCount(0);
+});
 
-        $log = DB::connection()->getQueryLog();
+it('settings are shared between instances', function () {
+    $settingsA = resolve(DummySimpleSettings::class);
+    $settingsB = resolve(DummySimpleSettings::class);
 
-        $this->assertCount(0, $log);
-    }
+    $settingsA->name = 'Nina Simone';
 
-    /** @test */
-    public function settings_are_shared_between_instances()
-    {
-        $settingsA = resolve(DummySimpleSettings::class);
-        $settingsB = resolve(DummySimpleSettings::class);
+    expect($settingsB)
+        ->name
+        ->toEqual('Nina Simone');
 
-        $settingsA->name = 'Nina Simone';
+    $settingsB->lock('name');
 
-        $this->assertEquals('Nina Simone', $settingsB->name);
+    $settingsB->save();
 
-        $settingsB->lock('name');
+    expect($settingsA)
+        ->name
+        ->toEqual('Louis Armstrong');
+});
 
-        $settingsB->save();
+it('can refresh settings', function () {
+    $settings = resolve(DummySimpleSettings::class);
 
-        $this->assertEquals('Louis Armstrong', $settingsA->name);
-    }
+    $fakeAction = resolve(FakeAction::class);
 
-    /** @test */
-    public function it_can_refresh_settings()
-    {
-        $settings = resolve(DummySimpleSettings::class);
+    $fakeAction->updateSettings();
 
-        $fakeAction = resolve(FakeAction::class);
-
-        $fakeAction->updateSettings();
-
-        $this->assertEquals('updated', $settings->name);
-    }
-}
+    expect($settings)->name->toEqual('updated');
+});

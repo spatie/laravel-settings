@@ -12,215 +12,150 @@ use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 
-class SettingsMigratorTest extends TestCase
-{
-    private SettingsMigrator $settingsMigrator;
+beforeEach(function () {
+    $this->settingsMigrator = new SettingsMigrator(
+        new DatabaseSettingsRepository(config('settings.repositories.database'))
+    );
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
 
-        $this->settingsMigrator = new SettingsMigrator(
-            new DatabaseSettingsRepository(config('settings.repositories.database'))
-        );
-    }
+it('can add a setting', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
 
-    /** @test */
-    public function it_can_add_a_setting(): void
-    {
-        $this->settingsMigrator->add('compliance.enabled', true);
+    $this->assertDatabaseHasSetting('compliance.enabled', true);
+});
 
-        $this->assertDatabaseHasSetting('compliance.enabled', true);
-    }
+it('cannot add the same setting twice', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
+    $this->settingsMigrator->add('compliance.enabled', true);
+})->throws(SettingAlreadyExists::class);
 
-    /** @test */
-    public function it_cannot_add_the_same_setting_twice(): void
-    {
-        $this->expectException(SettingAlreadyExists::class);
+it('can add a setting with the same name in different groups', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
+    $this->settingsMigrator->add('eduction.enabled', false);
 
-        $this->settingsMigrator->add('compliance.enabled', true);
-        $this->settingsMigrator->add('compliance.enabled', true);
-    }
+    $this->assertDatabaseHasSetting('compliance.enabled', true);
+    $this->assertDatabaseHasSetting('eduction.enabled', false);
+});
 
-    /** @test */
-    public function it_can_add_a_setting_with_the_same_name_in_different_groups(): void
-    {
-        $this->settingsMigrator->add('compliance.enabled', true);
-        $this->settingsMigrator->add('eduction.enabled', false);
+it('cannot provide a invalid name when creating a setting', function () {
+    $this->settingsMigrator->add('compliance', true);
+})->throws(InvalidSettingName::class);
 
-        $this->assertDatabaseHasSetting('compliance.enabled', true);
-        $this->assertDatabaseHasSetting('eduction.enabled', false);
-    }
+it('can rename a setting', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
 
-    /** @test */
-    public function it_cannot_provide_a_invalid_name_when_creating_a_setting(): void
-    {
-        $this->expectException(InvalidSettingName::class);
+    $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
 
-        $this->settingsMigrator->add('compliance', true);
-    }
+    $this->assertDatabaseHasSetting('eduction.enabled', true);
+    $this->assertDatabaseDoesNotHaveSetting('compliance.enabled');
+});
 
-    /** @test */
-    public function it_can_rename_a_setting(): void
-    {
-        $this->settingsMigrator->add('compliance.enabled', true);
+it('cannot rename a property that does not exist', function () {
+    $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
+})->throws(SettingDoesNotExist::class);
 
-        $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
+it('cannot rename a property to another existing property', function () {
+    $this->settingsMigrator->add('eduction.enabled', true);
+    $this->settingsMigrator->add('compliance.enabled', true);
 
-        $this->assertDatabaseHasSetting('eduction.enabled', true);
-        $this->assertDatabaseDoesNotHaveSetting('compliance.enabled');
-    }
+    $this->settingsMigrator->rename('eduction.enabled', 'compliance.enabled');
+})->throws(SettingAlreadyExists::class);
 
-    /** @test */
-    public function it_cannot_rename_a_property_that_does_not_exist(): void
-    {
-        $this->expectException(SettingDoesNotExist::class);
+it('cannot rename from an invalid property', function () {
+    $this->settingsMigrator->rename('eduction', 'compliance.enabled');
+})->throws(InvalidSettingName::class);
 
-        $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
-    }
+it('cannot rename to an invalid property', function () {
+    $this->settingsMigrator->add('eduction.enabled', true);
 
-    /** @test */
-    public function it_cannot_rename_a_property_to_another_existing_property(): void
-    {
-        $this->expectException(SettingAlreadyExists::class);
+    $this->settingsMigrator->rename('eduction.enabled', 'compliance');
+})->throws(InvalidSettingName::class);
 
-        $this->settingsMigrator->add('eduction.enabled', true);
-        $this->settingsMigrator->add('compliance.enabled', true);
+it('can delete a setting', function () {
+    $this->settingsMigrator->add('eduction.enabled', true);
 
-        $this->settingsMigrator->rename('eduction.enabled', 'compliance.enabled');
-    }
+    $this->settingsMigrator->delete('eduction.enabled');
 
-    /** @test */
-    public function it_cannot_rename_from_an_invalid_property(): void
-    {
-        $this->expectException(InvalidSettingName::class);
+    $this->assertDatabaseDoesNotHaveSetting('eduction.enabled');
+});
 
-        $this->settingsMigrator->rename('eduction', 'compliance.enabled');
-    }
+it('cannot delete a setting that does not exist', function () {
+    $this->settingsMigrator->delete('eduction.enabled');
+})->throws(SettingDoesNotExist::class);
 
-    /** @test */
-    public function it_cannot_rename_to_an_invalid_property(): void
-    {
-        $this->expectException(InvalidSettingName::class);
+it('cannot delete a setting with an invalid property', function () {
+    $this->settingsMigrator->delete('eductions');
+})->throws(InvalidSettingName::class);
 
-        $this->settingsMigrator->add('eduction.enabled', true);
+it('can update a setting', function () {
+    $this->settingsMigrator->add('user.name', 'Brent Roose');
 
-        $this->settingsMigrator->rename('eduction.enabled', 'compliance');
-    }
+    $this->settingsMigrator->update('user.name', fn (string $name) => 'Ruben Van Assche');
 
-    /** @test */
-    public function it_can_delete_a_setting(): void
-    {
-        $this->settingsMigrator->add('eduction.enabled', true);
+    $this->assertDatabaseHasSetting('user.name', 'Ruben Van Assche');
+});
 
-        $this->settingsMigrator->delete('eduction.enabled');
+it('cannot update a setting that does not exist', function () {
+    $this->settingsMigrator->update('user.name', fn (string $name) => 'Ruben Van Assche');
+})->throws(SettingDoesNotExist::class);
 
-        $this->assertDatabaseDoesNotHaveSetting('eduction.enabled');
-    }
+it('can perform migrations within a group', function () {
+    $this->settingsMigrator->inGroup('test', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('a', 'Alpha');
+    });
 
-    /** @test */
-    public function it_cannot_delete_a_setting_that_does_not_exist(): void
-    {
-        $this->expectException(SettingDoesNotExist::class);
+    $this->assertDatabaseHasSetting('test.a', 'Alpha');
+});
 
-        $this->settingsMigrator->delete('eduction.enabled');
-    }
+it('can add a setting encrypted', function () {
+    $this->settingsMigrator->addEncrypted('compliance.enabled', true);
 
-    /** @test */
-    public function it_cannot_delete_a_setting_with_an_invalid_property(): void
-    {
-        $this->expectException(InvalidSettingName::class);
+    $this->assertDatabaseHasEncryptedSetting('compliance.enabled', true);
+});
 
-        $this->settingsMigrator->delete('eductions');
-    }
+it('can update an encrypted setting', function () {
+    $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
 
-    /** @test */
-    public function it_can_update_a_setting(): void
-    {
-        $this->settingsMigrator->add('user.name', 'Brent Roose');
+    $this->settingsMigrator->updateEncrypted('user.name', fn (string $name) => 'Ruben Van Assche');
 
-        $this->settingsMigrator->update('user.name', fn (string $name) => 'Ruben Van Assche');
+    $this->assertDatabaseHasEncryptedSetting('user.name', 'Ruben Van Assche');
+});
 
-        $this->assertDatabaseHasSetting('user.name', 'Ruben Van Assche');
-    }
+it('can encrypt a setting', function () {
+    $this->settingsMigrator->add('user.name', 'Brent Roose');
 
-    /** @test */
-    public function it_cannot_update_a_setting_that_does_not_exist(): void
-    {
-        $this->expectException(SettingDoesNotExist::class);
+    $this->settingsMigrator->encrypt('user.name');
 
-        $this->settingsMigrator->update('user.name', fn (string $name) => 'Ruben Van Assche');
-    }
+    $this->assertDatabaseHasEncryptedSetting('user.name', 'Brent Roose');
+});
 
-    /** @test */
-    public function it_can_perform_migrations_within_a_group(): void
-    {
-        $this->settingsMigrator->inGroup('test', function (SettingsBlueprint $blueprint): void {
-            $blueprint->add('a', 'Alpha');
-        });
+it('can decrypt a setting', function () {
+    $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
 
-        $this->assertDatabaseHasSetting('test.a', 'Alpha');
-    }
+    $this->settingsMigrator->decrypt('user.name');
 
-    /** @test */
-    public function it_can_add_a_setting_encrypted()
-    {
-        $this->settingsMigrator->addEncrypted('compliance.enabled', true);
+    $this->assertDatabaseHasSetting('user.name', 'Brent Roose');
+});
 
-        $this->assertDatabaseHasEncryptedSetting('compliance.enabled', true);
-    }
+it('can cast on migration', function () {
+    $this->setRegisteredSettings([
+        DummySettings::class,
+    ]);
 
-    /** @test */
-    public function it_can_update_an_encrypted_setting()
-    {
-        $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
+    $timezoneMontreal = new DateTimeZone('America/Montreal');
 
-        $this->settingsMigrator->updateEncrypted('user.name', fn (string $name) => 'Ruben Van Assche');
+    $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
 
-        $this->assertDatabaseHasEncryptedSetting('user.name', 'Ruben Van Assche');
-    }
+    $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneMontreal));
 
-    /** @test */
-    public function it_can_encrypt_a_setting()
-    {
-        $this->settingsMigrator->add('user.name', 'Brent Roose');
+    $timezoneBrussels = new DateTimeZone('Europe/Brussels');
 
-        $this->settingsMigrator->encrypt('user.name');
+    $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
+        $this->assertEquals($timezoneMontreal, $savedTimezone);
 
-        $this->assertDatabaseHasEncryptedSetting('user.name', 'Brent Roose');
-    }
+        return $timezoneBrussels;
+    });
 
-    /** @test */
-    public function it_can_decrypt_a_setting()
-    {
-        $this->settingsMigrator->addEncrypted('user.name', 'Brent Roose');
-
-        $this->settingsMigrator->decrypt('user.name');
-
-        $this->assertDatabaseHasSetting('user.name', 'Brent Roose');
-    }
-
-    /** @test */
-    public function it_can_cast_on_migration()
-    {
-        $this->setRegisteredSettings([
-            DummySettings::class,
-        ]);
-
-        $timezoneMontreal = new DateTimeZone('America/Montreal');
-
-        $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
-
-        $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneMontreal));
-
-        $timezoneBrussels = new DateTimeZone('Europe/Brussels');
-
-        $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
-            $this->assertEquals($timezoneMontreal, $savedTimezone);
-
-            return $timezoneBrussels;
-        });
-
-        $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
-    }
-}
+    $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
+});
