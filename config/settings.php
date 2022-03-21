@@ -51,6 +51,7 @@ return [
         'enabled' => env('SETTINGS_CACHE_ENABLED', false),
         'store' => null,
         'prefix' => null,
+        'ttl' => null,
     ],
 
     /*

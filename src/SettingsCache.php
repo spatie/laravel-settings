@@ -15,14 +15,19 @@ class SettingsCache
 
     private ?string $prefix;
 
+    /** @var \DateTimeInterface|\DateInterval|int|null */
+    private $ttl;
+
     public function __construct(
         bool $enabled,
         ?string $store,
-        ?string $prefix
+        ?string $prefix,
+        $ttl
     ) {
         $this->enabled = $enabled;
         $this->store = $store;
         $this->prefix = $prefix;
+        $this->ttl = $ttl;
     }
 
     public function isEnabled(): bool
@@ -66,7 +71,8 @@ class SettingsCache
 
         Cache::store($this->store)->put(
             $this->resolveCacheKey(get_class($settings)),
-            $serialized
+            $serialized,
+            $this->ttl
         );
     }
 
