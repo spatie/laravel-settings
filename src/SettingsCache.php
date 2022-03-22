@@ -22,7 +22,7 @@ class SettingsCache
         bool $enabled,
         ?string $store,
         ?string $prefix,
-        $ttl
+        $ttl = null
     ) {
         $this->enabled = $enabled;
         $this->store = $store;
