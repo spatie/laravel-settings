@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.0 - 2022-03-22
+
+## What's Changed
+
+- Add TTL config for settings cache by @AlexVanderbist in https://github.com/spatie/laravel-settings/pull/122
+
+## New Contributors
+
+- @AlexVanderbist made their first contribution in https://github.com/spatie/laravel-settings/pull/122
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/2.3.3...2.4.0
+
 ## 2.3.3 - 2022-03-18
 
 - fix debug info method
@@ -87,10 +99,13 @@ All notable changes to `laravel-settings` will be documented in this file
 - - properties won't be loaded when constructed but when requested
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
