@@ -1,0 +1,21 @@
+<?php
+
+namespace {{ namespace }};
+
+use Spatie\LaravelSettings\Settings;
+
+class {{ class }} extends Settings
+{
+    /**
+     * The app name.
+     *
+     * @return string
+     */
+//    protected $appName = 'Laravel Settings';
+
+
+    public static function group(): string
+    {
+        return '{{ group }}';
+    }
+}
