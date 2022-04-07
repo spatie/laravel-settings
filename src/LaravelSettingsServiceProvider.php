@@ -57,7 +57,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             config('settings.cache.ttl')
         ));
 
-        $this->app->singleton(SettingsMapper::class);
+        $this->app->scoped(SettingsMapper::class);
 
         $settingsContainer = app(SettingsContainer::class);
         $settingsContainer->registerBindings();

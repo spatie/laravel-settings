@@ -25,7 +25,7 @@ class SettingsContainer
         $cache = $this->container->make(SettingsCache::class);
 
         $this->getSettingClasses()->each(function (string $settingClass) use ($cache) {
-            $this->container->singleton($settingClass, function () use ($cache, $settingClass) {
+            $this->container->scoped($settingClass, function () use ($cache, $settingClass) {
                 if ($cache->has($settingClass)) {
                     try {
                         return $cache->get($settingClass);
