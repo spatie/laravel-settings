@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.1 - 2022-04-07
+
+- Switch to using scoped instances instead of singletons (#129)
+
 ## 2.4.0 - 2022-03-22
 
 ## What's Changed
@@ -100,11 +104,14 @@ All notable changes to `laravel-settings` will be documented in this file
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
