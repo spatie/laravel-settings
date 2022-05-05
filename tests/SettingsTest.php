@@ -2,17 +2,17 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use Cache;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
-use DB;
 use ErrorException;
-use Event;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -448,11 +448,11 @@ it('will not contact the repository when loading cached settings', function () {
         DummySimpleSettings::class,
     ]);
 
-    DB::connection()->enableQueryLog();
+    DB::enableQueryLog();
 
     $name = resolve(DummySimpleSettings::class)->name;
 
-    $log = DB::connection()->getQueryLog();
+    $log = DB::getQueryLog();
 
     expect($name)->toEqual('Louis Armstrong');
     expect($log)->toHaveCount(0);
@@ -488,11 +488,11 @@ it('will load settings from the repository when a serialized setting cannot be l
         DummySimpleSettings::class,
     ]);
 
-    DB::connection()->enableQueryLog();
+    DB::enableQueryLog();
 
     $name = resolve(DummySimpleSettings::class)->name;
 
-    $log = DB::connection()->getQueryLog();
+    $log = DB::getQueryLog();
 
     expect($name)->toEqual('Louis Armstrong');
     expect($log)->toHaveCount(1);
