@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.2 - 2022-06-17
+
+- use Facade imports instead of aliases (#132)
+
 ## 2.4.1 - 2022-04-07
 
 - Switch to using scoped instances instead of singletons (#129)
@@ -105,12 +109,15 @@ All notable changes to `laravel-settings` will be documented in this file
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
