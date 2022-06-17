@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelSettings;
 
-use Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
 use Spatie\LaravelSettings\Exceptions\SettingsCacheDisabled;
 

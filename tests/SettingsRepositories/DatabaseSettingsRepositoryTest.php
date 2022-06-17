@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
-use DB;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
