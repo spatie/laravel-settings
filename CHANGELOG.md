@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.3 - 2022-08-10
+
+- add rollback to migration
+
 ## 2.4.2 - 2022-06-17
 
 - use Facade imports instead of aliases (#132)
@@ -110,13 +114,16 @@ All notable changes to `laravel-settings` will be documented in this file
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
