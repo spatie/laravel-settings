@@ -2,7 +2,7 @@
 
 namespace Spatie\LaravelSettings;
 
-use Exception;
+use Error;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -23,6 +23,8 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
     private bool $loaded = false;
 
     private bool $configInitialized = false;
+
+    private ?string $error = null;
 
     protected ?Collection $originalValues = null;
 
@@ -104,7 +106,9 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
             $this->loadValues();
 
             return $this->toArray();
-        } catch (Exception $exception) {
+        } catch (Error $exception) {
+            $this->error = $exception->getMessage();
+
             return [
                 'Could not load values',
             ];
