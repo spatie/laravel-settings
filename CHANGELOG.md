@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.4 - 2022-09-07
+
+- cache encrypted settings
+
+Please, be sure to clear your cache since settings classes with encrypted properties will crash due to the cached versions missing a proper encrypted version of the property. Clearing and caching again after installing this version resolves this problem and is something you probably should always do when deploying to production!
+
 ## 2.4.3 - 2022-08-10
 
 - add rollback to migration
@@ -115,6 +121,7 @@ All notable changes to `laravel-settings` will be documented in this file
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -122,7 +129,9 @@ All notable changes to `laravel-settings` will be documented in this file
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
