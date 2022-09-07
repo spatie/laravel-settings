@@ -435,7 +435,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
-})->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+})->skip(fn() => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
@@ -456,6 +456,32 @@ it('will not contact the repository when loading cached settings', function () {
 
     expect($name)->toEqual('Louis Armstrong');
     expect($log)->toHaveCount(0);
+});
+
+it('will cache encrypted setting', function () {
+    useEnabledCache($this->app);
+
+    $data = [
+        'string' => 'Hello',
+        'nullable' => null,
+        'cast' => new DateTime('2020-05-16'),
+    ];
+
+    $cache = resolve(SettingsCache::class);
+
+    $cache->put(new DummyEncryptedSettings($data));
+
+    $serialized = Cache::get('settings.'.DummyEncryptedSettings::class);
+
+    expect($serialized)->not()->toContain($data['string']);
+
+    $this->setRegisteredSettings([
+        DummyEncryptedSettings::class,
+    ]);
+
+    $decrypted = resolve(DummyEncryptedSettings::class);
+
+    expect($decrypted->string)->toEqual($data['string']);
 });
 
 it('can clear a settings cache', function () {

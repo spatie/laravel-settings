@@ -13,6 +13,7 @@ use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\Support\Crypto;
 
 abstract class Settings implements Arrayable, Jsonable, Responsable
 {
@@ -120,12 +121,35 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function __serialize(): array
     {
-        return $this->toCollection()->all();
+        /** @var Collection $encrypted */
+        /** @var Collection $nonEncrypted */
+        [$encrypted, $nonEncrypted] = $this->toCollection()->partition(
+            fn($value, string $name) => $this->config->isEncrypted($name)
+        );
+
+        return array_merge(
+            $encrypted->map(fn($value) => Crypto::encrypt($value))->all(),
+            $nonEncrypted->all()
+        );
     }
 
     public function __unserialize(array $data): void
     {
         $this->loaded = false;
+
+        $this->ensureConfigIsLoaded();
+
+        /** @var Collection $encrypted */
+        /** @var Collection $nonEncrypted */
+        [$encrypted, $nonEncrypted] = collect($data)->partition(
+            fn($value, string $name) => $this->config->isEncrypted($name)
+        );
+
+        $data = array_merge(
+            $encrypted->map(fn($value) => Crypto::decrypt($value))->all(),
+            $nonEncrypted->all()
+        );
+
         $this->loadValues($data);
     }
 
