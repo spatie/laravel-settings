@@ -124,11 +124,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         /** @var Collection $encrypted */
         /** @var Collection $nonEncrypted */
         [$encrypted, $nonEncrypted] = $this->toCollection()->partition(
-            fn($value, string $name) => $this->config->isEncrypted($name)
+            fn ($value, string $name) => $this->config->isEncrypted($name)
         );
 
         return array_merge(
-            $encrypted->map(fn($value) => Crypto::encrypt($value))->all(),
+            $encrypted->map(fn ($value) => Crypto::encrypt($value))->all(),
             $nonEncrypted->all()
         );
     }
@@ -142,11 +142,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         /** @var Collection $encrypted */
         /** @var Collection $nonEncrypted */
         [$encrypted, $nonEncrypted] = collect($data)->partition(
-            fn($value, string $name) => $this->config->isEncrypted($name)
+            fn ($value, string $name) => $this->config->isEncrypted($name)
         );
 
         $data = array_merge(
-            $encrypted->map(fn($value) => Crypto::decrypt($value))->all(),
+            $encrypted->map(fn ($value) => Crypto::decrypt($value))->all(),
             $nonEncrypted->all()
         );
 

@@ -435,7 +435,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
-})->skip(fn() => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+})->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
