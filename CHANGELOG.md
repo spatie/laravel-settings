@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+## 2.4.5 - 2022-09-28
+
+- Add deleteIfExists() method to migrator (#154)
+
 ## 2.4.4 - 2022-09-07
 
 - cache encrypted settings
@@ -122,6 +126,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -130,7 +135,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
