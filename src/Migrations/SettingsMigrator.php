@@ -70,6 +70,13 @@ class SettingsMigrator
         $this->deleteProperty($property);
     }
 
+    public function deleteIfExists(string $property): void
+    {
+        if ($this->checkIfPropertyExists($property)) {
+            $this->deleteProperty($property);
+        }
+    }
+    
     public function update(string $property, Closure $closure, bool $encrypted = false): void
     {
         if (! $this->checkIfPropertyExists($property)) {
