@@ -182,6 +182,8 @@ Although it is possible to use the same group for different settings classes, we
 
 
 ```php
+use Spatie\LaravelSettings\Settings;
+
 class GeneralSettings extends Settings
 {
     public string $site_name;
