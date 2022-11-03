@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-settings` will be documented in this file
 
+# Unreleased
+
+- Make `spatie/data-transfer-object` dependency optional. (#160)
+
 ## 2.4.5 - 2022-09-28
 
 - Add deleteIfExists() method to migrator (#154)
