@@ -21,7 +21,6 @@
         "illuminate/database": "^8.73|^9.0",
         "doctrine/dbal": "^2.13|^3.2",
         "phpdocumentor/type-resolver": "^1.5",
-        "spatie/data-transfer-object": "^2.8|^3.7",
         "spatie/temporary-directory": "^1.3|^2.0"
     },
     "require-dev": {
@@ -37,6 +36,9 @@
         "phpunit/phpunit": "^9.5",
         "spatie/pest-plugin-snapshots": "^1.1",
         "spatie/phpunit-snapshot-assertions": "^4.2"
+    },
+    "suggest": {
+        "spatie/data-transfer-object": "Allows for DTO casting to settings. (deprecated)"
     },
     "autoload": {
         "psr-4": {
