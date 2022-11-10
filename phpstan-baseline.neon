@@ -11,6 +11,21 @@ parameters:
 			path: src/Models/SettingsProperty.php
 
 		-
+			message: "#^Call to method toArray\\(\\) on an unknown class Spatie\\\\DataTransferObject\\\\DataTransferObject\\.$#"
+			count: 1
+			path: src/SettingsCasts/DtoCast.php
+
+		-
+			message: "#^Method Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\DtoCast\\:\\:get\\(\\) has invalid return type Spatie\\\\DataTransferObject\\\\DataTransferObject\\.$#"
+			count: 1
+			path: src/SettingsCasts/DtoCast.php
+
+		-
+			message: "#^Parameter \\$payload of method Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\DtoCast\\:\\:set\\(\\) has invalid type Spatie\\\\DataTransferObject\\\\DataTransferObject\\.$#"
+			count: 1
+			path: src/SettingsCasts/DtoCast.php
+
+		-
 			message: "#^Property Spatie\\\\LaravelSettings\\\\SettingsConfig\\:\\:\\$casts \\(Illuminate\\\\Support\\\\Collection\\<string, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\) does not accept Illuminate\\\\Support\\\\Collection\\<int, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\.$#"
 			count: 1
 			path: src/SettingsConfig.php
