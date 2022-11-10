@@ -4,9 +4,9 @@
 # Store strongly typed application settings
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/spatie/laravel-settings/run-tests?label=tests)](https://github.com/spatie/laravel-settings/actions?query=workflow%3Arun-tests+branch%3Amaster)
+[![Tests](https://github.com/spatie/laravel-settings/actions/workflows/run-tests.yml/badge.svg)](https://github.com/spatie/laravel-settings/actions/workflows/run-tests.yml)
 [![PHPStan](https://github.com/spatie/laravel-settings/actions/workflows/phpstan.yml/badge.svg)](https://github.com/spatie/laravel-settings/actions/workflows/phpstan.yml)
-[![GitHub Check and fix styling](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
+[![Style](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 
 This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings class as such:
