@@ -26,16 +26,6 @@ parameters:
 			path: src/SettingsCasts/DtoCast.php
 
 		-
-			message: "#^Property Spatie\\\\LaravelSettings\\\\SettingsConfig\\:\\:\\$casts \\(Illuminate\\\\Support\\\\Collection\\<string, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\) does not accept Illuminate\\\\Support\\\\Collection\\<int, Spatie\\\\LaravelSettings\\\\SettingsCasts\\\\SettingsCast\\|null\\>\\.$#"
-			count: 1
-			path: src/SettingsConfig.php
-
-		-
-			message: "#^Property Spatie\\\\LaravelSettings\\\\SettingsConfig\\:\\:\\$reflectionProperties \\(Illuminate\\\\Support\\\\Collection\\<string, ReflectionProperty\\>\\) does not accept Illuminate\\\\Support\\\\Collection\\<int, ReflectionProperty\\>\\.$#"
-			count: 1
-			path: src/SettingsConfig.php
-
-		-
 			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$name\\.$#"
 			count: 1
 			path: src/SettingsRepositories/DatabaseSettingsRepository.php

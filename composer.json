@@ -26,7 +26,7 @@
     "require-dev" : {
         "ext-redis": "*",
         "mockery/mockery": "^1.4",
-        "nunomaduro/larastan": "^1.0",
+        "nunomaduro/larastan": "^2.0",
         "orchestra/testbench": "^6.23|^7.0",
         "pestphp/pest": "^1.21",
         "pestphp/pest-plugin-laravel": "^1.2",
