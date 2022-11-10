@@ -6,9 +6,11 @@ use DateTime;
 use ReflectionProperty;
 use Spatie\LaravelSettings\Factories\SettingsCastFactory;
 use Spatie\LaravelSettings\SettingsCasts\ArraySettingsCast;
+use Spatie\LaravelSettings\SettingsCasts\DataCast;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast;
 use Spatie\LaravelSettings\SettingsCasts\DtoCast;
 use Spatie\LaravelSettings\SettingsCasts\EnumCast;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
@@ -66,7 +68,7 @@ it('can have no type and no cast', function () {
 
 it('can have a global cast with an array', function () {
     $fake = new class() {
-        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData[] */
         public array $dto_array;
     };
 
@@ -74,12 +76,12 @@ it('can have a global cast with an array', function () {
 
     $cast = SettingsCastFactory::resolve($reflectionProperty, []);
 
-    expect($cast)->toEqual(new ArraySettingsCast(new DtoCast(DummyDto::class)));
+    expect($cast)->toEqual(new ArraySettingsCast(new DataCast(DummyData::class)));
 });
 
 it('can have a global cast with an array without array type', function () {
     $fake = new class() {
-        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData[] */
         public $dto_array;
     };
 
@@ -87,7 +89,7 @@ it('can have a global cast with an array without array type', function () {
 
     $cast = SettingsCastFactory::resolve($reflectionProperty, []);
 
-    expect($cast)->toEqual(new ArraySettingsCast(new DtoCast(DummyDto::class)));
+    expect($cast)->toEqual(new ArraySettingsCast(new DataCast(DummyData::class)));
 });
 
 it('can have a plain array without cast', function () {
@@ -151,24 +153,24 @@ it('can create a local cast with class identifier and arguments', function () {
     $reflectionProperty = new ReflectionProperty($fake, 'dto');
 
     $cast = SettingsCastFactory::resolve($reflectionProperty, [
-        'dto' => DtoCast::class . ':' . DummyDto::class,
+        'dto' => DataCast::class . ':' . DummyData::class,
     ]);
 
-    expect($cast)->toEqual(new DtoCast(DummyDto::class));
+    expect($cast)->toEqual(new DataCast(DummyData::class));
 });
 
 it('can create a local cast with an already constructed cast', function () {
     $fake = new class() {
-        public DummyDto $dto;
+        public DummyData $dto;
     };
 
     $reflectionProperty = new ReflectionProperty($fake, 'dto');
 
     $cast = SettingsCastFactory::resolve($reflectionProperty, [
-        'dto' => new DtoCast(DummyDto::class),
+        'dto' => new DataCast(DummyData::class),
     ]);
 
-    expect($cast)->toEqual(new DtoCast(DummyDto::class));
+    expect($cast)->toEqual(new DataCast(DummyData::class));
 });
 
 it('will not resolve a cast for a primitive type', function () {
@@ -216,5 +218,5 @@ it('will resolve imported annotated casts', function () {
 
     $cast = SettingsCastFactory::resolve($reflectionProperty, []);
 
-    expect($cast)->toEqual(new ArraySettingsCast(new DtoCast(DummyDto::class)));
+    expect($cast)->toEqual(new ArraySettingsCast(new DataCast(DummyData::class)));
 });

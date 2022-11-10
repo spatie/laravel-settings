@@ -6,7 +6,7 @@ use Spatie\LaravelSettings\Settings;
 
 class DummySettingsWithImportedType extends Settings
 {
-    /** @var DummyDto[] */
+    /** @var DummyData[] */
     public array $dto_array;
 
     public static function group(): string

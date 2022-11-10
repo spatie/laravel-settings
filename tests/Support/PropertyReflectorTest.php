@@ -15,6 +15,7 @@ use phpDocumentor\Reflection\Types\Object_;
 use phpDocumentor\Reflection\Types\String_;
 use ReflectionProperty;
 use Spatie\LaravelSettings\Support\PropertyReflector;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
 
@@ -60,29 +61,29 @@ it('wont reflect build in typed properties', function () {
 
 it('can reflect property types', function () {
     $reflection = fakeReflection(fn () => new class() {
-        public DummyDto $property;
+        public DummyData $property;
     });
 
     expect(PropertyReflector::resolveType($reflection))
-        ->toEqual(new Object_(new Fqsen('\\' . DummyDto::class)));
+        ->toEqual(new Object_(new Fqsen('\\' . DummyData::class)));
 });
 
 it('can reflect docblock types', function () {
     $reflection = fakeReflection(fn () => new class() {
-        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto */
-        public DummyDto $property;
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData */
+        public DummyData $property;
     });
 
     expect(PropertyReflector::resolveType($reflection))
-        ->toEqual(new Object_(new Fqsen('\\' . DummyDto::class)));
+        ->toEqual(new Object_(new Fqsen('\\' . DummyData::class)));
 
     $reflection = fakeReflection(fn () => new class() {
-        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto */
+        /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData */
         public $property;
     });
 
     expect(PropertyReflector::resolveType($reflection))
-        ->toEqual(new Object_(new Fqsen('\\' . DummyDto::class)));
+        ->toEqual(new Object_(new Fqsen('\\' . DummyData::class)));
 });
 
 it('can reflect arrays', function () {
@@ -194,7 +195,7 @@ it('can handle a nullable docblock type', function () {
     });
 
     expect(PropertyReflector::resolveType($reflection))
-        ->toEqual(new Array_(new Nullable(new Integer()), new Compound([new String_(), new Integer()])));
+        ->toEqual(new Nullable(new Array_(new Integer(), new Compound([new String_(), new Integer()]))));
 });
 
 it('can handle a compound nullable', function () {
@@ -236,7 +237,7 @@ it('can handle an imported type', function () {
 
     expect(PropertyReflector::resolveType($reflection))
         ->toEqual(new Array_(
-            new Object_(new Fqsen('\\' . DummyDto::class)),
+            new Object_(new Fqsen('\\' . DummyData::class)),
             new Compound([new String_(), new Integer()])
         ));
 });

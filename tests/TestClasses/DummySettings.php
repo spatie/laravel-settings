@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTimeZone;
 use Spatie\LaravelSettings\Settings;
+use Spatie\LaravelSettings\SettingsCasts\DataCast;
 use Spatie\LaravelSettings\SettingsCasts\DtoCast;
 
 class DummySettings extends Settings
@@ -20,9 +21,9 @@ class DummySettings extends Settings
 
     public ?string $nullable_string;
 
-    public DummyDto $dto;
+    public DummyData $dto;
 
-    /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
+    /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData[] */
     public array $dto_array;
 
     // Todo: enable this later
@@ -43,7 +44,7 @@ class DummySettings extends Settings
     public static function casts(): array
     {
         return [
-            'dto' => new DtoCast(DummyDto::class),
+            'dto' => new DataCast(DummyData::class),
         ];
     }
 }

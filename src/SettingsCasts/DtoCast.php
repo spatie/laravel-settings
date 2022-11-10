@@ -5,6 +5,7 @@ namespace Spatie\LaravelSettings\SettingsCasts;
 use Exception;
 use Spatie\DataTransferObject\DataTransferObject;
 
+/** @deprecated  */
 class DtoCast implements SettingsCast
 {
     protected string $type;

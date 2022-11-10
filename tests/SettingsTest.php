@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -75,10 +76,10 @@ it('will handle loading settings correctly', function () {
         ->int->toEqual(42)
         ->array->toEqual(['John', 'Ringo', 'Paul', 'George'])
         ->nullable_string->toBeNull()
-        ->dto->toEqual(new DummyDto(['name' => 'Freek']))
+        ->dto->toEqual(DummyData::from(['name' => 'Freek']))
         ->dto_array->toEqual([
-            new DummyDto(['name' => 'Seb']),
-            new DummyDto(['name' => 'Adriaan']),
+            DummyData::from(['name' => 'Seb']),
+            DummyData::from(['name' => 'Adriaan']),
         ])
         ->date_time->toEqual($dateTime)
         ->carbon->toEqual($carbon);
@@ -130,14 +131,14 @@ it('can save settings', function () {
         'array' => ['Bono', 'Adam', 'The Edge'],
         'nullable_string' => null,
         'default_string' => 'another',
-        'dto' => new DummyDto(['name' => 'Rias']),
+        'dto' => DummyData::from(['name' => 'Rias']),
         'dto_array' => [
-            new DummyDto(['name' => 'Wouter']),
-            new DummyDto(['name' => 'Jef']),
+            DummyData::from(['name' => 'Wouter']),
+            DummyData::from(['name' => 'Jef']),
         ],
         'dto_collection' => [
-            new DummyDto(['name' => 'Wouter']),
-            new DummyDto(['name' => 'Jef']),
+            DummyData::from(['name' => 'Wouter']),
+            DummyData::from(['name' => 'Jef']),
         ],
         'nullable_date_time_zone' => null,
     ]);
@@ -170,7 +171,7 @@ it('cannot save settings that do not exist', function () {
         'int' => 69,
         'array' => ['Bono', 'Adam', 'The Edge'],
         'nullable_string' => null,
-        'dto' => new DummyDto(['name' => 'Rias']),
+        'dto' => DummyData::from(['name' => 'Rias']),
         'date_time' => new DateTimeImmutable(),
         'carbon' => Carbon::now(),
     ]);

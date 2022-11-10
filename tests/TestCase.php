@@ -5,6 +5,7 @@ namespace Spatie\LaravelSettings\Tests;
 use Carbon\CarbonImmutable;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelSettings\LaravelSettingsServiceProvider;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
@@ -31,6 +32,7 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
+            LaravelDataServiceProvider::class,
             LaravelSettingsServiceProvider::class,
         ];
     }
@@ -114,8 +116,8 @@ class TestCase extends BaseTestCase
             "The setting {$group}.{$name} could not be found in the database"
         );
 
-        PHPUnit::assertNotEquals($value, json_decode($setting->payload, true));
-        PHPUnit::assertEquals($value, Crypto::decrypt(json_decode($setting->payload, true)));
+        PHPUnit::assertNotSame($value, json_decode($setting->payload, true));
+        PHPUnit::assertSame($value, Crypto::decrypt(json_decode($setting->payload, true)));
     }
 
     protected function assertDatabaseDoesNotHaveSetting(string $property): void

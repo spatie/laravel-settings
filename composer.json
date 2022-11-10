@@ -1,29 +1,29 @@
 {
-    "name": "spatie/laravel-settings",
-    "description": "Store your application settings",
-    "keywords": [
+    "name" : "spatie/laravel-settings",
+    "description" : "Store your application settings",
+    "keywords" : [
         "spatie",
         "laravel-settings"
     ],
-    "homepage": "https://github.com/spatie/laravel-settings",
-    "license": "MIT",
-    "authors": [
+    "homepage" : "https://github.com/spatie/laravel-settings",
+    "license" : "MIT",
+    "authors" : [
         {
-            "name": "Ruben Van Assche",
-            "email": "ruben@spatie.be",
-            "homepage": "https://spatie.be",
-            "role": "Developer"
+            "name" : "Ruben Van Assche",
+            "email" : "ruben@spatie.be",
+            "homepage" : "https://spatie.be",
+            "role" : "Developer"
         }
     ],
-    "require": {
-        "php": "^7.4|^8.0",
-        "ext-json": "*",
-        "illuminate/database": "^8.73|^9.0",
-        "doctrine/dbal": "^2.13|^3.2",
-        "phpdocumentor/type-resolver": "^1.5",
-        "spatie/temporary-directory": "^1.3|^2.0"
+    "require" : {
+        "php" : "^7.4|^8.0",
+        "ext-json" : "*",
+        "illuminate/database" : "^8.73|^9.0",
+        "doctrine/dbal" : "^2.13|^3.2",
+        "phpdocumentor/type-resolver" : "^1.5",
+        "spatie/temporary-directory" : "^1.3|^2.0"
     },
-    "require-dev": {
+    "require-dev" : {
         "ext-redis": "*",
         "mockery/mockery": "^1.4",
         "nunomaduro/larastan": "^1.0",
@@ -34,41 +34,43 @@
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5",
+        "spatie/laravel-data": "^2.0.0",
         "spatie/pest-plugin-snapshots": "^1.1",
-        "spatie/phpunit-snapshot-assertions": "^4.2"
+        "spatie/phpunit-snapshot-assertions": "^4.2",
+        "spatie/ray": "^1.36"
     },
-    "suggest": {
-        "spatie/data-transfer-object": "Allows for DTO casting to settings. (deprecated)"
+    "suggest" : {
+        "spatie/data-transfer-object" : "Allows for DTO casting to settings. (deprecated)"
     },
-    "autoload": {
-        "psr-4": {
-            "Spatie\\LaravelSettings\\": "src"
+    "autoload" : {
+        "psr-4" : {
+            "Spatie\\LaravelSettings\\" : "src"
         }
     },
-    "autoload-dev": {
-        "psr-4": {
-            "Spatie\\LaravelSettings\\Tests\\": "tests"
+    "autoload-dev" : {
+        "psr-4" : {
+            "Spatie\\LaravelSettings\\Tests\\" : "tests"
         }
     },
-    "scripts": {
-        "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage"
+    "scripts" : {
+        "analyse" : "vendor/bin/phpstan analyse",
+        "test" : "vendor/bin/pest",
+        "test-coverage" : "vendor/bin/pest --coverage"
     },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
+    "config" : {
+        "sort-packages" : true,
+        "allow-plugins" : {
+            "pestphp/pest-plugin" : true,
+            "phpstan/extension-installer" : true
         }
     },
-    "extra": {
-        "laravel": {
-            "providers": [
+    "extra" : {
+        "laravel" : {
+            "providers" : [
                 "Spatie\\LaravelSettings\\LaravelSettingsServiceProvider"
             ]
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability" : "dev",
+    "prefer-stable" : true
 }
