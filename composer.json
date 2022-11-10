@@ -34,7 +34,7 @@
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5",
-        "spatie/laravel-data": "^2.0.0",
+        "spatie/laravel-data": "^1.0.0|^2.0.0",
         "spatie/pest-plugin-snapshots": "^1.1",
         "spatie/phpunit-snapshot-assertions": "^4.2",
         "spatie/ray": "^1.36"
