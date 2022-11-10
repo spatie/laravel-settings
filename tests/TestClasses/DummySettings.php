@@ -7,7 +7,6 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
-use Spatie\LaravelSettings\SettingsCasts\DtoCast;
 
 class DummySettings extends Settings
 {

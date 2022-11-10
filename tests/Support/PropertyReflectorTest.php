@@ -16,7 +16,6 @@ use phpDocumentor\Reflection\Types\String_;
 use ReflectionProperty;
 use Spatie\LaravelSettings\Support\PropertyReflector;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
-use Spatie\LaravelSettings\Tests\TestClasses\DummyDto;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
 
 it('wont reflect non typed properties', function () {
