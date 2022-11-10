@@ -6,6 +6,14 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.5.0 - 2022-11-10
+
+- Remove deprecated package
+- Add laravel data cast
+- Add support for PHP 8.2
+- Remove PHP 7.4 support
+- Remove dto cast from default config
+
 ## 2.4.5 - 2022-09-28
 
 - Add deleteIfExists() method to migrator (#154)
@@ -131,6 +139,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -140,7 +149,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
