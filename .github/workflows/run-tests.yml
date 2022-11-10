@@ -17,7 +17,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest ]
-        php: [ 8.1, 8.0, 7.4 ]
+        php: [ 8.2, 8.1, 8.0]
         laravel: [ 9.*, 8.* ]
         dependency-version: [ prefer-stable ]
         include:
@@ -25,9 +25,6 @@ jobs:
             testbench: ^6.23
           - laravel: 9.*
             testbench: 7.*
-        exclude:
-          - laravel: 9.*
-            php: 7.4
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
@@ -45,7 +42,6 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer require spatie/data-transfer-object --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Execute tests
