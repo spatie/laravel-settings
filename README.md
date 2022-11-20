@@ -398,7 +398,7 @@ When you're working on a big settings class with many properties, it can be a bi
 public function up(): void
 {
     $this->migrator->inGroup('general', function (SettingsBlueprint $blueprint): void {
-        $blueprint->add('timzone', 'Europe/Brussels');
+        $blueprint->add('timezone', 'Europe/Brussels');
         
         $blueprint->rename('timezone', 'local_timezone');
         
