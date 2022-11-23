@@ -62,6 +62,18 @@ class TestCase extends BaseTestCase
         return $this;
     }
 
+    protected function migrateDummyGroupPrefixSettings(
+        string $name = 'John Doe',
+        string $description = 'John, Again?'
+    ): self {
+        resolve(SettingsMigrator::class)->inGroup('some_id:dummy_simple', function (SettingsBlueprint $blueprint) use ($description, $name): void {
+            $blueprint->add('name', $name);
+            $blueprint->add('description', $description);
+        });
+
+        return $this;
+    }
+
     protected function migrateDummySettings(CarbonImmutable $date): self
     {
         resolve(SettingsMigrator::class)->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($date): void {

@@ -70,7 +70,7 @@ class SettingsConfig
 
     public function getGroup(): string
     {
-        return $this->settingsClass::group();
+        return app(SettingsGroupPrefixer::class)->getPrefix().$this->settingsClass::group();
     }
 
     public function isEncrypted(string $name): bool

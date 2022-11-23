@@ -58,6 +58,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         ));
 
         $this->app->scoped(SettingsMapper::class);
+        $this->app->scoped(SettingsGroupPrefixer::class);
 
         $settingsContainer = app(SettingsContainer::class);
         $settingsContainer->registerBindings();

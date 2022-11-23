@@ -153,6 +153,18 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->loadValues($data);
     }
 
+
+    /**
+     * @param  string  $prefix
+     * @return $this
+     */
+    public function setGroupPrefixer(string $prefix): self
+    {
+        app(SettingsGroupPrefixer::class)->setPrefix($prefix);
+
+        return $this->refresh();
+    }
+
     /**
      * @param \Illuminate\Support\Collection|array $properties
      *
