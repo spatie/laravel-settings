@@ -40,7 +40,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         }
 
         Event::subscribe(SettingsEventSubscriber::class);
-        Event::listen(SchemaLoaded::class, fn($event) => $this->removeMigrationsWhenSchemaLoaded($event));
+        Event::listen(SchemaLoaded::class, fn ($event) => $this->removeMigrationsWhenSchemaLoaded($event));
 
         $this->loadMigrationsFrom($this->resolveMigrationPaths());
     }
@@ -49,9 +49,9 @@ class LaravelSettingsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/settings.php', 'settings');
 
-        $this->app->bind(SettingsRepository::class, fn() => SettingsRepositoryFactory::create());
+        $this->app->bind(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
 
-        $this->app->bind(SettingsCacheFactory::class, fn() => new SettingsCacheFactory(
+        $this->app->bind(SettingsCacheFactory::class, fn () => new SettingsCacheFactory(
             config('settings'),
         ));
 
@@ -81,7 +81,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
                 return [$file->getBasename('.php') => $found[1]];
             })
-            ->filter(fn(string $migrationClass) => is_subclass_of($migrationClass, SettingsMigration::class))
+            ->filter(fn (string $migrationClass) => is_subclass_of($migrationClass, SettingsMigration::class))
             ->keys();
 
         $event->connection
