@@ -25,13 +25,14 @@ use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\Settings;
-use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 use Spatie\LaravelSettings\Tests\Fakes\FakeSettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
 
@@ -440,7 +441,7 @@ it('will remigrate when the schema was dumped', function () {
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
 
-    resolve(SettingsCache::class)->put(new DummySimpleSettings(
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
@@ -467,11 +468,11 @@ it('will cache encrypted setting', function () {
         'cast' => new DateTime('2020-05-16'),
     ];
 
-    $cache = resolve(SettingsCache::class);
+    $cache = resolve(SettingsCacheFactory::class)->build();
 
     $cache->put(new DummyEncryptedSettings($data));
 
-    $serialized = Cache::get('settings.'.DummyEncryptedSettings::class);
+    $serialized = Cache::get('settings.' . DummyEncryptedSettings::class);
 
     expect($serialized)->not()->toContain($data['string']);
 
@@ -491,7 +492,7 @@ it('can clear a settings cache', function () {
         DummySimpleSettings::class,
     ]);
 
-    resolve(SettingsCache::class)->put(new DummySimpleSettings(
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
@@ -499,7 +500,7 @@ it('can clear a settings cache', function () {
 
     expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeTrue();
 
-    resolve(SettingsCache::class)->clear();
+    resolve(SettingsCacheFactory::class)->build()->clear();
 
     expect(cache()->has('other_cache_entry'))->toBeTrue();
     expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeFalse();
@@ -676,13 +677,46 @@ it('supports complex types with casts when caching Settings', function () {
         $blueprint->add('collection', $collection);
     });
 
-    resolve(SettingsCache::class)->put(resolve(DummySettingsWithCast::class));
+    resolve(SettingsCacheFactory::class)->build()->put(resolve(DummySettingsWithCast::class));
 
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast $cachedSettings */
-    $cachedSettings = resolve(SettingsCache::class)->get(DummySettingsWithCast::class);
+    $cachedSettings = resolve(SettingsCacheFactory::class)->build()->get(DummySettingsWithCast::class);
 
     expect($cachedSettings)
         ->collection
         ->toEqual($collection)
         ->toBeInstanceOf(Collection::class);
+});
+
+it('will use specific repository cache settings when supplied', function () {
+    $repositoryConfig = array_merge(
+        $this->app['config']->get('settings.repositories.database'),
+        [
+            'cache' => [
+                'enabled' => true,
+            ],
+        ]
+    );
+
+    $this->app['config']->set(
+        'settings.repositories.other_repository',
+        $repositoryConfig
+    );
+
+    resolve(SettingsCacheFactory::class)->build('other_repository')->put(new DummySettingsWithRepository(
+        ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+    ));
+
+    $this->setRegisteredSettings([
+        DummySettingsWithRepository::class,
+    ]);
+
+    DB::enableQueryLog();
+
+    $name = resolve(DummySettingsWithRepository::class)->name;
+
+    $log = DB::getQueryLog();
+
+    expect($name)->toEqual('Louis Armstrong');
+    expect($log)->toHaveCount(0);
 });

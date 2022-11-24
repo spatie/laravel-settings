@@ -962,6 +962,29 @@ The Redis repository also has two optional configuration options:
 - `prefix` an optional prefix that will be prepended to the keys
 - `connection` the connection to use when interacting with Redis
 
+#### Caching
+
+It is possible to add a custom caching configuration per repository, by adding a cache configuration like the default one to your repository config within the `settings.php` config file:
+
+```php
+    'repositories' => [
+        'landlord' => [
+            'type' => Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository::class,
+            'model' => null,
+            'table' => null,
+            'connection' => 'landlord',
+            'cache' => [
+                'enabled' => env('SETTINGS_CACHE_ENABLED', false),
+                'store' => null,
+                'prefix' => 'landlord',
+                'ttl' => null,
+            ],
+        ],
+        
+        ...
+    ],
+```
+
 #### Creating your own repository type
 
 It is possible to create your own types of repositories. A repository is a class which implements `SettingsRepository`:

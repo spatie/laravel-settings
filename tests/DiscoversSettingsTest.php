@@ -9,6 +9,7 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
@@ -28,5 +29,6 @@ it('can get all classes that are settings', function () {
         DummyEncryptedSettings::class,
         DummySettingsWithImportedType::class,
         DummySettingsWithCast::class,
+        DummySettingsWithRepository::class,
     ], $discovered);
 });

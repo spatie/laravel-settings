@@ -12,6 +12,7 @@ use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
@@ -50,11 +51,8 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
         $this->app->bind(SettingsRepository::class, fn () => SettingsRepositoryFactory::create());
 
-        $this->app->bind(SettingsCache::class, fn () => new SettingsCache(
-            config('settings.cache.enabled', false),
-            config('settings.cache.store'),
-            config('settings.cache.prefix'),
-            config('settings.cache.ttl')
+        $this->app->bind(SettingsCacheFactory::class, fn () => new SettingsCacheFactory(
+            config('settings'),
         ));
 
         $this->app->scoped(SettingsMapper::class);

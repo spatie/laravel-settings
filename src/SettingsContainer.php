@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 
 class SettingsContainer
 {
@@ -22,11 +23,13 @@ class SettingsContainer
 
     public function registerBindings(): void
     {
-        $cache = $this->container->make(SettingsCache::class);
+        $cacheFactory = $this->container->make(SettingsCacheFactory::class);
 
-        $this->getSettingClasses()->each(function (string $settingClass) use ($cache) {
-            $this->container->scoped($settingClass, function () use ($cache, $settingClass) {
-                if ($cache->has($settingClass)) {
+        $this->getSettingClasses()->each(function (string $settingClass) use ($cacheFactory) {
+            $this->container->scoped($settingClass, function () use ($cacheFactory, $settingClass) {
+                $cache = $cacheFactory->build($settingClass::repository());
+
+                if ($cache->isEnabled() && $cache->has($settingClass)) {
                     try {
                         return $cache->get($settingClass);
                     } catch (CouldNotUnserializeSettings $exception) {
