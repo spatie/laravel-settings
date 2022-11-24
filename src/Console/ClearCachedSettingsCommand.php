@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
-use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 
 class ClearCachedSettingsCommand extends Command

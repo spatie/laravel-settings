@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
-use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -33,6 +32,7 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
 
@@ -436,7 +436,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
-})->skip(fn() => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+})->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);

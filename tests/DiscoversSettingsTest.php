@@ -2,7 +2,6 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
@@ -10,6 +9,7 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
