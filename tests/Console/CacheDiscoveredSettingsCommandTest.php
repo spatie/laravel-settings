@@ -22,7 +22,7 @@ beforeEach(function () {
 });
 
 it('can cache the registered sessions', function () {
-    artisan($this, 'settings:discover')->assertExitCode(0);
+    expect(artisan($this, 'settings:discover'))->toBe(0);
 
     assertMatchesSnapshot(file_get_contents(config('settings.discovered_settings_cache_path').'/settings.php'));
 });
