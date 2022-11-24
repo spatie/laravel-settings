@@ -20,11 +20,11 @@ beforeEach(function () {
 });
 
 it('can clear the registered settings', function () {
-    expect(artisan($this, 'settings:discover'))->toBe(0);
+    artisan($this, 'settings:discover');
 
     assertFileExists(config('settings.discovered_settings_cache_path').'/settings.php');
 
-    expect(artisan($this, 'settings:clear-discovered'))->toBe(0);
+    artisan($this, 'settings:clear-discovered');
 
     assertFileDoesNotExist(config('settings.discovered_settings_cache_path').'/settings.php');
 });
