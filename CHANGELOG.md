@@ -6,6 +6,10 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.6.0 - 2022-11-24
+
+- Add support for caching on repository level
+
 ## 2.5.0 - 2022-11-10
 
 - Remove deprecated package
@@ -140,6 +144,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -150,7 +155,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
