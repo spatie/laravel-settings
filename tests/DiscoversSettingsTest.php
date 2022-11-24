@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
 use Spatie\LaravelSettings\Support\Composer;
 use Spatie\LaravelSettings\Support\DiscoverSettings;
@@ -28,5 +29,6 @@ it('can get all classes that are settings', function () {
         DummyEncryptedSettings::class,
         DummySettingsWithImportedType::class,
         DummySettingsWithCast::class,
+        DummySettingsWithRepository::class,
     ], $discovered);
 });

@@ -29,7 +29,7 @@ class SettingsContainer
             $this->container->scoped($settingClass, function () use ($cacheFactory, $settingClass) {
                 $cache = $cacheFactory->build($settingClass::repository());
 
-                if ($cache->has($settingClass)) {
+                if ($cache->isEnabled() && $cache->has($settingClass)) {
                     try {
                         return $cache->get($settingClass);
                     } catch (CouldNotUnserializeSettings $exception) {

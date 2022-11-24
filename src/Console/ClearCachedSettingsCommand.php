@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
 use Spatie\LaravelSettings\SettingsCache;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 
 class ClearCachedSettingsCommand extends Command
 {
@@ -11,9 +12,11 @@ class ClearCachedSettingsCommand extends Command
 
     protected $description = 'Clear cached settings';
 
-    public function handle(SettingsCache $settingsCache): void
+    public function handle(SettingsCacheFactory $settingsCacheFactory): void
     {
-        $settingsCache->clear();
+        foreach ($settingsCacheFactory->all() as $settingsCache) {
+            $settingsCache->clear();
+        }
 
         $this->info('Cached settings cleared!');
     }

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -435,7 +436,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
-})->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+})->skip(fn() => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
@@ -471,7 +472,7 @@ it('will cache encrypted setting', function () {
 
     $cache->put(new DummyEncryptedSettings($data));
 
-    $serialized = Cache::get('settings.'.DummyEncryptedSettings::class);
+    $serialized = Cache::get('settings.' . DummyEncryptedSettings::class);
 
     expect($serialized)->not()->toContain($data['string']);
 
@@ -685,4 +686,37 @@ it('supports complex types with casts when caching Settings', function () {
         ->collection
         ->toEqual($collection)
         ->toBeInstanceOf(Collection::class);
+});
+
+it('will use specific repository cache settings when supplied', function () {
+    $repositoryConfig = array_merge(
+        $this->app['config']->get('settings.repositories.database'),
+        [
+            'cache' => [
+                'enabled' => true,
+            ],
+        ]
+    );
+
+    $this->app['config']->set(
+        'settings.repositories.other_repository',
+        $repositoryConfig
+    );
+
+    resolve(SettingsCacheFactory::class)->build('other_repository')->put(new DummySettingsWithRepository(
+        ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+    ));
+
+    $this->setRegisteredSettings([
+        DummySettingsWithRepository::class,
+    ]);
+
+    DB::enableQueryLog();
+
+    $name = resolve(DummySettingsWithRepository::class)->name;
+
+    $log = DB::getQueryLog();
+
+    expect($name)->toEqual('Louis Armstrong');
+    expect($log)->toHaveCount(0);
 });

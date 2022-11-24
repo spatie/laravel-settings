@@ -10,7 +10,7 @@ class SettingsCacheFactory
 
     private SettingsCache $defaultCache;
 
-    private array $repositoryCaches;
+    private array $repositoryCaches = [];
 
     public function __construct(array $settingsConfig)
     {
