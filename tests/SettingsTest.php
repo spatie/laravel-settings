@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -440,7 +441,7 @@ it('will remigrate when the schema was dumped', function () {
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
 
-    resolve(SettingsCache::class)->put(new DummySimpleSettings(
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
@@ -467,7 +468,7 @@ it('will cache encrypted setting', function () {
         'cast' => new DateTime('2020-05-16'),
     ];
 
-    $cache = resolve(SettingsCache::class);
+    $cache = resolve(SettingsCacheFactory::class)->build();
 
     $cache->put(new DummyEncryptedSettings($data));
 
@@ -491,7 +492,7 @@ it('can clear a settings cache', function () {
         DummySimpleSettings::class,
     ]);
 
-    resolve(SettingsCache::class)->put(new DummySimpleSettings(
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
@@ -499,7 +500,7 @@ it('can clear a settings cache', function () {
 
     expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeTrue();
 
-    resolve(SettingsCache::class)->clear();
+    resolve(SettingsCacheFactory::class)->build()->clear();
 
     expect(cache()->has('other_cache_entry'))->toBeTrue();
     expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeFalse();
@@ -676,10 +677,10 @@ it('supports complex types with casts when caching Settings', function () {
         $blueprint->add('collection', $collection);
     });
 
-    resolve(SettingsCache::class)->put(resolve(DummySettingsWithCast::class));
+    resolve(SettingsCacheFactory::class)->build()->put(resolve(DummySettingsWithCast::class));
 
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast $cachedSettings */
-    $cachedSettings = resolve(SettingsCache::class)->get(DummySettingsWithCast::class);
+    $cachedSettings = resolve(SettingsCacheFactory::class)->build()->get(DummySettingsWithCast::class);
 
     expect($cachedSettings)
         ->collection

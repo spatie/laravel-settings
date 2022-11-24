@@ -5,37 +5,44 @@ namespace Spatie\LaravelSettings;
 use Illuminate\Events\Dispatcher;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 
 class SettingsEventSubscriber
 {
-    private SettingsCache $settingsCache;
+    private SettingsCacheFactory $settingsCacheFactory;
 
-    public function __construct(SettingsCache $settingsCache)
+    public function __construct(SettingsCacheFactory $settingsCacheFactory)
     {
-        $this->settingsCache = $settingsCache;
+        $this->settingsCacheFactory = $settingsCacheFactory;
     }
 
     public function subscribe(Dispatcher $dispatcher)
     {
-        if (! $this->settingsCache->isEnabled()) {
-            return;
-        }
-
         $dispatcher->listen(
             SettingsSaved::class,
             function (SettingsSaved $event) {
-                $this->settingsCache->put($event->settings);
+                $cache = $this->settingsCacheFactory->build(
+                    $event->settings::repository()
+                );
+
+                if ($cache->isEnabled()) {
+                    $cache->put($event->settings);
+                }
             }
         );
 
         $dispatcher->listen(
             SettingsLoaded::class,
             function (SettingsLoaded $event) {
-                if ($this->settingsCache->has(get_class($event->settings))) {
+                $cache = $this->settingsCacheFactory->build(
+                    $event->settings::repository()
+                );
+
+                if ($cache->has(get_class($event->settings))) {
                     return;
                 }
 
-                $this->settingsCache->put($event->settings);
+                $cache->put($event->settings);
             }
         );
     }
