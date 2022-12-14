@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearCachedSettingsCommand;
 use Spatie\LaravelSettings\Console\ClearDiscoveredSettingsCacheCommand;
+use Spatie\LaravelSettings\Console\MakeSettingCommand;
 use Spatie\LaravelSettings\Console\MakeSettingsMigrationCommand;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
@@ -34,6 +35,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             }
 
             $this->commands([
+                MakeSettingCommand::class,
                 MakeSettingsMigrationCommand::class,
                 CacheDiscoveredSettingsCommand::class,
                 ClearDiscoveredSettingsCacheCommand::class,
