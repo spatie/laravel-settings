@@ -174,7 +174,7 @@ return [
 
 ## Usage
 
-The package is built around settings classes, which are classes public properties that extend from `Settings`. They also have a static method `group` that should return a string.
+The package is built around settings classes, which are classes with public properties that extend from `Settings`. They also have a static method `group` that should return a string.
 
 You can create multiple groups of settings, each with their settings class. You could, for example, have `GeneralSettings` with the `general` group and `BlogSettings` with the `blog` group. It's up to you how to structure these groups.
 
