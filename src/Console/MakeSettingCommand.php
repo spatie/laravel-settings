@@ -4,7 +4,6 @@ namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use InvalidArgumentException;
 
 class MakeSettingCommand extends Command
 {
@@ -13,7 +12,7 @@ class MakeSettingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:setting {name : The name of the setting class} {--group=default : The group name} {path? : Path to write the setting class file to}';
+    protected $signature = 'make:setting {name : The name of the setting class} {--group=default : The group name} {--path= : Path to write the setting class file to}';
 
     /**
      * The console command name.
@@ -45,13 +44,8 @@ class MakeSettingCommand extends Command
     public function handle()
     {
         $name = trim($this->input->getArgument('name'));
-
-        if (empty($name)) {
-            $this->error('The Setting Class name is required.');
-        }
-
         $group = trim($this->input->getOption('group'));
-        $path = trim($this->input->getArgument('path'));
+        $path = trim($this->input->getOption('path'));
 
         if (empty($path)) {
             $path = $this->resolveSettingsPath();
@@ -65,6 +59,8 @@ class MakeSettingCommand extends Command
             $this->getPath($name, $path),
             $this->getContent($name, $group, $path)
         );
+
+        $this->components->info(sprintf('%s created successfully.', $name));
     }
 
     protected function getStub(): string
@@ -96,10 +92,12 @@ EOT;
         );
     }
 
-    protected function ensureSettingClassDoesntAlreadyExist($name, $path)
+    protected function ensureSettingClassDoesntAlreadyExist($name, $path): void
     {
         if ($this->files->exists($this->getPath($name, $path))) {
-            throw new InvalidArgumentException("Setting Class {$name} already exists!");
+            $this->components->error(sprintf('%s already exists!', $name));
+
+            exit(1); // for some reason, return false was not working
         }
     }
 
@@ -115,6 +113,8 @@ EOT;
 
     protected function getNamespace($path): string
     {
-        return 'namespace' . ' ' . trim(implode('\\', array_map('ucfirst', explode('/', $path))), '\\') . ';';
+        $namespace = str_replace('/', '\\', trim(str_replace(base_path(), '', $path), '/')) . ';';
+
+        return "namespace $namespace";
     }
 }
