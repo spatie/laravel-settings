@@ -108,7 +108,7 @@ EOT;
 
     protected function getPath($name, $path): string
     {
-        return $path() . '/' . $name . '.php';
+        return $path . '/' . $name . '.php';
     }
 
     protected function getNamespace($path): string
