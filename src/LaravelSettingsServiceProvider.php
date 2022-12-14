@@ -29,7 +29,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
             if (! class_exists('CreateSettingsTable')) {
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_settings_table.php.stub' => database_path('migrations/' '2022_12_14_083707_create_settings_table.php'),
+                    __DIR__ . '/../database/migrations/create_settings_table.php.stub' => database_path('migrations/2022_12_14_083707_create_settings_table.php'),
                 ], 'migrations');
             }
 
