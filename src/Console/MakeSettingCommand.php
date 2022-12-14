@@ -59,6 +59,8 @@ class MakeSettingCommand extends Command
 
         $this->ensureSettingClassDoesntAlreadyExist($name, $path);
 
+        $this->files->ensureDirectoryExists($path);
+
         $this->files->put(
             $this->getPath($name, $path),
             $this->getContent($name, $group, $path)
