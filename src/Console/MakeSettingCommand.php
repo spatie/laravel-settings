@@ -1,0 +1,118 @@
+<?php
+
+namespace Spatie\LaravelSettings\Console;
+
+use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
+use InvalidArgumentException;
+
+class MakeSettingCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'make:setting {name : The name of the setting class} {--group=default : The group name} {path? : Path to write the setting class file to}';
+
+    /**
+     * The console command name.
+     *
+     * @var string
+     */
+
+    protected $name = 'make:setting';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Create a new Settings Class';
+
+    /**
+     * @var Filesystem $files
+     */
+    protected Filesystem $files;
+
+    public function __construct(Filesystem $files)
+    {
+        parent::__construct();
+
+        $this->files = $files;
+    }
+
+    public function handle()
+    {
+        $name = trim($this->input->getArgument('name'));
+
+        if (empty($name)) {
+            $this->error('The Setting Class name is required.');
+        }
+
+        $group = trim($this->input->getOption('group'));
+        $path = trim($this->input->getArgument('path'));
+
+        if (empty($path)) {
+            $path = $this->resolveSettingsPath();
+        }
+
+        $this->ensureSettingClassDoesntAlreadyExist($name, $path);
+
+        $this->files->put(
+            $this->getPath($name, $path),
+            $this->getContent($name, $group, $path)
+        );
+    }
+
+    protected function getStub(): string
+    {
+        return <<<EOT
+<?php
+
+{{ namespace }}
+
+use Spatie\LaravelSettings\Settings;
+
+class {{ class }} extends Settings
+{
+
+    public static function group(): string
+    {
+        return '{{ group }}';
+    }
+}
+EOT;
+    }
+
+    protected function getContent($name, $group, $path)
+    {
+        return str_replace(
+            ['{{ namespace }}', '{{ class }}', '{{ group }}'],
+            [$this->getNamespace($path), $name, $group],
+            $this->getStub()
+        );
+    }
+
+    protected function ensureSettingClassDoesntAlreadyExist($name, $path)
+    {
+        if ($this->files->exists($this->getPath($name, $path))) {
+            throw new InvalidArgumentException("Setting Class {$name} already exists!");
+        }
+    }
+
+    protected function resolveSettingsPath(): string
+    {
+        return config('settings.settings_path', app_path('Settings'));
+    }
+
+    protected function getPath($name, $path): string
+    {
+        return $path() . '/' . $name . '.php';
+    }
+
+    protected function getNamespace($path): string
+    {
+        return 'namespace' . ' ' . trim(implode('\\', array_map('ucfirst', explode('/', $path))), '\\') . ';';
+    }
+}

@@ -11,6 +11,11 @@ return [
     ],
 
     /*
+     * The path where the settings classes will be created.
+     */
+    'setting_class_path' => app_path('Settings'),
+
+    /*
      * In these directories settings migrations will be stored and ran when migrating. A settings
      * migration created via the make:settings-migration command will be stored in the first path or
      * a custom defined path when running the command.
