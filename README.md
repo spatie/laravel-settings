@@ -943,7 +943,7 @@ Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime`, or `Date
 The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
 
 
-### Repostitories
+### Repositories
 
 There are two types of repositories included in the package, the `redis` and `database` repository. You can create multiple repositories for one type in the `setting.php` config file. And each repository can be configured.
 
