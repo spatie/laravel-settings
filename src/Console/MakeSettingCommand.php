@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Console;
 
+use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
@@ -59,8 +60,6 @@ class MakeSettingCommand extends Command
             $this->getPath($name, $path),
             $this->getContent($name, $group, $path)
         );
-
-        $this->components->info(sprintf('%s created successfully.', $name));
     }
 
     protected function getStub(): string
@@ -95,9 +94,7 @@ EOT;
     protected function ensureSettingClassDoesntAlreadyExist($name, $path): void
     {
         if ($this->files->exists($this->getPath($name, $path))) {
-            $this->components->error(sprintf('%s already exists!', $name));
-
-            exit(1); // for some reason, return false was not working
+            throw new InvalidArgumentException(sprintf('%s already exists!', $name));
         }
     }
 
