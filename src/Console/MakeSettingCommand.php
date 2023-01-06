@@ -2,9 +2,9 @@
 
 namespace Spatie\LaravelSettings\Console;
 
-use InvalidArgumentException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use InvalidArgumentException;
 
 class MakeSettingCommand extends Command
 {
@@ -31,7 +31,7 @@ class MakeSettingCommand extends Command
     protected $description = 'Create a new Settings Class';
 
     /**
-     * @var Filesystem $files
+     * @var Filesystem
      */
     protected Filesystem $files;
 
