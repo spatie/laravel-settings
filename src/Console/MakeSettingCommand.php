@@ -110,7 +110,7 @@ EOT;
 
     protected function getNamespace($path): string
     {
-        $namespace = str_replace('/', '\\', trim(str_replace(base_path(), '', $path), '/')) . ';';
+        $namespace = str_replace('/', '\\', trim(str_replace(ucfirst(base_path()), '', $path), '/')) . ';';
 
         return "namespace $namespace";
     }
