@@ -6,7 +6,7 @@ use function Orchestra\Testbench\artisan;
 
 it('creates a new test settings migration on specified path', function () {
     $tmpDir = sys_get_temp_dir();
-
+    
     artisan($this, 'make:settings-migration', [
         'name' => 'CreateNewTestSettingsMigration',
         'path' => $tmpDir,
