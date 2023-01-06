@@ -104,6 +104,11 @@ return [
     ],
 
     /*
+     * The path where the settings classes will be created.
+     */
+    'setting_class_path' => app_path('Settings'),
+
+    /*
      * In these directories settings migrations will be stored and ran when migrating. A settings 
      * migration created via the make:settings-migration command will be stored in the first path or
      * a custom defined path when running the command.
@@ -195,6 +200,12 @@ class GeneralSettings extends Settings
         return 'general';
     }
 }
+```
+
+You can generate a new settings class using this artisan command. Before you do, please check if the `setting_class_path` is correctly set. You can also specify a `path` option, which is optional.
+
+```bash
+    php artisan make:setting SettingName --group=groupName 
 ```
 
 Now, you will have to add this settings class to the `settings.php` config file in the `settings` array so it can be loaded by Laravel:
