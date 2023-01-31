@@ -529,7 +529,8 @@ You can define global casts in the `global_casts` array of the package configura
 'global_casts' => [
     DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
     DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
-    Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
+ // Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
+    Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
 ],
 ```
 
@@ -537,7 +538,7 @@ You can define global casts in the `global_casts` array of the package configura
  
  - a specific type (`DateTimeZone::class`)
  - a type that implements an interface (`DateTimeInterface::class`)
- - a type that extends from another class (`DataTransferObject::class`)
+ - a type that extends from another class (`Data::class`)
  
 In your settings class, when you use a `DateTime` property (which implements `DateTimeInterface`), you no longer have to define local casts:
 
@@ -822,9 +823,9 @@ class DtoCast implements SettingsCast
         $this->type = $type;
     }
 
-    public function get($payload): DataTransferObject
+    public function get($payload): Data
     {
-        return new $this->type($payload);
+        return $this->type::from($payload);
     }
 
     public function set($payload): array
@@ -834,7 +835,7 @@ class DtoCast implements SettingsCast
 }
 ```
 
-The above is a caster for the [spatie/data-transfer-object](https://github.com/spatie/data-transfer-object) package, within its constructor, the type will be a specific DTO class, for example, `DateDto::class`. In the `get` method, the caster will construct a `DateDto::class` with the repository properties. The caster receives a `DateDto::class` as payload in the `set` method and converts it to an array for safe storing in the repository.
+The above is a caster for the [spatie/laravel-data](https://github.com/spatie/laravel-data) package, within its constructor, the type will be a specific Data class, for example, `SongData::class`. In the `get` method, the caster will construct a `Data::class` with the repository properties. The caster receives a `Data::class` as payload in the `set` method and converts it to an array for safe storing in the repository.
 
 #### Local casts
 
