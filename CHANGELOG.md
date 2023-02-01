@@ -6,6 +6,12 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.7.0 - 2023-02-01
+
+- Add Laravel 10 Support (#192)
+- Update make:settings migration class as anonymous class (#189)
+- Use correct namespace in make:settings command (#190)
+
 ## 2.6.1 - 2023-01-06
 
 - Add current date to the settings migration file (#178)
@@ -156,6 +162,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -169,7 +176,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
