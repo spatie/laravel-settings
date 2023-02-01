@@ -25,8 +25,9 @@ class TestCase extends BaseTestCase
     {
         $this->artisan('migrate', ['--database' => 'testing']);
 
-        include_once __DIR__ . '/../database/migrations/create_settings_table.php.stub';
-        (new \CreateSettingsTable())->up();
+        $migration = require(__DIR__ . '/../database/migrations/create_settings_table.php.stub');
+
+        (new $migration)->up();
     }
 
     protected function getPackageProviders($app)
