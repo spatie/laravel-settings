@@ -58,6 +58,25 @@ class GeneralSettingsController
 }
 ```
 
+Or:
+
+```php
+class GeneralSettingsController
+{
+    public function update(
+        GeneralSettingsRequest $request,
+        GeneralSettings $settings
+    ){
+        $settings->update($request->only([
+            'site_name',
+            'site_active',
+        ]));
+        
+        return redirect()->back();
+    }
+}
+```
+
 Let's take a look at how to create your own settings classes.
 
 ## Support us
@@ -281,6 +300,22 @@ class SettingsController
         $settings->site_active = $request->boolean('site_active');
         
         $settings->save();
+        
+        return redirect()->back();
+    }
+}
+```
+
+Or:
+
+```php
+class SettingsController
+{
+    public function __invoke(GeneralSettings $settings, GeneralSettingsRequest $request){
+        $settings->update($request->input([
+            'site_name',
+            'site_active',
+        ]));
         
         return redirect()->back();
     }
