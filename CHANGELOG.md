@@ -6,6 +6,12 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.8.0 - 2023-02-10
+
+- Drop Laravel 8 support
+- Drop PHP 8.0 support
+- Use spatie/structures-discoverer for finding settings
+
 ## 2.7.0 - 2023-02-01
 
 - Add Laravel 10 Support (#192)
@@ -163,6 +169,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -177,7 +184,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
