@@ -18,6 +18,10 @@ beforeEach(function () {
         DummySimpleSettings::class,
     ]);
 
+    $this->app['config']->set('settings.auto_discover_settings', [
+        __DIR__.'/../TestClasses'
+    ]);
+
     $this->container = app(SettingsContainer::class);
 });
 
