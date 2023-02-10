@@ -6,8 +6,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
-use Spatie\LaravelSettings\Support\Composer;
-use Spatie\LaravelSettings\Support\DiscoverSettings;
 use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 use Spatie\LaravelSettings\Support\SettingsStructureScout;
 
