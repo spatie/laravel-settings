@@ -2,16 +2,15 @@
 
 namespace Spatie\LaravelSettings\Tests\Console;
 
+use function Orchestra\Testbench\artisan;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithImportedType;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
-use function Orchestra\Testbench\artisan;
-use Spatie\LaravelSettings\SettingsContainer;
-use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 
-use function Spatie\Snapshots\assertMatchesSnapshot;
 use Spatie\Snapshots\MatchesSnapshots;
 
 uses(MatchesSnapshots::class);
@@ -40,6 +39,6 @@ it('can cache the registered sessions', function () {
         DummySimpleSettings::class,
         DummySettings::class,
         DummySettingsWithImportedType::class,
-        DummySettingsWithCast::class
+        DummySettingsWithCast::class,
     ]);
 });
