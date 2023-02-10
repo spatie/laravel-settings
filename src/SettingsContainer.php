@@ -51,9 +51,6 @@ class SettingsContainer
 
         $structureScout = SettingsStructureScout::create();
 
-        $settings = $structureScout->isCached()
-            ? $settings->get()
-
         $settings = array_merge(
             $structureScout->get(),
             config('settings.settings', [])

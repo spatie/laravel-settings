@@ -13,6 +13,8 @@ use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 use Spatie\LaravelSettings\Support\SettingsCacheFactory;
+use Spatie\LaravelSettings\Support\SettingsStructureScout;
+use Spatie\StructureDiscoverer\Support\StructureScoutManager;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 
@@ -41,6 +43,8 @@ class LaravelSettingsServiceProvider extends ServiceProvider
 
         Event::subscribe(SettingsEventSubscriber::class);
         Event::listen(SchemaLoaded::class, fn ($event) => $this->removeMigrationsWhenSchemaLoaded($event));
+
+        StructureScoutManager::add(SettingsStructureScout::class);
 
         $this->loadMigrationsFrom($this->resolveMigrationPaths());
     }
