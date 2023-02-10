@@ -4,7 +4,6 @@ namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\Support\SettingsStructureScout;
 
