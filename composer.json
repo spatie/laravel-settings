@@ -16,7 +16,7 @@
         }
     ],
     "require" : {
-        "php" : "^7.4|^8.0",
+        "php" : "^8.1",
         "ext-json" : "*",
         "illuminate/database" : "^8.73|^9.0|^10.0",
         "doctrine/dbal" : "^2.13|^3.2",
