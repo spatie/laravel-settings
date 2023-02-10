@@ -2,8 +2,8 @@
 
 namespace Spatie\LaravelSettings\Tests;
 
-use Spatie\LaravelSettings\Support\SettingsStructureScout;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
+use Spatie\LaravelSettings\Support\SettingsStructureScout;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;

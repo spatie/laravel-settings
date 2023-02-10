@@ -22,8 +22,6 @@ beforeEach(function () {
 });
 
 it('can cache the registered sessions', function () {
-
-
     artisan($this, 'settings:discover');
 
     assertMatchesSnapshot(file_get_contents(config('settings.discovered_settings_cache_path').'/settings.php'));
