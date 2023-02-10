@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\SettingsContainer;
+use Spatie\LaravelSettings\Support\SettingsStructureScout;
 
 class CacheDiscoveredSettingsCommand extends Command
 {
@@ -17,19 +18,8 @@ class CacheDiscoveredSettingsCommand extends Command
     {
         $this->info('Caching registered settings...');
 
-        $container
-            ->clearCache()
-            ->getSettingClasses()
-            ->pipe(function (Collection $settingClasses) use ($files) {
-                $cachePath = config('settings.discovered_settings_cache_path');
-
-                $files->makeDirectory($cachePath, 0755, true, true);
-
-                $files->put(
-                    $cachePath . '/settings.php',
-                    '<?php return ' . var_export($settingClasses->toArray(), true) . ';'
-                );
-            });
+        SettingsStructureScout::create()->clear();
+        SettingsStructureScout::create()->cache();
 
         $this->info('All done!');
     }

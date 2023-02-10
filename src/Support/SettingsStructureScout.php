@@ -25,12 +25,10 @@ class SettingsStructureScout extends StructureScout
 
     public function cacheDriver(): DiscoverCacheDriver
     {
-        if (app()->environment('local')) {
-            return new NullDiscoverCacheDriver();
-        }
-
         return new FileDiscoverCacheDriver(
-            config('settings.discovered_settings_cache_path')
+            config('settings.discovered_settings_cache_path'),
+            serialize: false,
+            filename: 'settings.php'
         );
     }
 }

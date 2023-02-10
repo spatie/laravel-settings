@@ -1,8 +1,2 @@
 <?php return array (
-  0 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummySettingsWithRepository',
-  1 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummyEncryptedSettings',
-  2 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummySimpleSettings',
-  3 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummySettings',
-  4 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummySettingsWithImportedType',
-  5 => 'Spatie\\LaravelSettings\\Tests\\TestClasses\\DummySettingsWithCast',
 );
