@@ -33,7 +33,7 @@ it('can cache the registered sessions', function () {
 
     $settingsClasses = require config('settings.discovered_settings_cache_path').'/settings.php';
 
-    expect($settingsClasses)->toEqual([
+    expect($settingsClasses)->toEqualCanonicalizing([
         DummySettingsWithRepository::class,
         DummyEncryptedSettings::class,
         DummySimpleSettings::class,
