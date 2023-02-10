@@ -15,13 +15,15 @@
             "role" : "Developer"
         }
     ],
+    "repositories" : [{"type" : "path", "url":  "../structure-discoverer"}],
     "require" : {
         "php" : "^7.4|^8.0",
         "ext-json" : "*",
         "illuminate/database" : "^8.73|^9.0",
         "doctrine/dbal" : "^2.13|^3.2",
         "phpdocumentor/type-resolver" : "^1.5",
-        "spatie/temporary-directory" : "^1.3|^2.0"
+        "spatie/temporary-directory" : "^1.3|^2.0",
+        "spatie/php-structure-discoverer" : "dev-main"
     },
     "require-dev" : {
         "ext-redis": "*",
