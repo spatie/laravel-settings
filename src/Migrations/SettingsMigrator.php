@@ -3,7 +3,7 @@
 namespace Spatie\LaravelSettings\Migrations;
 
 use Closure;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Spatie\LaravelSettings\Exceptions\InvalidSettingName;
 use Spatie\LaravelSettings\Exceptions\SettingAlreadyExists;
 use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
@@ -76,7 +76,7 @@ class SettingsMigrator
             $this->deleteProperty($property);
         }
     }
-    
+
     public function update(string $property, Closure $closure, bool $encrypted = false): void
     {
         if (! $this->checkIfPropertyExists($property)) {
@@ -177,15 +177,15 @@ class SettingsMigrator
 
     protected function getCast(string $group, string $name): ?SettingsCast
     {
-        return optional($this->settingsGroups()->get($group))->getCast($name);
-    }
+        $settingsClass = Arr::first(
+            app(SettingsContainer::class)->getSettingClasses(),
+            fn (string $settingsClass) => $settingsClass::group() === $group
+        );
 
-    protected function settingsGroups(): Collection
-    {
-        return app(SettingsContainer::class)
-            ->getSettingClasses()
-            ->mapWithKeys(fn (string $settingsClass) => [
-                $settingsClass::group() => new SettingsConfig($settingsClass),
-            ]);
+        if ($settingsClass === null) {
+            return null;
+        }
+
+        return (new SettingsConfig($settingsClass))->getCast($name);
     }
 }
