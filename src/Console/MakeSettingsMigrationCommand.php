@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -79,7 +80,7 @@ EOT;
 
     protected function getPath($name, $path): string
     {
-        return $path . '/' . date('Y_m_d_His') . '_' . Str::snake($name) . '.php';
+        return $path . '/' . Carbon::now()->format('Y_m_d_His') . '_' . Str::snake($name) . '.php';
     }
 
     protected function resolveMigrationPaths(): array
