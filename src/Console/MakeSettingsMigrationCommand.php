@@ -37,9 +37,11 @@ class MakeSettingsMigrationCommand extends Command
         $this->files->ensureDirectoryExists($path);
 
         $this->files->put(
-            $this->getPath($name, $path),
+            $file =$this->getPath($name, $path),
             str_replace('{{ class }}', $name, $this->getStub())
         );
+
+        $this->info(sprintf('Setting migration [%s] created successfully.', $file));
     }
 
     protected function getStub(): string
