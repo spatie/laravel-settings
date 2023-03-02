@@ -39,7 +39,7 @@ class MakeSettingsMigrationCommand extends Command
 
         $this->files->put(
             $file = $this->getPath($name, $path),
-            str_replace('{{ class }}', $name, $this->getStub())
+            $this->getStub()
         );
 
         $this->info(sprintf('Setting migration [%s] created successfully.', $file));
@@ -52,13 +52,13 @@ class MakeSettingsMigrationCommand extends Command
 
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
-class {{ class }} extends SettingsMigration
+return new class extends SettingsMigration
 {
     public function up(): void
     {
 
     }
-}
+};
 
 EOT;
     }
