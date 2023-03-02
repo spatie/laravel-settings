@@ -6,6 +6,13 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.8.1 - 2023-03-02
+
+- Show message and target path after setting migration created (#203)
+- Follow Laravel's namespace convention in MakeSettingCommand (#200)
+- Update MakeSettingsMigrationCommand.php (#205)
+- Revert "Add support for structure discoverer"( #207)
+
 ## 2.8.0 - 2023-02-10
 
 - Drop Laravel 8 support
@@ -170,6 +177,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -185,7 +193,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
