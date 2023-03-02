@@ -38,7 +38,7 @@ class MakeSettingsMigrationCommand extends Command
         $this->files->ensureDirectoryExists($path);
 
         $this->files->put(
-            $file =$this->getPath($name, $path),
+            $file = $this->getPath($name, $path),
             str_replace('{{ class }}', $name, $this->getStub())
         );
 
