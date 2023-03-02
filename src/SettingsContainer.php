@@ -6,8 +6,9 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Spatie\LaravelSettings\Exceptions\CouldNotUnserializeSettings;
+use Spatie\LaravelSettings\Support\Composer;
+use Spatie\LaravelSettings\Support\DiscoverSettings;
 use Spatie\LaravelSettings\Support\SettingsCacheFactory;
-use Spatie\LaravelSettings\Support\SettingsStructureScout;
 
 class SettingsContainer
 {
@@ -47,10 +48,17 @@ class SettingsContainer
             return self::$settingsClasses;
         }
 
-        $structureScout = SettingsStructureScout::create();
+        $cachedDiscoveredSettings = config('settings.discovered_settings_cache_path') . '/settings.php';
 
+        if (file_exists($cachedDiscoveredSettings)) {
+            $classes = require $cachedDiscoveredSettings;
+
+            return self::$settingsClasses = collect($classes);
+        }
+
+        /** @var \Spatie\LaravelSettings\Settings[] $settings */
         $settings = array_merge(
-            $structureScout->get(),
+            $this->discoverSettings(),
             config('settings.settings', [])
         );
 
@@ -62,5 +70,14 @@ class SettingsContainer
         self::$settingsClasses = null;
 
         return $this;
+    }
+
+    protected function discoverSettings(): array
+    {
+        return (new DiscoverSettings())
+            ->within(config('settings.auto_discover_settings', []))
+            ->useBasePath(base_path())
+            ->ignoringFiles(Composer::getAutoloadedFiles(base_path('composer.json')))
+            ->discover();
     }
 }
