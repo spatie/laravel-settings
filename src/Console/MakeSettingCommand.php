@@ -67,7 +67,7 @@ class MakeSettingCommand extends Command
         return <<<EOT
 <?php
 
-{{ namespace }}
+namespace {{ namespace }};
 
 use Spatie\LaravelSettings\Settings;
 
@@ -100,7 +100,7 @@ EOT;
 
     protected function resolveSettingsPath(): string
     {
-        return config('settings.settings_path', app_path('Settings'));
+        return config('settings.setting_class_path', app_path('Settings'));
     }
 
     protected function getPath($name, $path): string
@@ -110,8 +110,8 @@ EOT;
 
     protected function getNamespace($path): string
     {
-        $namespace = str_replace('/', '\\', trim(str_replace(ucfirst(base_path()), '', $path), '/')) . ';';
+        $path = trim(str_replace([base_path(), '/'], ['', '\\'], $path), '\\');
 
-        return "namespace $namespace";
+        return implode('\\', array_map(fn ($directory) => ucfirst($directory), explode('\\', $path)));
     }
 }
