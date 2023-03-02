@@ -4,7 +4,6 @@ namespace Spatie\LaravelSettings\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Spatie\LaravelSettings\Support\SettingsStructureScout;
 
 class ClearDiscoveredSettingsCacheCommand extends Command
 {
@@ -14,7 +13,7 @@ class ClearDiscoveredSettingsCacheCommand extends Command
 
     public function handle(Filesystem $files): void
     {
-        SettingsStructureScout::create()->clear();
+        $files->delete(config('settings.discovered_settings_cache_path') . '/settings.php');
 
         $this->info('Cached discovered settings cleared!');
     }

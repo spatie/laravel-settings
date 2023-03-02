@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -37,9 +38,11 @@ class MakeSettingsMigrationCommand extends Command
         $this->files->ensureDirectoryExists($path);
 
         $this->files->put(
-            $this->getPath($name, $path),
+            $file = $this->getPath($name, $path),
             $this->getStub()
         );
+
+        $this->info(sprintf('Setting migration [%s] created successfully.', $file));
     }
 
     protected function getStub(): string
@@ -77,7 +80,7 @@ EOT;
 
     protected function getPath($name, $path): string
     {
-        return $path . '/' . date('Y_m_d_His') . '_' . Str::snake($name) . '.php';
+        return $path . '/' . Carbon::now()->format('Y_m_d_His') . '_' . Str::snake($name) . '.php';
     }
 
     protected function resolveMigrationPaths(): array
