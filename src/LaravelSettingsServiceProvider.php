@@ -72,19 +72,32 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ->depth(0);
 
         $migrations = collect(iterator_to_array($files))
-            ->mapWithKeys(function (SplFileInfo $file) {
-                preg_match('/class\s*(\w*)\s*extends/', file_get_contents($file->getRealPath()), $found);
+            ->map(function (SplFileInfo $file) {
+                $contents = file_get_contents($file->getRealPath());
 
-                if (empty($found)) {
+                if(
+                    str_contains($contents, 'return new class extends '.SettingsMigration::class)
+                    || str_contains($contents, 'return new class extends SettingsMigration')
+                ) {
+                    return $file->getBasename('.php');
+                }
+
+                preg_match('/class\s*(?P<className>\w*)\s*extends/', $contents, $found);
+
+                if (empty($found['className'])) {
                     return null;
                 }
 
                 require_once $file->getRealPath();
 
-                return [$file->getBasename('.php') => $found[1]];
+                if(! is_subclass_of($found['className'], SettingsMigration::class)){
+                    return null;
+                }
+
+                return $file->getBasename('.php');
             })
-            ->filter(fn (string $migrationClass) => is_subclass_of($migrationClass, SettingsMigration::class))
-            ->keys();
+            ->filter()
+            ->values();
 
         $event->connection
             ->table(config()->get('database.migrations'))
