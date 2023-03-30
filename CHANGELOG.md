@@ -6,6 +6,10 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 2.8.3 - 2023-03-30
+
+- Remove doctrine as a dependency
+
 ## 2.8.2 - 2023-03-10
 
 - Fix remigration problems with anonymous settings migrations
@@ -183,6 +187,7 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - receive a `SettingsMapper` when constructed
 - 
 - 
@@ -200,7 +205,9 @@ Please, be sure to clear your cache since settings classes with encrypted proper
 - 
 - 
 - 
+- 
 - - faking settings will now only request non-given properties from the repository
+- 
 - 
 - 
 - 
