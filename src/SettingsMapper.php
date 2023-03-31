@@ -45,16 +45,18 @@ class SettingsMapper
     }
 
     public function save(
-        string $settingsClass,
+        string     $settingsClass,
         Collection $properties
     ): Collection {
         $config = $this->getConfig($settingsClass);
 
         $this->ensureNoMissingSettings($config, $properties, 'saving');
 
-        $changedProperties = $properties
-            ->reject(fn ($payload, string $name) => $config->isLocked($name))
-            ->each(function ($payload, string $name) use ($config) {
+        $propertiesToUpdate = $properties
+            ->reject(fn ($payload, string $name) => $config->isLocked($name));
+
+        (clone $propertiesToUpdate)
+            ->map(function ($payload, string $name) use ($config) {
                 if ($cast = $config->getCast($name)) {
                     $payload = $cast->set($payload);
                 }
@@ -63,16 +65,23 @@ class SettingsMapper
                     $payload = Crypto::encrypt($payload);
                 }
 
-                $config->getRepository()->updatePropertyPayload(
-                    $config->getGroup(),
-                    $name,
-                    $payload
+                return [
+                    'group' => $config->getGroup(),
+                    'name' => $name,
+                    'payload' => $payload,
+                ];
+            })
+            ->groupBy('group')
+            ->each(function (Collection $properties, string $group) use ($config) {
+                $config->getRepository()->updatePropertiesPayload(
+                    $group,
+                    $properties
                 );
             });
 
         return $this
             ->fetchProperties($settingsClass, $config->getLocked())
-            ->merge($changedProperties);
+            ->merge($propertiesToUpdate);
     }
 
     public function fetchProperties(string $settingsClass, Collection $names): Collection
@@ -105,8 +114,8 @@ class SettingsMapper
 
     private function ensureNoMissingSettings(
         SettingsConfig $config,
-        Collection $properties,
-        string $operation
+        Collection     $properties,
+        string         $operation
     ): void {
         $missingSettings = $config
             ->getReflectedProperties()

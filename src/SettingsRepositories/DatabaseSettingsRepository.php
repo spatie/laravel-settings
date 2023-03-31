@@ -3,7 +3,9 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Models\SettingsProperty;
+use Throwable;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
@@ -69,6 +71,25 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->update([
                 'payload' => json_encode($value),
             ]);
+    }
+
+    public function updatePropertiesPayload(string $group, Collection $properties): void
+    {
+        $propertiesInBatch = (clone $properties)->map(function ($property) {
+            $property['payload'] = json_encode($property['payload']);
+
+            return $property;
+        })->toArray();
+
+        try {
+            $this->getBuilder()
+                ->where('group', $group)
+                ->upsert($propertiesInBatch, ['group', 'name'], ['payload']);
+        } catch (Throwable $exception) {
+            $properties->each(function (array $property) use ($group) {
+                $this->updatePropertyPayload($group, data_get($property, 'name'), data_get($property, 'payload'));
+            });
+        }
     }
 
     public function deleteProperty(string $group, string $name): void

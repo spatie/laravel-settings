@@ -234,10 +234,12 @@ it('can have a different table name', function () {
 
         $table->string('group')->index();
         $table->string('name');
-        $table->boolean('locked');
+        $table->boolean('locked')->default(false);
         $table->json('payload');
 
         $table->timestamps();
+
+        $table->unique(['group', 'name']);
     });
 
     $repository = new DatabaseSettingsRepository([

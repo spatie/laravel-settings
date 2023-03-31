@@ -2,6 +2,8 @@
 
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
+use Illuminate\Support\Collection;
+
 interface SettingsRepository
 {
     /**
@@ -28,6 +30,11 @@ interface SettingsRepository
      * Update the payload of a property within a group
      */
     public function updatePropertyPayload(string $group, string $name, $value): void;
+
+    /**
+     * Update the payload of a property within a group
+     */
+    public function updatePropertiesPayload(string $group, Collection $properties): void;
 
     /**
      * Delete a property from a group
