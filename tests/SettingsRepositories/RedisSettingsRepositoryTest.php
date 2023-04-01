@@ -113,14 +113,14 @@ it('can update a property payload', function () {
 
 
 it('can update a properties payload', function () {
-    $this->repository->createProperty('test', 'a', 'Alpha');
-    $this->repository->createProperty('test', 'b', true);
-    $this->repository->createProperty('test', 'c', ['night', 'day']);
-    $this->repository->createProperty('test', 'd', null);
-    $this->repository->createProperty('test', 'e', 42);
-    $this->repository->createProperty('second_test', 'a', ['night', 'day']);
-    $this->repository->createProperty('second_test', 'b', null);
-    $this->repository->createProperty('second_test', 'c', 42);
+    $this->repository->createProperty('test1', 'a', 'Alpha');
+    $this->repository->createProperty('test1', 'b', true);
+    $this->repository->createProperty('test1', 'c', ['night', 'day']);
+    $this->repository->createProperty('test1', 'd', null);
+    $this->repository->createProperty('test1', 'e', 42);
+    $this->repository->createProperty('test2', 'a', ['night', 'day']);
+    $this->repository->createProperty('test2', 'b', null);
+    $this->repository->createProperty('test2', 'c', 42);
 
     $data = [
         ['group' => 'test1', 'name' => 'a', 'payload' => null],
