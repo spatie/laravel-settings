@@ -52,10 +52,10 @@ class SettingsMapper
 
         $this->ensureNoMissingSettings($config, $properties, 'saving');
 
-        $propertiesToUpdate = $properties
+        $notRejectedProperties = $properties
             ->reject(fn ($payload, string $name) => $config->isLocked($name));
 
-        (clone $propertiesToUpdate)
+        $changedProperties = $notRejectedProperties
             ->map(function ($payload, string $name) use ($config) {
                 if ($cast = $config->getCast($name)) {
                     $payload = $cast->set($payload);
@@ -65,23 +65,18 @@ class SettingsMapper
                     $payload = Crypto::encrypt($payload);
                 }
 
-                return [
-                    'group' => $config->getGroup(),
-                    'name' => $name,
-                    'payload' => $payload,
-                ];
+                return $payload;
             })
-            ->groupBy('group')
-            ->each(function (Collection $properties, string $group) use ($config) {
-                $config->getRepository()->updatePropertiesPayload(
-                    $group,
-                    $properties
-                );
-            });
+            ->toArray();
+
+        $config->getRepository()->updatePropertiesPayload(
+            $config->getGroup(),
+            $changedProperties
+        );
 
         return $this
             ->fetchProperties($settingsClass, $config->getLocked())
-            ->merge($propertiesToUpdate);
+            ->merge($notRejectedProperties);
     }
 
     public function fetchProperties(string $settingsClass, Collection $names): Collection

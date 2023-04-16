@@ -3,9 +3,7 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Models\SettingsProperty;
-use Throwable;
 
 class DatabaseSettingsRepository implements SettingsRepository
 {
@@ -63,33 +61,19 @@ class DatabaseSettingsRepository implements SettingsRepository
         ]);
     }
 
-    public function updatePropertyPayload(string $group, string $name, $value): void
+    public function updatePropertiesPayload(string $group, array $properties): void
     {
+        $propertiesInBatch = collect($properties)->map(function ($payload, $name) use ($group) {
+            return [
+                'group' => $group,
+                'name' => $name,
+                'payload' => json_encode($payload),
+            ];
+        })->values()->toArray();
+
         $this->getBuilder()
             ->where('group', $group)
-            ->where('name', $name)
-            ->update([
-                'payload' => json_encode($value),
-            ]);
-    }
-
-    public function updatePropertiesPayload(string $group, Collection $properties): void
-    {
-        $propertiesInBatch = (clone $properties)->map(function ($property) {
-            $property['payload'] = json_encode($property['payload']);
-
-            return $property;
-        })->toArray();
-
-        try {
-            $this->getBuilder()
-                ->where('group', $group)
-                ->upsert($propertiesInBatch, ['group', 'name'], ['payload']);
-        } catch (Throwable $exception) {
-            $properties->each(function (array $property) use ($group) {
-                $this->updatePropertyPayload($group, data_get($property, 'name'), data_get($property, 'payload'));
-            });
-        }
+            ->upsert($propertiesInBatch, ['group', 'name'], ['payload']);
     }
 
     public function deleteProperty(string $group, string $name): void

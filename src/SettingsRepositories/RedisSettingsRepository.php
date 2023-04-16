@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Collection;
 
 class RedisSettingsRepository implements SettingsRepository
 {
@@ -46,20 +45,13 @@ class RedisSettingsRepository implements SettingsRepository
         $this->connection->hSet($this->prefix . $group, $name, json_encode($payload));
     }
 
-    public function updatePropertyPayload(string $group, string $name, $value): void
+    public function updatePropertiesPayload(string $group, array $properties): void
     {
-        $this->connection->hSet($this->prefix . $group, $name, json_encode($value));
-    }
+        $properties = collect($properties)->mapWithKeys(function ($payload, $name) use ($group) {
+            return [$name => json_encode($payload)];
+        })->toArray();
 
-    public function updatePropertiesPayload(string $group, Collection $properties): void
-    {
-        $data = [];
-
-        $properties->each(function (array $property) use ($group, &$data) {
-            $data[data_get($property, 'name')] = json_encode(data_get($property, 'payload'));
-        });
-
-        $this->connection->hmset($this->prefix . $group, $data);
+        $this->connection->hmset($this->prefix . $group, $properties);
     }
 
     public function deleteProperty(string $group, string $name): void

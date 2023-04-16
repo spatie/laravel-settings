@@ -76,7 +76,7 @@ class SettingsMigrator
             $this->deleteProperty($property);
         }
     }
-    
+
     public function update(string $property, Closure $closure, bool $encrypted = false): void
     {
         if (! $this->checkIfPropertyExists($property)) {
@@ -165,7 +165,7 @@ class SettingsMigrator
             $payload = optional($this->getCast($group, $name))->set($payload) ?: $payload;
         }
 
-        $this->repository->updatePropertyPayload($group, $name, $payload);
+        $this->repository->updatePropertiesPayload($group, [$name => $payload]);
     }
 
     protected function deleteProperty(string $property): void

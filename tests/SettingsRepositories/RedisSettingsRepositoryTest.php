@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\Tests\SettingsRepositories;
 
 use Illuminate\Redis\RedisManager;
-use Illuminate\Support\Collection;
 use function PHPUnit\Framework\assertEqualsCanonicalizing;
 
 use Spatie\LaravelSettings\SettingsRepositories\RedisSettingsRepository;
@@ -98,11 +97,15 @@ it('can update a property payload', function () {
     $this->repository->createProperty('test', 'd', null);
     $this->repository->createProperty('test', 'e', 42);
 
-    $this->repository->updatePropertyPayload('test', 'a', null);
-    $this->repository->updatePropertyPayload('test', 'b', false);
-    $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
-    $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
-    $this->repository->updatePropertyPayload('test', 'e', 69);
+    $newValues = [
+        'a' => null,
+        'b' => false,
+        'c' => ['light', 'dark'],
+        'd' => 'Alpha',
+        'e' => 69,
+    ];
+
+    $this->repository->updatePropertiesPayload('test', $newValues);
 
     expect($this->repository->getPropertyPayload('test', 'a'))->toBeNull();
     expect($this->repository->getPropertyPayload('test', 'b'))->toBeFalse();
@@ -113,38 +116,27 @@ it('can update a property payload', function () {
 
 
 it('can update a properties payload', function () {
-    $this->repository->createProperty('test1', 'a', 'Alpha');
-    $this->repository->createProperty('test1', 'b', true);
-    $this->repository->createProperty('test1', 'c', ['night', 'day']);
-    $this->repository->createProperty('test1', 'd', null);
-    $this->repository->createProperty('test1', 'e', 42);
-    $this->repository->createProperty('test2', 'a', ['night', 'day']);
-    $this->repository->createProperty('test2', 'b', null);
-    $this->repository->createProperty('test2', 'c', 42);
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->createProperty('test', 'b', true);
+    $this->repository->createProperty('test', 'c', ['night', 'day']);
+    $this->repository->createProperty('test', 'd', null);
+    $this->repository->createProperty('test', 'e', 42);
 
-    $data = [
-        ['group' => 'test1', 'name' => 'a', 'payload' => null],
-        ['group' => 'test1', 'name' => 'b', 'payload' => false],
-        ['group' => 'test1', 'name' => 'c', 'payload' => ['light', 'dark']],
-        ['group' => 'test1', 'name' => 'd', 'payload' => 'Alpha'],
-        ['group' => 'test1', 'name' => 'e', 'payload' => 69],
-        ['group' => 'test2', 'name' => 'a', 'payload' => 'Alpha'],
-        ['group' => 'test2', 'name' => 'b', 'payload' => 'beta'],
-        ['group' => 'test2', 'name' => 'c', 'payload' => 87],
+    $properties = [
+        'a' => null,
+        'b' => false,
+        'c' => ['light', 'dark'],
+        'd' => 'Alpha',
+        'e' => 69,
     ];
 
-    collect($data)->groupBy('group')->each(function (Collection $properties, string $group) {
-        $this->repository->updatePropertiesPayload($group, $properties);
-    });
+    $this->repository->updatePropertiesPayload('test', $properties);
 
-    expect($this->repository->getPropertyPayload('test1', 'a'))->toBeNull();
-    expect($this->repository->getPropertyPayload('test1', 'b'))->toBeFalse();
-    expect($this->repository->getPropertyPayload('test1', 'c'))->toEqual(['light', 'dark']);
-    expect($this->repository->getPropertyPayload('test1', 'd'))->toEqual('Alpha');
-    expect($this->repository->getPropertyPayload('test1', 'e'))->toEqual(69);
-    expect($this->repository->getPropertyPayload('test2', 'a'))->toEqual('Alpha');
-    expect($this->repository->getPropertyPayload('test2', 'b'))->toEqual('beta');
-    expect($this->repository->getPropertyPayload('test2', 'c'))->toEqual(87);
+    expect($this->repository->getPropertyPayload('test', 'a'))->toBeNull();
+    expect($this->repository->getPropertyPayload('test', 'b'))->toBeFalse();
+    expect($this->repository->getPropertyPayload('test', 'c'))->toEqual(['light', 'dark']);
+    expect($this->repository->getPropertyPayload('test', 'd'))->toEqual('Alpha');
+    expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(69);
 });
 
 it('can delete a property', function () {
@@ -209,7 +201,7 @@ it('can use a prefix', function () {
 
     expect($this->repository->getPropertyPayload('test', 'a'))->toEqual('Alpha');
 
-    $this->repository->updatePropertyPayload('test', 'a', 'Alpha Updated');
+    $this->repository->updatePropertiesPayload('test', ['a' => 'Alpha Updated']);
 
     expect($this->client->hGet('spatie.test', 'a'))
         ->toEqual(json_encode('Alpha Updated'));

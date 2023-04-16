@@ -124,11 +124,13 @@ it('can update a property payload', function () {
     $this->repository->createProperty('test', 'd', null);
     $this->repository->createProperty('test', 'e', 42);
 
-    $this->repository->updatePropertyPayload('test', 'a', null);
-    $this->repository->updatePropertyPayload('test', 'b', false);
-    $this->repository->updatePropertyPayload('test', 'c', ['light', 'dark']);
-    $this->repository->updatePropertyPayload('test', 'd', 'Alpha');
-    $this->repository->updatePropertyPayload('test', 'e', 69);
+    $this->repository->updatePropertiesPayload('test', [
+        'a' => null,
+        'b' => false,
+        'c' => ['light', 'dark'],
+        'd' => 'Alpha',
+        'e' => 69,
+    ]);
 
     expect($this->repository->getPropertyPayload('test', 'a'))->toBeNull();
     expect($this->repository->getPropertyPayload('test', 'b'))->toBeFalse();
@@ -208,7 +210,7 @@ it('can have different configuration options', function ($repositoryFactory) {
     expect($otherRepository->getPropertiesInGroup('test'))->toEqual(['a' => 'Alpha']);
 
     $otherRepository->createProperty('test', 'b', 'Beta');
-    $otherRepository->updatePropertyPayload('test', 'b', 'Beta updated');
+    $otherRepository->updatePropertiesPayload('test', ['b' => 'Beta updated']);
 
     expect($otherRepository->getPropertyPayload('test', 'b'))->toEqual('Beta updated');
 
