@@ -6,6 +6,12 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.0.0 - 2023-04-28
+
+- Allow repositories to update multiple settings at once (#213 )
+- The default location where searching for settings happens is now `app_path('Settings')` instead of `app_path()`
+- The default `discovered_settings_cache_path` is changed
+
 ## 2.8.3 - 2023-03-30
 
 - Remove doctrine as a dependency
