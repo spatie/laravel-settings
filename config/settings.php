@@ -75,7 +75,7 @@ return [
      * register them.
      */
     'auto_discover_settings' => [
-        app()->path(),
+        app_path('Settings'),
     ],
 
     /*

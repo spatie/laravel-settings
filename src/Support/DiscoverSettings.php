@@ -26,7 +26,9 @@ class DiscoverSettings
 
     public function within(array $directories): self
     {
-        $this->directories = $directories;
+        $this->directories = array_values(
+            array_filter($directories, fn (string $directory) => is_dir($directory))
+        );
 
         return $this;
     }
@@ -85,6 +87,6 @@ class DiscoverSettings
             ucfirst(Str::replaceLast('.php', '', $class))
         );
 
-        return $this->rootNamespace . $class;
+        return $this->rootNamespace.$class;
     }
 }
