@@ -45,9 +45,13 @@ class RedisSettingsRepository implements SettingsRepository
         $this->connection->hSet($this->prefix . $group, $name, json_encode($payload));
     }
 
-    public function updatePropertyPayload(string $group, string $name, $value): void
+    public function updatePropertiesPayload(string $group, array $properties): void
     {
-        $this->connection->hSet($this->prefix . $group, $name, json_encode($value));
+        $properties = collect($properties)->mapWithKeys(function ($payload, $name) use ($group) {
+            return [$name => json_encode($payload)];
+        })->toArray();
+
+        $this->connection->hmset($this->prefix . $group, $properties);
     }
 
     public function deleteProperty(string $group, string $name): void

@@ -25,9 +25,9 @@ interface SettingsRepository
     public function createProperty(string $group, string $name, $payload): void;
 
     /**
-     * Update the payload of a property within a group
+     * Update the payloads of properties within a group.
      */
-    public function updatePropertyPayload(string $group, string $name, $value): void;
+    public function updatePropertiesPayload(string $group, array $properties): void;
 
     /**
      * Delete a property from a group

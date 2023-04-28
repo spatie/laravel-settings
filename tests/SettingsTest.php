@@ -583,8 +583,8 @@ it('can refresh the settings properties', function () {
 
     $repository = $settings->getRepository();
 
-    $repository->updatePropertyPayload('dummy_simple', 'name', 'Rick Astley');
-    $repository->updatePropertyPayload('dummy_simple', 'description', 'Never gonna give you up');
+    $repository->updatePropertiesPayload('dummy_simple', ['name' => 'Rick Astley']);
+    $repository->updatePropertiesPayload('dummy_simple', ['description' => 'Never gonna give you up']);
 
     $settings->refresh();
 
