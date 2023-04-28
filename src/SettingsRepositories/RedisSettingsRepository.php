@@ -47,7 +47,7 @@ class RedisSettingsRepository implements SettingsRepository
 
     public function updatePropertiesPayload(string $group, array $properties): void
     {
-        $properties = collect($properties)->mapWithKeys(function ($payload, $name) use ($group) {
+        $properties = collect($properties)->mapWithKeys(function ($payload, $name) {
             return [$name => json_encode($payload)];
         })->toArray();
 
