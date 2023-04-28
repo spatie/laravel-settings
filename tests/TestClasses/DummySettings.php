@@ -26,8 +26,8 @@ class DummySettings extends Settings
     public array $dto_array;
 
     // Todo: enable this later
-//    /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
-//    public array $dto_collection;
+    //    /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyDto[] */
+    //    public array $dto_collection;
 
     public DateTimeImmutable $date_time;
 
