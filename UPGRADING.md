@@ -28,6 +28,8 @@ return new class extends Migration
             $table->boolean('locked')->default(false)->change();
 
             $table->unique(['group', 'name']);
+
+            $table->dropIndex(['group']);
         });
     }
 
@@ -40,6 +42,8 @@ return new class extends Migration
             $table->boolean('locked')->default(null)->change();
 
             $table->dropUnique(['group', 'name']);
+
+            $table->index('group');
         });
     }
 };
