@@ -207,7 +207,6 @@ it('will resolve an enum cast for native enums', function () {
     expect(new EnumCast(DummyUnitEnum::class))->toEqual(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'unit'), []));
     expect(new EnumCast(DummyIntEnum::class))->toEqual(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'int'), []));
     expect(new EnumCast(DummyStringEnum::class))->toEqual(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'string'), []));
-
     expect(new EnumCast(DummyStringEnum::class))->toEqual(SettingsCastFactory::resolve(new ReflectionProperty($fake, 'annotated'), []));
 });
 

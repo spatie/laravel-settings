@@ -724,3 +724,36 @@ it('will use specific repository cache settings when supplied', function () {
     expect($name)->toEqual('Louis Armstrong');
     expect($log)->toHaveCount(0);
 });
+
+
+it('it can use enums which are null', function () {
+    $this->skipIfPHPLowerThen('8.1');
+
+    resolve(SettingsMigrator::class)->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('name');
+    });
+
+    $class = new class extends Settings {
+        public ?DummyStringEnum $name;
+
+        public static function group(): string
+        {
+            return 'dummy_simple';
+        }
+    };
+
+    /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings $settings */
+    $settings = resolve(get_class($class));
+
+    expect($settings->name)->toBeNull();
+
+    $settings->name = DummyStringEnum::ARCHIVED;
+    $settings->save();
+
+    expect($settings->name)->toBe(DummyStringEnum::ARCHIVED);
+
+    $settings->name = null;
+    $settings->save();
+
+    expect($settings->name)->toBeNull();
+});

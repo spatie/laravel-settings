@@ -15,8 +15,12 @@ class EnumCast implements SettingsCast
         $this->enum = $enum;
     }
 
-    public function get($payload): UnitEnum
+    public function get($payload): ?UnitEnum
     {
+        if($payload === null){
+            return null;
+        }
+
         if (is_a($this->enum, BackedEnum::class, true)) {
             return $this->enum::from($payload);
         }
@@ -32,8 +36,12 @@ class EnumCast implements SettingsCast
         throw new Exception('Invalid enum');
     }
 
-    public function set($payload): string|int
+    public function set($payload): string|int|null
     {
+        if($payload === null){
+            return null;
+        }
+
         if ($payload instanceof BackedEnum) {
             return $payload->value;
         }
