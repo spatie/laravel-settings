@@ -9,7 +9,7 @@
 [![Style](https://github.com/spatie/laravel-settings/workflows/Check%20&%20fix%20styling/badge.svg)](https://github.com/spatie/laravel-settings/actions?query=workflow%3A%22Check+%26+fix+styling%22)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-settings.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-settings)
 
-This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You create a settings class as such:
+This package allows you to store settings in a repository (database, Redis, ...) and use them through an application without hassle. You can create a settings class as such:
 
 ```php
 class GeneralSettings extends Settings
@@ -25,7 +25,7 @@ class GeneralSettings extends Settings
 }
 ```
 
-When you want to use these settings somewhere in your application, you can inject them since we register them in the Laravel Container. For example, in a controller:
+If you want to use these settings somewhere in your application, you can inject them, since we register them in the Laravel Container. For example, in a controller:
 
 ```php
 class GeneralSettingsController
@@ -39,7 +39,7 @@ class GeneralSettingsController
 }
 ```
 
-You can update settings as such:
+You can update the settings as such:
 
 ```php
 class GeneralSettingsController
@@ -97,7 +97,7 @@ return [
 
     /*
      * Each settings class used in your application must be registered, you can
-     * put them (manually) here.
+     * add them (manually) here.
      */
     'settings' => [
 
@@ -118,7 +118,7 @@ return [
     ]
 
     /*
-     * When no repository was set for a settings class the following repository
+     * When no repository is set for a settings class, the following repository
      * will be used for loading and saving settings.
      */
     'default_repository' => 'database',
@@ -153,7 +153,7 @@ return [
 
     /*
      * These global casts will be automatically used whenever a property within
-     * your settings class isn't a default PHP type.
+     * your settings class isn't the default PHP type.
      */
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
@@ -171,7 +171,7 @@ return [
     ],
 
     /*
-     * Automatically discovered settings classes can be cached so they don't
+     * Automatically discovered settings classes can be cached, so they don't
      * need to be searched each time the application boots up.
      */
     'discovered_settings_cache_path' => base_path('bootstrap/cache'),
@@ -209,12 +209,12 @@ You can generate a new settings class using this artisan command. Before you do,
     php artisan make:setting SettingName --group=groupName 
 ```
 
-Now, you will have to add this settings class to the `settings.php` config file in the `settings` array so it can be loaded by Laravel:
+Now, you will have to add this settings class to the `settings.php` config file in the `settings` array, so it can be loaded by Laravel:
 
 ```php
     /*
      * Each settings class used in your application must be registered, you can
-     * put them (manually) here.
+     * add them (manually) here.
      */
     'settings' => [
         GeneralSettings::class
@@ -250,7 +250,7 @@ You should migrate your database to add the properties:
 php artisan migrate
 ```
 
-Now when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it into your application:
+Now, when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it into your application:
 
 ```php
 class IndexController
@@ -263,7 +263,7 @@ class IndexController
 }
 ```
 
-Or use it load it somewhere in your application as such:
+Or use it to load it somewhere in your application as such:
 
 ```php
 function getName(): string{
@@ -271,7 +271,7 @@ function getName(): string{
 }
 ```
 
-Updating settings can be done as such:
+Updating the settings can be done as such:
 
 ```php
 class SettingsController
@@ -289,7 +289,7 @@ class SettingsController
 
 ### Selecting a repository
 
-Settings will be stored and loaded from a repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
+Settings will be stored and loaded from the repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.
 
 You can explicitly set the repository of a settings class by implementing the `repository` method:
 
@@ -340,7 +340,7 @@ class CreateGeneralSettings extends SettingsMigration
 }
 ```
 
-We haven't added a `down` method, but this can be added if desired. In the `up` method, you can change the settings data in a repository when migrating. There are a few default operations supported:
+We haven't added a `down` method, but this can be added if desired. In the `up` method, you can change the settings data in the repository when migrating. There are a few default operations supported:
 
 #### Adding a property
 
@@ -687,7 +687,7 @@ class GeneralSettings extends Settings
 
 #### Using encryption in migrations
 
-Creating and updating encrypted properties in migrations work a little bit differently than non-encrypted properties.
+Creating and updating encrypted properties in migrations works a bit differently than non-encrypted properties.
 
 Instead of calling the `add` method to create a new property, you should use the `addEncrypted` method:
 
@@ -776,7 +776,7 @@ Each settings class you create should be added to the `settings` array within th
 
 That's why it is also possible to auto-discover settings classes. The package will look through your application and tries to discover settings classes. You can specify the paths where will be searched in the config `auto_discover_settings` array. By default, this is the application's app path.
 
-Autodiscovering settings requires some extra time before your application is booted up. That's why it is possible to cache them using the following command:
+Autodiscovering settings require some extra time before your application is booted up. That's why it is possible to cache them using the following command:
 
 ```bash
 php artisan settings:discover

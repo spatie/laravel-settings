@@ -79,7 +79,7 @@ return [
     ],
 
     /*
-     * Automatically discovered settings classes can be cached so they don't
+     * Automatically discovered settings classes can be cached, so they don't
      * need to be searched each time the application boots up.
      */
     'discovered_settings_cache_path' => base_path('bootstrap/cache'),
