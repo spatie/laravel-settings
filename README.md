@@ -746,7 +746,7 @@ DateSettings::fake([
 
 Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
 
-If all properties are overwritten, no database calls will be made. If only some properties are overwritten, the package will first load the settings from the database and then overwrite the properties. It is possible to explicitly throw an MissingSettings exception when a property is not overwritten in a fake method call
+If all properties are overwritten, no calls to repositories will be made. If only some properties are overwritten, the package will first add the overwritten properties and then load the missing settings from the repository. It is possible to explicitly throw an MissingSettings exception when a property is not overwritten in a fake method call like this:
 
 ```php
 DateSettings::fake([
