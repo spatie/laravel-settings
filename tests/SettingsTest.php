@@ -227,7 +227,7 @@ it('can disable loading not provided fake settings', function () {
 
     DB::enableQueryLog();
 
-    expect(fn() => DummySimpleSettings::fake([], false))->toThrow(MissingSettings::class); // missing description
+    expect(fn () => DummySimpleSettings::fake([], false))->toThrow(MissingSettings::class); // missing description
 
     expect(DB::getQueryLog())->toBeEmpty();
 });
