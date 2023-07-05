@@ -6,6 +6,10 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.2.0 - 2023-07-05
+
+- Add support for database-less fakes
+
 ## 3.1.0 - 2023-05-11
 
 - Add support for nullable enum properties
