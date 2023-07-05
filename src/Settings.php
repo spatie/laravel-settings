@@ -12,6 +12,7 @@ use ReflectionProperty;
 use Spatie\LaravelSettings\Events\SavingSettings;
 use Spatie\LaravelSettings\Events\SettingsLoaded;
 use Spatie\LaravelSettings\Events\SettingsSaved;
+use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\SettingsRepositories\SettingsRepository;
 use Spatie\LaravelSettings\Support\Crypto;
 
@@ -49,7 +50,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
      *
      * @return static
      */
-    public static function fake(array $values): self
+    public static function fake(array $values, bool $loadMissingValues = true): self
     {
         $settingsMapper = app(SettingsMapper::class);
 
@@ -57,6 +58,16 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
             ->getReflectedProperties()
             ->keys()
             ->reject(fn (string $name) => array_key_exists($name, $values));
+
+        if ($propertiesToLoad->isEmpty()) {
+            return app(Container::class)->instance(static::class, new static(
+                $values
+            ));
+        }
+
+        if($propertiesToLoad->isNotEmpty() && $loadMissingValues === false) {
+            throw MissingSettings::create(static::class, $propertiesToLoad->toArray(), 'loading fake');
+        }
 
         $mergedValues = $settingsMapper
             ->fetchProperties(static::class, $propertiesToLoad)

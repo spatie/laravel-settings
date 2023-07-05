@@ -746,6 +746,14 @@ DateSettings::fake([
 
 Now, when the `DateSettings` settings class is injected somewhere in your application, the `birth_date` property will be `DateTime('16-05-1994')`.
 
+If all properties are overwritten, no database calls will be made. If only some properties are overwritten, the package will first load the settings from the database and then overwrite the properties. It is possible to explicitly throw an MissingSettings exception when a property is not overwritten in a fake method call
+
+```php
+DateSettings::fake([
+    'birth_date' => new DateTime('16-05-1994')
+], false);
+```
+
 ### Caching settings
 
 It takes a small amount of time to load a settings class from a repository. When you've got many settings classes, these added small amounts of time can grow quickly out of hand. The package has built-in support for caching stored settings using the Laravel cache.

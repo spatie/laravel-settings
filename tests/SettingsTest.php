@@ -182,11 +182,16 @@ it('cannot save settings that do not exist', function () {
 it('can fake settings', function () {
     $this->migrateDummySimpleSettings();
 
+    DB::enableQueryLog();
+
     DummySimpleSettings::fake([
+        'name' => 'Louis Armstrong',
         'description' => 'La vie en rose',
     ]);
 
     $settings = resolve(DummySimpleSettings::class);
+
+    expect(DB::getQueryLog())->toBeEmpty();
 
     expect($settings)
         ->name->toEqual('Louis Armstrong')
@@ -198,15 +203,33 @@ it('will only load settings from the repository that were not given', function (
         $blueprint->add('name', 'Rick Astley');
     });
 
+    DB::enableQueryLog();
+
     DummySimpleSettings::fake([
         'description' => 'Never gonna give you up',
     ]);
 
     $settings = resolve(DummySimpleSettings::class);
 
+    expect(DB::getQueryLog())->toHaveCount(1);
+    expect(DB::getQueryLog()[0]['query'])->toBe('select "name", "payload" from "settings" where "group" = ?');
+    expect(DB::getQueryLog()[0]['bindings'])->toBe(['dummy_simple']);
+
     expect($settings)
         ->name->toEqual('Rick Astley')
         ->description->toEqual('Never gonna give you up');
+});
+
+it('can disable loading not provided fake settings', function () {
+    $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('name', 'Rick Astley');
+    });
+
+    DB::enableQueryLog();
+
+    expect(fn() => DummySimpleSettings::fake([], false))->toThrow(MissingSettings::class); // missing description
+
+    expect(DB::getQueryLog())->toBeEmpty();
 });
 
 it('can lock settings', function () {
