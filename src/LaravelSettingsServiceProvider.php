@@ -24,7 +24,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/settings.php' => config_path('settings.php'),
-            ], 'settings');
+            ], 'config');
 
             if (! class_exists('CreateSettingsTable')) {
                 $this->publishes([
