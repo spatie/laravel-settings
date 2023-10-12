@@ -75,9 +75,10 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ->map(function (SplFileInfo $file) {
                 $contents = file_get_contents($file->getRealPath());
 
+                $class = addslashes(SettingsMigration::class);
+
                 if (
-                    str_contains($contents, 'return new class extends '.SettingsMigration::class)
-                    || str_contains($contents, 'return new class extends SettingsMigration')
+                    preg_match("/return\s*new\s*class\s*?\(?\)?\s*extends\s*(?:SettingsMigration|{$class})/", $contents)
                 ) {
                     return $file->getBasename('.php');
                 }
