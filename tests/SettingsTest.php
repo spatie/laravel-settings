@@ -451,6 +451,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_settings']);
+    assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_with_parentheses_settings.php']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_table']);
 
@@ -461,6 +462,7 @@ it('will remigrate when the schema was dumped', function () {
 
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_settings']);
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_settings']);
+    assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_with_parentheses_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_table']);
 })->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
