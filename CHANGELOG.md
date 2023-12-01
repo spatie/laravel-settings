@@ -6,6 +6,10 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.2.2 - 2023-12-01
+
+- Use Illuminate\Database\Eloquent\Casts\Json if possible (#241)
+
 ## 3.2.1 - 2023-09-15
 
 - Change provider tag name for config (#233)
