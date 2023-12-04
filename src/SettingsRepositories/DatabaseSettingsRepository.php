@@ -3,7 +3,6 @@
 namespace Spatie\LaravelSettings\SettingsRepositories;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Json;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 
 class DatabaseSettingsRepository implements SettingsRepository
@@ -28,7 +27,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->where('group', $group)
             ->get(['name', 'payload'])
             ->mapWithKeys(function (object $object) {
-                return [$object->name => $this->decode($object->payload, true)];
+                return [$object->name => json_decode($object->payload, true)];
             })
             ->toArray();
     }
@@ -49,7 +48,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->first('payload')
             ->toArray();
 
-        return $this->decode($setting['payload']);
+        return json_decode($setting['payload']);
     }
 
     public function createProperty(string $group, string $name, $payload): void
@@ -57,7 +56,7 @@ class DatabaseSettingsRepository implements SettingsRepository
         $this->getBuilder()->create([
             'group' => $group,
             'name' => $name,
-            'payload' => $this->encode($payload),
+            'payload' => json_encode($payload),
             'locked' => false,
         ]);
     }
@@ -68,7 +67,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             return [
                 'group' => $group,
                 'name' => $name,
-                'payload' => $this->encode($payload),
+                'payload' => json_encode($payload),
             ];
         })->values()->toArray();
 
@@ -123,19 +122,5 @@ class DatabaseSettingsRepository implements SettingsRepository
         }
 
         return $model->newQuery();
-    }
-
-    private function encode(mixed $value): mixed
-    {
-        return class_exists(Json::class)
-            ? Json::encode($value)
-            : json_encode($value);
-    }
-
-    private function decode(string $payload, bool $associative = false): mixed
-    {
-        return class_exists(Json::class)
-            ? Json::decode($payload, ! $associative)
-            : json_decode($payload, $associative);
     }
 }
