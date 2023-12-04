@@ -6,6 +6,10 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.2.3 - 2023-12-04
+
+- Revert "Use Illuminate\Database\Eloquent\Casts\Json if possible" (#249)
+
 ## 3.2.2 - 2023-12-01
 
 - Use Illuminate\Database\Eloquent\Casts\Json if possible (#241)
