@@ -25,13 +25,13 @@ jobs:
             testbench: ^6.23
             larastan: ^1.0
           - laravel: 9.*
-            testbench: 7.*
+            testbench: ^7.0
             larastan: ^1.0
           - laravel: 10.*
-            testbench: 8.*
+            testbench: ^8.0
             larastan: ^2.0
           - laravel: 11.*
-            testbench: 9.*
+            testbench: ^9.0
             larastan: ^2.0
         exclude:
           - laravel: 10.*
