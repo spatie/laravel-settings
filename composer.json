@@ -39,7 +39,7 @@
         "spatie/ray": "^1.36"
     },
     "suggest" : {
-        "spatie/data-transfer-object" : "Allows for DTO casting to settings. (deprecated)"
+        "spatie/data-transfer-object" : "Allows for DTO casting to settings."
     },
     "autoload" : {
         "psr-4" : {
