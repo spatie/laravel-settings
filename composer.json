@@ -34,7 +34,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/phpunit": "^9.5|^10.0",
         "spatie/laravel-data": "^1.0.0|^2.0.0|^4.0.0",
-        "spatie/pest-plugin-snapshots": "^1.1",
+        "spatie/pest-plugin-snapshots": "^1.1|^2.0",
         "spatie/phpunit-snapshot-assertions": "^5.0",
         "spatie/ray": "^1.36"
     },
