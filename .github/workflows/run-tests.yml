@@ -19,8 +19,6 @@ jobs:
         os: [ ubuntu-latest ]
         php: [ 8.3, 8.2, 8.1, 8.0 ]
         laravel: [ 11.*, 10.*, 9.*, 8.* ]
-        testbench: [ ^9.0, ^8.0, ^7.0, ^6.23 ]
-        larastan: [ ^2.0, ^1.0 ]
         dependency-version: [ prefer-stable ]
         include:
           - laravel: 8.*
