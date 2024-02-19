@@ -3,6 +3,8 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Database\Events\SchemaLoaded;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
@@ -99,8 +101,12 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ->filter()
             ->values();
 
+        $migrationsConfig = config()->get('database.migrations');
+
+        $migrationsTable = is_array($migrationsConfig) ? ($migrationsConfig['table'] ?? null) : $migrationsConfig;
+
         $event->connection
-            ->table(config()->get('database.migrations'))
+            ->table($migrationsTable)
             ->useWritePdo()
             ->whereIn('migration', $migrations)
             ->delete();

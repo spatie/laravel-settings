@@ -11,6 +11,11 @@ parameters:
 			path: src/Models/SettingsProperty.php
 
 		-
+			message: "#^Property 'payload' does not exist in Spatie\\\\LaravelSettings\\\\Models\\\\SettingsProperty model\\.$#"
+			count: 1
+			path: src/Models/SettingsProperty.php
+
+		-
 			message: "#^Call to method toArray\\(\\) on an unknown class Spatie\\\\DataTransferObject\\\\DataTransferObject\\.$#"
 			count: 1
 			path: src/SettingsCasts/DtoCast.php
