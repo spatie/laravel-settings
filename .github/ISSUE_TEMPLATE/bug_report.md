@@ -1,38 +1,41 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report to help us improve laravel-settings
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
-**Describe the bug**
+**✏️ Describe the bug**
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**↪️ To Reproduce**
+Provide us a pest test like this one which shows the problem:
 
-**Expected behavior**
+```php
+
+it('cannot save settings', function () {
+    resolve(SettingsMigrator::class)->inGroup('dummy_simple', function (SettingsBlueprint $blueprint) use ($description, $name): void {
+        $blueprint->add('name', $name);
+        $blueprint->add('description', $description);
+    });
+        
+    $settings = resolve(DummySimpleSettings::class);
+    $settings->name = 'Nina Simone';
+    $settings->save();
+
+    // Property is not changed (off course it is but for documentation purposes it is not)
+    dd($settings->all());
+});
+```
+
+Assertions aren't required, a simple dump or dd statement of what's going wrong is good enough 😄
+
+**✅ Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**🖥️ Versions**
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+Laravel:
+Laravel settings:
+PHP:
