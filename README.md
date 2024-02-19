@@ -141,6 +141,14 @@ return [
     ],
 
     /*
+     * The encoder and decoder will determine how settings are stored and
+     * retrieved in the database. By default, `json_encode` and `json_decode`
+     * are used.
+     */
+    'encoder' => null,
+    'decoder' => null,
+
+    /*
      * The contents of settings classes can be cached through your application,
      * settings will be stored within a provided Laravel store and can have an
      * additional prefix.
@@ -733,6 +741,18 @@ public function up(): void
 ```
 
 Of course, you can use these methods when using `inGroup` migration operations.
+
+### Custom encoders and decoders
+
+It is possible to define custom encoders and decoders instead of the built-in `json_encode` and `json_decode` ones by
+changing the package configuration like so:
+
+```php
+...
+'encoder' => fn($value): string => str_rot13(json_encode($value)),
+'decoder' => fn(string $payload, bool $associative) => json_decode(str_rot13($payload), $associative),
+...
+```
 
 ### Faking settings classes
 

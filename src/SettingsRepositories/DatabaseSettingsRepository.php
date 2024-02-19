@@ -27,7 +27,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->where('group', $group)
             ->get(['name', 'payload'])
             ->mapWithKeys(function (object $object) {
-                return [$object->name => json_decode($object->payload, true)];
+                return [$object->name => $this->decode($object->payload, true)];
             })
             ->toArray();
     }
@@ -48,7 +48,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             ->first('payload')
             ->toArray();
 
-        return json_decode($setting['payload']);
+        return $this->decode($setting['payload']);
     }
 
     public function createProperty(string $group, string $name, $payload): void
@@ -56,7 +56,7 @@ class DatabaseSettingsRepository implements SettingsRepository
         $this->getBuilder()->create([
             'group' => $group,
             'name' => $name,
-            'payload' => json_encode($payload),
+            'payload' => $this->encode($payload),
             'locked' => false,
         ]);
     }
@@ -67,7 +67,7 @@ class DatabaseSettingsRepository implements SettingsRepository
             return [
                 'group' => $group,
                 'name' => $name,
-                'payload' => json_encode($payload),
+                'payload' => $this->encode($payload),
             ];
         })->values()->toArray();
 
@@ -122,5 +122,19 @@ class DatabaseSettingsRepository implements SettingsRepository
         }
 
         return $model->newQuery();
+    }
+
+    protected function encode(mixed $value): mixed
+    {
+        $encoder = config('settings.encoder') ?? fn ($value) => json_encode($value);
+
+        return $encoder($value);
+    }
+
+    protected function decode(string $payload, bool $associative = false): mixed
+    {
+        $decoder = config('settings.decoder') ?? fn ($payload, $associative) => json_decode($payload, $associative);
+
+        return $decoder($payload, $associative);
     }
 }

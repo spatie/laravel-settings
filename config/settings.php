@@ -48,6 +48,14 @@ return [
     ],
 
     /*
+     * The encoder and decoder will determine how settings are stored and
+     * retrieved in the database. By default, `json_encode` and `json_decode`
+     * are used.
+     */
+    'encoder' => null,
+    'decoder' => null,
+
+    /*
      * The contents of settings classes can be cached through your application,
      * settings will be stored within a provided Laravel store and can have an
      * additional prefix.
