@@ -3,8 +3,6 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Database\Events\SchemaLoaded;
-use Illuminate\Database\Migrations\MigrationRepositoryInterface;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Spatie\LaravelSettings\Console\CacheDiscoveredSettingsCommand;
