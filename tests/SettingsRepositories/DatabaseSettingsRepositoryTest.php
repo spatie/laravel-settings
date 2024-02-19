@@ -139,16 +139,16 @@ it('can update a property payload', function () {
     expect($this->repository->getPropertyPayload('test', 'e'))->toEqual(69);
 });
 
-it('can utilize custom encoders', function() {
-    config()->set('settings.encoder', fn($value) => str_rot13(json_encode($value)));
+it('can utilize custom encoders', function () {
+    config()->set('settings.encoder', fn ($value) => str_rot13(json_encode($value)));
 
     $this->repository->createProperty('test', 'a', 'Alpha');
 
     expect(SettingsProperty::all()->first()->payload)->toEqual('"Nycun"');
 });
 
-it('can utilize custom decoders', function() {
-    config()->set('settings.decoder', fn($payload, $assoc) => json_decode(str_rot13($payload), $assoc));
+it('can utilize custom decoders', function () {
+    config()->set('settings.decoder', fn ($payload, $assoc) => json_decode(str_rot13($payload), $assoc));
 
     $this->repository->createProperty('test', 'a', 'Nycun');
 
