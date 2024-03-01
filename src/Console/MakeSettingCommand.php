@@ -110,7 +110,17 @@ EOT;
 
     protected function getNamespace($path): string
     {
-        $path = trim(str_replace([base_path(), '/'], ['', '\\'], $path), '\\');
+        $path = preg_replace(
+            [
+                '/^(' . preg_quote(base_path(), '/') . ')/',
+                '/\//'
+            ],
+            [
+                '',
+                '\\'
+            ],
+            $path
+        );
 
         return implode('\\', array_map(fn ($directory) => ucfirst($directory), explode('\\', $path)));
     }
