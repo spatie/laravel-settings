@@ -6,6 +6,14 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.3.1 - 2024-03-13
+
+### What's Changed
+
+* fix when base path is app path by @mvenghaus in https://github.com/spatie/laravel-settings/pull/259
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.3.0...3.3.1
+
 ## 3.3.0 - 2024-02-19
 
 ### What's Changed
