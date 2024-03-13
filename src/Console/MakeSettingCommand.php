@@ -113,11 +113,11 @@ EOT;
         $path = preg_replace(
             [
                 '/^(' . preg_quote(base_path(), '/') . ')/',
-                '/\//'
+                '/\//',
             ],
             [
                 '',
-                '\\'
+                '\\',
             ],
             $path
         );
