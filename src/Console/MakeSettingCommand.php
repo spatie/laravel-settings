@@ -108,20 +108,27 @@ EOT;
         return $path . '/' . $name . '.php';
     }
 
-    protected function getNamespace($path): string
-    {
-        $path = preg_replace(
-            [
-                '/^(' . preg_quote(base_path(), '/') . ')/',
-                '/\//',
-            ],
-            [
-                '',
-                '\\',
-            ],
-            $path
-        );
+protected function getNamespace($path): string
+{
+    $path = preg_replace(
+        [
+            '/^(' . preg_quote(base_path(), '/') . ')/',
+            '/\//',
+        ],
+        [
+            '',
+            '\\',
+        ],
+        $path
+    );
 
-        return implode('\\', array_map(fn ($directory) => ucfirst($directory), explode('\\', $path)));
+    $namespace = implode('\\', array_map(fn ($directory) => ucfirst($directory), explode('\\', $path)));
+
+    // Remove leading backslash if present
+    if (substr($namespace, 0, 1) === '\\') {
+        $namespace = substr($namespace, 1);
     }
+
+    return $namespace;
+}
 }
