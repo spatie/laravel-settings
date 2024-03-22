@@ -6,6 +6,15 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.3.2 - 2024-03-22
+
+### What's Changed
+
+* [3.x] Fix PHP 7.4 Compatibilty by @Rizky92 in https://github.com/spatie/laravel-settings/pull/264
+* Update MakeSettingCommand.php by @hamzaelmaghari in https://github.com/spatie/laravel-settings/pull/262
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.3.1...3.3.2
+
 ## 3.3.1 - 2024-03-13
 
 ### What's Changed
