@@ -124,6 +124,10 @@ class DatabaseSettingsRepository implements SettingsRepository
         return $model->newQuery();
     }
 
+    /**
+     * @param  mixed  $value
+     * @return mixed
+     */
     protected function encode($value)
     {
         $encoder = config('settings.encoder') ?? fn ($value) => json_encode($value);
@@ -131,6 +135,9 @@ class DatabaseSettingsRepository implements SettingsRepository
         return $encoder($value);
     }
 
+    /**
+     * @return mixed
+     */
     protected function decode(string $payload, bool $associative = false)
     {
         $decoder = config('settings.decoder') ?? fn ($payload, $associative) => json_decode($payload, $associative);
