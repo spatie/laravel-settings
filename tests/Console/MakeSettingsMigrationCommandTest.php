@@ -3,11 +3,16 @@
 namespace Spatie\LaravelSettings\Tests\Console;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 it('creates a new test settings migration on specified path', function () {
     $tmpDir = sys_get_temp_dir();
 
     Carbon::setTestNow(Carbon::create(2023, 2, 22, 12, 0, 0));
+
+    foreach(File::files($tmpDir) as $file) {
+        File::delete($file);
+    }
 
     $this->artisan('make:settings-migration', [
         'name' => 'CreateNewTestSettingsMigration',
