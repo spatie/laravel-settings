@@ -78,6 +78,8 @@ class LaravelSettingsServiceProvider extends ServiceProvider
                 if (
                     str_contains($contents, 'return new class extends '.SettingsMigration::class)
                     || str_contains($contents, 'return new class extends SettingsMigration')
+                    || str_contains($contents, 'return new class() extends '.SettingsMigration::class)
+                    || str_contains($contents, 'return new class() extends SettingsMigration')
                 ) {
                     return $file->getBasename('.php');
                 }
