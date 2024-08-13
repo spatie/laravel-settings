@@ -6,6 +6,18 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.3.3 - 2024-08-13
+
+### What's Changed
+
+* Handle Parentheses On Anonymous Settings Migrations by @Magnesium38 in https://github.com/spatie/laravel-settings/pull/280
+
+### New Contributors
+
+* @Magnesium38 made their first contribution in https://github.com/spatie/laravel-settings/pull/280
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.3.2...3.3.3
+
 ## 3.3.2 - 2024-03-22
 
 ### What's Changed
