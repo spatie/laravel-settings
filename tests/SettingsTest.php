@@ -783,12 +783,12 @@ it('it can use enums which are null', function () {
     expect($settings->name)->toBeNull();
 });
 
-it('can check settings types', function () {
+it('will throw error if wrong value type is assigned', function () {
     $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
 
     $settings = resolve(DummySettings::class)
         ->fill([
-            'bool' => 'Nina Simone',
+            'bool' => 'bar bar',
         ])
         ->save()
         ->throws(\TypeError::class);
