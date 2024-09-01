@@ -58,6 +58,11 @@ return new class extends SettingsMigration
     {
 
     }
+
+    public function down(): void
+    {
+    
+    }
 };
 
 EOT;
