@@ -421,6 +421,7 @@ public function up(): void
         // do something
     }
 }
+```
 
 #### Operations in group
 
