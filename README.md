@@ -351,6 +351,11 @@ class CreateGeneralSettings extends SettingsMigration
     {
 
     }
+
+    public function down(): void
+    {
+
+    }
 }
 ```
 
