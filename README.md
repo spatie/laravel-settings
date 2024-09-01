@@ -247,6 +247,12 @@ class CreateGeneralSettings extends SettingsMigration
         $this->migrator->add('general.site_name', 'Spatie');
         $this->migrator->add('general.site_active', true);
     }
+
+    public function down(): void
+    {
+        $this->migrator->delete('general.site_name');
+        $this->migrator->delete('general.site_active');
+    }
 }
 ```
 
