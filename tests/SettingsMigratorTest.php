@@ -100,6 +100,16 @@ it('cannot update a setting that does not exist', function () {
     $this->settingsMigrator->update('user.name', fn (string $name) => 'Ruben Van Assche');
 })->throws(SettingDoesNotExist::class);
 
+it('can check if a setting exists', function () {
+    $this->settingsMigrator->add('settings.exists', true);
+
+    expect($this->settingsMigrator->exists('settings.exists'))->toBeTrue();
+});
+
+it('can check if a setting does not exists', function () {
+    expect($this->settingsMigrator->exists('settings.does_not_exists'))->toBeFalse();
+});
+
 it('can perform migrations within a group', function () {
     $this->settingsMigrator->inGroup('test', function (SettingsBlueprint $blueprint): void {
         $blueprint->add('a', 'Alpha');
