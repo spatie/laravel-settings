@@ -115,7 +115,7 @@ return [
      */
     'migrations_paths' => [
         database_path('settings'),
-    ]
+    ],
 
     /*
      * When no repository is set for a settings class, the following repository
