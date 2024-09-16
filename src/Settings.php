@@ -65,7 +65,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
             ));
         }
 
-        if($propertiesToLoad->isNotEmpty() && $loadMissingValues === false) {
+        if ($propertiesToLoad->isNotEmpty() && $loadMissingValues === false) {
             throw MissingSettings::create(static::class, $propertiesToLoad->toArray(), 'loading fake');
         }
 

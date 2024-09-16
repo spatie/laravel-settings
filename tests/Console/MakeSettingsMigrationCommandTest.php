@@ -10,7 +10,7 @@ it('creates a new test settings migration on specified path', function () {
 
     Carbon::setTestNow(Carbon::create(2023, 2, 22, 12, 0, 0));
 
-    foreach(File::files($tmpDir) as $file) {
+    foreach (File::files($tmpDir) as $file) {
         File::delete($file);
     }
 

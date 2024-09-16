@@ -17,7 +17,7 @@ class EnumCast implements SettingsCast
 
     public function get($payload): ?UnitEnum
     {
-        if($payload === null) {
+        if ($payload === null) {
             return null;
         }
 
@@ -38,7 +38,7 @@ class EnumCast implements SettingsCast
 
     public function set($payload): string|int|null
     {
-        if($payload === null) {
+        if ($payload === null) {
             return null;
         }
 
