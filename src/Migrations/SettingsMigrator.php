@@ -114,6 +114,11 @@ class SettingsMigrator
         $this->update($property, fn ($payload) => Crypto::decrypt($payload));
     }
 
+    public function exists(string $property): bool
+    {
+        return $this->checkIfPropertyExists($property);
+    }
+
     public function inGroup(string $group, Closure $closure): void
     {
         $closure(new SettingsBlueprint($group, $this));

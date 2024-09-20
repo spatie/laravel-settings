@@ -410,6 +410,19 @@ public function up(): void
 }
 ```
 
+#### Checking a property if it exists
+
+There might be times when you want to check if a property exists in the database. This can be done as such:
+
+```php
+public function up(): void
+{
+    if ($this->migrator->exists('general.timezone')) {
+        // do something
+    }
+}
+```
+
 #### Operations in group
 
 When you're working on a big settings class with many properties, it can be a bit cumbersome always to have to prepend the settings group. That's why you can also perform operations within a settings group:
