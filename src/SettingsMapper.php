@@ -39,6 +39,7 @@ class SettingsMapper
 
         event(new LoadingSettings($settingsClass, $properties));
 
+        $properties = $this->fillMissingSettingsWithDefaultValues($config, $properties);
         $this->ensureNoMissingSettings($config, $properties, 'loading');
 
         return $properties;
@@ -107,6 +108,24 @@ class SettingsMapper
         return $this->configs[$settingsClass];
     }
 
+    private function fillMissingSettingsWithDefaultValues(SettingsConfig $config, Collection $properties): Collection
+    {
+        $config
+            ->getReflectedProperties()
+            ->keys()
+            ->diff($properties->keys())
+            ->each(function($missingSetting) use ($config, &$properties) {
+                /** @var ReflectionProperty $reflectionProperty */
+                $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
+                $defaultValue = $reflectionProperty->getDefaultValue();
+                if (! is_null($defaultValue) || $reflectionProperty->getType()->allowsNull()) {
+                    $properties->put($missingSetting, $defaultValue);
+                }
+            });
+
+        return $properties;
+    }
+    
     private function ensureNoMissingSettings(
         SettingsConfig $config,
         Collection     $properties,
