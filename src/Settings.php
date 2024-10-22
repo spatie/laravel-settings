@@ -298,4 +298,10 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
         return $this;
     }
+    
+    public function getModel(): array
+    {
+        $settingsTypes = SettingsInspector::getSettingsTypes($this);
+        return $settingsTypes;
+    }
 }
