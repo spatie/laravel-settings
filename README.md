@@ -295,6 +295,27 @@ class SettingsController
 }
 ```
 
+You can get the model of a perticular settings class with getModel():
+
+```php
+class IndexController
+{
+    public function __invoke(GeneralSettings $settings){
+        return view('index', [
+            'settings_model' => $settings->getModel(),
+        ]);
+    }
+}
+
+/*
+
+Settings::getModel() returns an array:
+ [
+    "site_name" => [ "type" => "string", "nullable" => false ]
+ ]
+*/
+```
+
 ### Selecting a repository
 
 Settings will be stored and loaded from the repository. There are two types of repositories `database` and `redis`. And it is possible to create multiple repositories for these types. For example, you could have two `database` repositories, one that goes to a `settings` table in your database and another that goes to a `global_settings` table.

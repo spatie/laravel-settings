@@ -782,3 +782,23 @@ it('it can use enums which are null', function () {
 
     expect($settings->name)->toBeNull();
 });
+
+it('can use getModel', function() {
+    $this->migrateDummySettings(CarbonImmutable::create('2020-05-16')->startOfDay());
+
+    $settings = resolve(DummySettings::class);
+
+    $model = $settings->getModel();
+
+    expect($model)
+        ->toBeArray()
+        ->string->toBeArray()
+        ->string->type->toEqual('string')
+        ->string->nullable->toEqual(false)
+        ->int->toBeArray()
+        ->int->type->toEqual('int')
+        ->int->nullable->toEqual(false)
+        ->nullable_string->toBeArray()
+        ->nullable_string->type->toEqual('string')
+        ->nullable_string->nullable->toEqual(true);
+});
