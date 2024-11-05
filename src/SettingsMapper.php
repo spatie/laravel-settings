@@ -117,9 +117,9 @@ class SettingsMapper
             ->each(function($missingSetting) use ($config, &$properties) {
                 /** @var ReflectionProperty $reflectionProperty */
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
-                $defaultValue = $reflectionProperty->getDefaultValue();
-                if (! is_null($defaultValue) || $reflectionProperty->getType()->allowsNull()) {
-                    $properties->put($missingSetting, $defaultValue);
+
+                if ($reflectionProperty->hasDefaultValue() || $reflectionProperty->getType()->allowsNull()) {
+                    $properties->put($missingSetting, $reflectionProperty->getDefaultValue());
                 }
             });
 
