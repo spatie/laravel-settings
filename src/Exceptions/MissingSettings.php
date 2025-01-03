@@ -10,6 +10,6 @@ class MissingSettings extends Exception
     {
         $missing = implode(', ', $missingProperties);
 
-        return new self("Tried {$operation} settings '{$settingsClass}', and following properties were missing: {$missing}");
+        return new self("Tried {$operation} settings '{$settingsClass}', and the following properties were missing: {$missing}");
     }
 }
