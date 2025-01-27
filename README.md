@@ -93,14 +93,17 @@ This is the contents of the published config file:
 
 ```php
 
+<?php
+
+use App\Settings\Prices;
+
 return [
 
     /*
      * Each settings class used in your application must be registered, you can
-     * add them (manually) here.
+     * put them (manually) here.
      */
     'settings' => [
-
     ],
 
     /*
@@ -109,7 +112,7 @@ return [
     'setting_class_path' => app_path('Settings'),
 
     /*
-     * In these directories settings migrations will be stored and ran when migrating. A settings 
+     * In these directories settings migrations will be stored and ran when migrating. A settings
      * migration created via the make:settings-migration command will be stored in the first path or
      * a custom defined path when running the command.
      */
@@ -118,7 +121,7 @@ return [
     ],
 
     /*
-     * When no repository is set for a settings class, the following repository
+     * When no repository was set for a settings class the following repository
      * will be used for loading and saving settings.
      */
     'default_repository' => 'database',
@@ -153,20 +156,21 @@ return [
      * settings will be stored within a provided Laravel store and can have an
      * additional prefix.
      */
-    'cache' => [
+    'cache'                          => [
         'enabled' => env('SETTINGS_CACHE_ENABLED', false),
         'store' => null,
         'prefix' => null,
+        'ttl' => null,
     ],
 
     /*
      * These global casts will be automatically used whenever a property within
-     * your settings class isn't the default PHP type.
+     * your settings class isn't a default PHP type.
      */
     'global_casts' => [
         DateTimeInterface::class => Spatie\LaravelSettings\SettingsCasts\DateTimeInterfaceCast::class,
         DateTimeZone::class => Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast::class,
-     // Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
+    // Spatie\DataTransferObject\DataTransferObject::class => Spatie\LaravelSettings\SettingsCasts\DtoCast::class,
         Spatie\LaravelData\Data::class => Spatie\LaravelSettings\SettingsCasts\DataCast::class,
     ],
 
