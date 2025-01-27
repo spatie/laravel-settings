@@ -240,7 +240,7 @@ This command will create a new file in `database/settings` where you can add the
 ```php
 use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
-class CreateGeneralSettings extends SettingsMigration
+return new class extends SettingsMigration
 {
     public function up(): void
     {
