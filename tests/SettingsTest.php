@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use ErrorException;
 use Illuminate\Database\Events\SchemaLoaded;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +49,7 @@ beforeEach(function () {
 it('will handle loading settings correctly', function () {
     $dateTime = new DateTimeImmutable('16-05-1994 12:00:00');
     $carbon = new Carbon('16-05-1994 12:00:00');
+    $illuminateCarbon = new IlluminateCarbon('20-05-1994 12:00:00');
 
     $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime): void {
         $blueprint->add('string', 'Ruben');
@@ -64,6 +66,7 @@ it('will handle loading settings correctly', function () {
 
         $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
         $blueprint->add('carbon', $carbon->toAtomString());
+        $blueprint->add('illuminate_carbon', $illuminateCarbon->toAtomString());
         $blueprint->add('nullable_date_time_zone', null);
     });
 
@@ -82,7 +85,8 @@ it('will handle loading settings correctly', function () {
             DummyData::from(['name' => 'Adriaan']),
         ])
         ->date_time->toEqual($dateTime)
-        ->carbon->toEqual($carbon);
+        ->carbon->toEqual($carbon)
+        ->illuminate_carbon->toEqual($illuminateCarbon);
 });
 
 it('will fail loading when settings are missing', function () {
@@ -98,6 +102,7 @@ it('cannot get settings that do not exist', function () {
 it('can save settings', function () {
     $dateTime = new DateTimeImmutable('16-05-1994 12:00:00');
     $carbon = new Carbon('16-05-1994 12:00:00');
+    $illuminateCarbon = new IlluminateCarbon('20-05-1994 12:00:00');
     $dateTimeZone = new DateTimeZone('europe/brussels');
 
     $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($dateTimeZone, $carbon, $dateTime): void {
@@ -118,6 +123,7 @@ it('can save settings', function () {
         ]);
         $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
         $blueprint->add('carbon', $carbon->toAtomString());
+        $blueprint->add('illuminate_carbon', $illuminateCarbon->toAtomString());
         $blueprint->add('nullable_date_time_zone', $dateTimeZone->getName());
     });
 
@@ -159,6 +165,7 @@ it('can save settings', function () {
     expect($settings)
         ->date_time->toEqual($dateTime)
         ->carbon->toEqual($carbon)
+        ->illuminate_carbon->toEqual($illuminateCarbon)
         ->nullable_date_time_zone->toBeNull();
 });
 
@@ -174,6 +181,7 @@ it('cannot save settings that do not exist', function () {
         'dto' => DummyData::from(['name' => 'Rias']),
         'date_time' => new DateTimeImmutable(),
         'carbon' => Carbon::now(),
+        'illuminate_carbon' => IlluminateCarbon::now(),
     ]);
 
     $settings->save();
