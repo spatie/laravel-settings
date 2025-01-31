@@ -8,6 +8,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 
 class DateTimeInterfaceCast implements SettingsCast
 {
@@ -30,6 +31,10 @@ class DateTimeInterfaceCast implements SettingsCast
 
         if ($this->type === CarbonImmutable::class) {
             return new CarbonImmutable($payload);
+        }
+
+        if ($this->type === IlluminateCarbon::class) {
+            return new IlluminateCarbon($payload);
         }
 
         if ($this->type === DateTimeImmutable::class) {
