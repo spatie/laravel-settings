@@ -118,14 +118,14 @@ class SettingsMapper
                 /** @var ReflectionProperty $reflectionProperty */
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
 
-                if ($reflectionProperty->hasDefaultValue() || $reflectionProperty->getType()->allowsNull()) {
+                if ($reflectionProperty->hasDefaultValue()) {
                     $properties->put($missingSetting, $reflectionProperty->getDefaultValue());
                 }
             });
 
         return $properties;
     }
-    
+
     private function ensureNoMissingSettings(
         SettingsConfig $config,
         Collection     $properties,
