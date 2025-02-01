@@ -20,6 +20,9 @@ class DummySettings extends Settings
 
     public ?string $nullable_string;
 
+    public ?string $nullable_string_default = 'default';
+
+
     public DummyData $dto;
 
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyData[] */
