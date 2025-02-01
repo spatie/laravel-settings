@@ -93,6 +93,14 @@ it('will fail loading when settings are missing', function () {
     resolve(DummySettings::class)->int;
 })->throws(MissingSettings::class);
 
+it('will fail loading when settings are missing and no default value is present', function () {
+    resolve(DummySettings::class)->nullable_string;
+})->throws(MissingSettings::class);
+
+it('will return default when settings are missing and default value is present', function () {
+    expect(resolve(DummySettings::class))->nullable_string_default->toEqual('default');
+})->throws(MissingSettings::class);
+
 it('cannot get settings that do not exist', function () {
     $this->migrateDummySimpleSettings();
 

@@ -256,6 +256,17 @@ You should migrate your database to add the properties:
 php artisan migrate
 ```
 
+Without the migration, if you try to load the `GeneralSettings` settings class, it will throw `MissingSettings` exception. To avoid this, you can define default values for each attribute. This can be useful if you have long-running migrations.
+
+```php
+    // Will throw an error
+    public ?string $site_name;
+    // Will return `null`
+    public ?string $site_description = null;
+    // Will return `false`
+    public bool $site_active = false;
+```
+
 Now, when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it into your application:
 
 ```php
