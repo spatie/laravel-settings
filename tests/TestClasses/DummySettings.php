@@ -36,8 +36,6 @@ class DummySettings extends Settings
 
     public Carbon $carbon;
 
-    public IlluminateCarbon $illuminate_carbon;
-
     public ?DateTimeZone $nullable_date_time_zone;
 
     public static function group(): string

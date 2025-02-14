@@ -185,7 +185,6 @@ it('cannot save settings that do not exist', function () {
         'dto' => DummyData::from(['name' => 'Rias']),
         'date_time' => new DateTimeImmutable(),
         'carbon' => Carbon::now(),
-        'illuminate_carbon' => IlluminateCarbon::now(),
     ]);
 
     $settings->save();
