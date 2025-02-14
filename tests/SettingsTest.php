@@ -51,7 +51,7 @@ it('will handle loading settings correctly', function () {
     $carbon = new Carbon('16-05-1994 12:00:00');
     $illuminateCarbon = new IlluminateCarbon('20-05-1994 12:00:00');
 
-    $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime): void {
+    $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($carbon, $dateTime, $illuminateCarbon): void {
         $blueprint->add('string', 'Ruben');
         $blueprint->add('bool', false);
         $blueprint->add('int', 42);
@@ -91,6 +91,14 @@ it('will fail loading when settings are missing', function () {
     resolve(DummySettings::class)->int;
 })->throws(MissingSettings::class);
 
+it('will fail loading when settings are missing and no default value is present', function () {
+    resolve(DummySettings::class)->nullable_string;
+})->throws(MissingSettings::class);
+
+it('will return default when settings are missing and default value is present', function () {
+    expect(resolve(DummySettings::class))->nullable_string_default->toEqual('default');
+})->throws(MissingSettings::class);
+
 it('cannot get settings that do not exist', function () {
     $this->migrateDummySimpleSettings();
 
@@ -103,7 +111,7 @@ it('can save settings', function () {
     $illuminateCarbon = new IlluminateCarbon('20-05-1994 12:00:00');
     $dateTimeZone = new DateTimeZone('europe/brussels');
 
-    $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($dateTimeZone, $carbon, $dateTime): void {
+    $this->migrator->inGroup('dummy', function (SettingsBlueprint $blueprint) use ($dateTimeZone, $carbon, $dateTime, $illuminateCarbon): void {
         $blueprint->add('string', 'Ruben');
         $blueprint->add('bool', false);
         $blueprint->add('int', 42);
