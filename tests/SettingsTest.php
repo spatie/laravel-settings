@@ -66,7 +66,6 @@ it('will handle loading settings correctly', function () {
 
         $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
         $blueprint->add('carbon', $carbon->toAtomString());
-        $blueprint->add('illuminate_carbon', $illuminateCarbon->toAtomString());
         $blueprint->add('nullable_date_time_zone', null);
     });
 
@@ -85,8 +84,7 @@ it('will handle loading settings correctly', function () {
             DummyData::from(['name' => 'Adriaan']),
         ])
         ->date_time->toEqual($dateTime)
-        ->carbon->toEqual($carbon)
-        ->illuminate_carbon->toEqual($illuminateCarbon);
+        ->carbon->toEqual($carbon);
 });
 
 it('will fail loading when settings are missing', function () {
@@ -123,7 +121,6 @@ it('can save settings', function () {
         ]);
         $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
         $blueprint->add('carbon', $carbon->toAtomString());
-        $blueprint->add('illuminate_carbon', $illuminateCarbon->toAtomString());
         $blueprint->add('nullable_date_time_zone', $dateTimeZone->getName());
     });
 
@@ -165,7 +162,6 @@ it('can save settings', function () {
     expect($settings)
         ->date_time->toEqual($dateTime)
         ->carbon->toEqual($carbon)
-        ->illuminate_carbon->toEqual($illuminateCarbon)
         ->nullable_date_time_zone->toBeNull();
 });
 
