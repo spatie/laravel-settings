@@ -5,9 +5,9 @@ namespace Spatie\LaravelSettings\Tests\TestClasses;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTimeZone;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
-use Illuminate\Support\Carbon as IlluminateCarbon;
 
 class DummySettings extends Settings
 {

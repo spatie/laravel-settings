@@ -114,7 +114,7 @@ class SettingsMapper
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->each(function($missingSetting) use ($config, &$properties) {
+            ->each(function ($missingSetting) use ($config, &$properties) {
                 /** @var ReflectionProperty $reflectionProperty */
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
 
