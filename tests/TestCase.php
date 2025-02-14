@@ -80,6 +80,7 @@ class TestCase extends BaseTestCase
 
             $blueprint->add('date_time', $date->toAtomString());
             $blueprint->add('carbon', $date->toAtomString());
+            $blueprint->add('illuminate_carbon', $date->toAtomString());
             $blueprint->add('nullable_date_time_zone', 'europe/brussels');
         });
 

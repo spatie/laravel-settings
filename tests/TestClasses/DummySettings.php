@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Spatie\LaravelSettings\Settings;
 use Spatie\LaravelSettings\SettingsCasts\DataCast;
+use Illuminate\Support\Carbon as IlluminateCarbon;
 
 class DummySettings extends Settings
 {
@@ -34,6 +35,8 @@ class DummySettings extends Settings
     public DateTimeImmutable $date_time;
 
     public Carbon $carbon;
+
+    public IlluminateCarbon $illuminate_carbon;
 
     public ?DateTimeZone $nullable_date_time_zone;
 
