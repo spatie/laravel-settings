@@ -78,6 +78,7 @@ it('will handle loading settings correctly', function () {
         ->int->toEqual(42)
         ->array->toEqual(['John', 'Ringo', 'Paul', 'George'])
         ->nullable_string->toBeNull()
+        ->nullable_string_default->toEqual('default')
         ->dto->toEqual(DummyData::from(['name' => 'Freek']))
         ->dto_array->toEqual([
             DummyData::from(['name' => 'Seb']),
@@ -85,6 +86,9 @@ it('will handle loading settings correctly', function () {
         ])
         ->date_time->toEqual($dateTime)
         ->carbon->toEqual($carbon);
+
+        // nullable_string_default should throw an error on save because no migration is present
+        expect(fn() => $settings->save())->toThrow(MissingSettings::class);
 });
 
 it('will fail loading when settings are missing', function () {
@@ -117,6 +121,7 @@ it('can save settings', function () {
         $blueprint->add('int', 42);
         $blueprint->add('array', ['John', 'Ringo', 'Paul', 'George']);
         $blueprint->add('nullable_string', null);
+        $blueprint->add('nullable_string_default', 'default2');
         $blueprint->add('default_string', null);
         $blueprint->add('dto', ['name' => 'Freek']);
         $blueprint->add('dto_array', [
@@ -141,6 +146,7 @@ it('can save settings', function () {
         'int' => 69,
         'array' => ['Bono', 'Adam', 'The Edge'],
         'nullable_string' => null,
+        'nullable_string_default' => 'modified',
         'default_string' => 'another',
         'dto' => DummyData::from(['name' => 'Rias']),
         'dto_array' => [
@@ -157,6 +163,7 @@ it('can save settings', function () {
     $settings->save();
 
     $this->assertDatabaseHasSetting('dummy.string', 'Brent');
+    $this->assertDatabaseHasSetting('dummy.nullable_string_default', 'modified');
     $this->assertDatabaseHasSetting('dummy.bool', true);
     $this->assertDatabaseHasSetting('dummy.int', 69);
     $this->assertDatabaseHasSetting('dummy.array', ['Bono', 'Adam', 'The Edge']);
