@@ -11,7 +11,6 @@ class SettingsMapper
 {
     /** @var array<string, \Spatie\LaravelSettings\SettingsConfig> */
     private array $configs = [];
-    private array $propertiesWithDefaultValues = [];
 
     public function initialize(string $settingsClass): SettingsConfig
     {
@@ -111,6 +110,8 @@ class SettingsMapper
 
     private function fillMissingSettingsWithDefaultValues(SettingsConfig $config, Collection $properties): Collection
     {
+        $config->clearPropertiesWithDefaultValues();
+
         $config
             ->getReflectedProperties()
             ->keys()
@@ -120,7 +121,7 @@ class SettingsMapper
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
 
                 if ($reflectionProperty->hasDefaultValue()) {
-                    $this->propertiesWithDefaultValues[] = $missingSetting;
+                    $config->addDefaultValueProperty($missingSetting);
                     $properties->put($missingSetting, $reflectionProperty->getDefaultValue());
                 }
             });
@@ -137,7 +138,7 @@ class SettingsMapper
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->when($operation === 'saving', fn($collection) => $collection->concat($this->propertiesWithDefaultValues))
+            ->when($operation === 'saving', fn($collection) => $collection->concat($config->getPropertiesWithDefaultValues()))
             ->toArray();
 
         if (! empty($missingSettings)) {

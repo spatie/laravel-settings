@@ -16,6 +16,8 @@ class SettingsConfig
     /** @var class-string<\Spatie\LaravelSettings\Settings> */
     private string $settingsClass;
 
+    private Collection $propertiesWithDefaultValues;
+
     /** @var Collection<string, ?\Spatie\LaravelSettings\SettingsCasts\SettingsCast> */
     private Collection $casts;
 
@@ -121,6 +123,25 @@ class SettingsConfig
         return $this->locked = collect(
             $this->repository->getLockedProperties($this->settingsClass::group())
         );
+    }
+
+    public function addDefaultValueProperty(string ...$names): self
+    {
+        $this->propertiesWithDefaultValues = $this->getPropertiesWithDefaultValues()->push(...$names);
+
+        return $this;
+    }
+
+    public function getPropertiesWithDefaultValues(): Collection
+    {
+        return $this->propertiesWithDefaultValues;
+    }
+
+    public function clearPropertiesWithDefaultValues(): self
+    {
+        $this->propertiesWithDefaultValues = collect([]);
+
+        return $this;
     }
 
     public function clearCachedLockedProperties(): self
