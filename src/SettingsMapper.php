@@ -6,9 +6,17 @@ use Illuminate\Support\Collection;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Support\Crypto;
+use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 
 class SettingsMapper
 {
+    private SettingsCacheFactory $settingsCacheFactory;
+
+    public function __construct(SettingsCacheFactory $settingsCacheFactory)
+    {
+        $this->settingsCacheFactory = $settingsCacheFactory;
+    }
+
     /** @var array<string, \Spatie\LaravelSettings\SettingsConfig> */
     private array $configs = [];
 
@@ -83,8 +91,13 @@ class SettingsMapper
     public function fetchProperties(string $settingsClass, Collection $names): Collection
     {
         $config = $this->getConfig($settingsClass);
-
-        return collect($config->getRepository()->getPropertiesInGroup($config->getGroup()))
+        $cache = $this->settingsCacheFactory->build($settingsClass::repository());
+        if ($cache->isEnabled() && $cache->has($settingsClass)) {
+            $settings = $cache->get($settingsClass)->toCollection();
+        } else {
+            $settings = collect($config->getRepository()->getPropertiesInGroup($config->getGroup()));
+        }
+        return $settings
             ->filter(fn ($payload, string $name) => $names->contains($name))
             ->map(function ($payload, string $name) use ($config) {
                 if ($config->isEncrypted($name)) {
