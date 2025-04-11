@@ -82,7 +82,6 @@ it('will handle loading settings correctly', function () {
         ->int->toEqual(42)
         ->array->toEqual(['John', 'Ringo', 'Paul', 'George'])
         ->nullable_string->toBeNull()
-        ->nullable_string_default->toBe('not a default anymore')
         ->dto->toEqual(DummyData::from(['name' => 'Freek']))
         ->dto_array->toEqual([
             DummyData::from(['name' => 'Seb']),
