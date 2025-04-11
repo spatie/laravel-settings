@@ -148,7 +148,7 @@ class SettingsMigrator
 
         $payload = $this->repository->getPropertyPayload($group, $name);
 
-        return optional($this->getCast($group, $name))->get($payload) ?: $payload;
+        return $this->getCast($group, $name)?->get($payload) ?: $payload;
     }
 
     protected function createProperty(string $property, $payload): void
@@ -156,7 +156,7 @@ class SettingsMigrator
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         if (is_object($payload)) {
-            $payload = optional($this->getCast($group, $name))->set($payload) ?: $payload;
+            $payload = $this->getCast($group, $name)?->set($payload) ?: $payload;
         }
 
         $this->repository->createProperty($group, $name, $payload);
@@ -167,7 +167,7 @@ class SettingsMigrator
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         if (is_object($payload)) {
-            $payload = optional($this->getCast($group, $name))->set($payload) ?: $payload;
+            $payload = $this->getCast($group, $name)?->set($payload) ?: $payload;
         }
 
         $this->repository->updatePropertiesPayload($group, [$name => $payload]);
@@ -182,7 +182,7 @@ class SettingsMigrator
 
     protected function getCast(string $group, string $name): ?SettingsCast
     {
-        return optional($this->settingsGroups()->get($group))->getCast($name);
+        return $this->settingsGroups()->get($group)?->getCast($name);
     }
 
     protected function settingsGroups(): Collection
