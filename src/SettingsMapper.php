@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Support\Collection;
+use ReflectionProperty;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Support\Crypto;
@@ -111,15 +112,19 @@ class SettingsMapper
 
     private function fillMissingSettingsWithDefaultValues(SettingsConfig $config, Collection $properties): Collection
     {
+        $config->resetDefaultValueLoadedProperties();
+
         $config
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->each(function ($missingSetting) use ($config, &$properties) {
+            ->each(function (string $missingSetting) use ($config, &$properties) {
                 /** @var ReflectionProperty $reflectionProperty */
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
 
                 if ($reflectionProperty->hasDefaultValue()) {
+                    $config->markPropertyAsDefaultValueLoaded($missingSetting);
+
                     $properties->put($missingSetting, $reflectionProperty->getDefaultValue());
                 }
             });
@@ -136,6 +141,7 @@ class SettingsMapper
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
+            ->when($operation === 'saving', fn(Collection $collection) => $collection->concat($config->getDefaultValueLoadedProperties()))
             ->toArray();
 
         if (! empty($missingSettings)) {
