@@ -40,6 +40,7 @@ class SettingsMapper
         event(new LoadingSettings($settingsClass, $properties));
 
         $properties = $this->fillMissingSettingsWithDefaultValues($config, $properties);
+
         $this->ensureNoMissingSettings($config, $properties, 'loading');
 
         return $properties;

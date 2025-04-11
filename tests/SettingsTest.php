@@ -67,7 +67,9 @@ it('will handle loading settings correctly', function () {
         $blueprint->add('date_time', $dateTime->format(DATE_ATOM));
         $blueprint->add('carbon', $carbon->toAtomString());
         $blueprint->add('nullable_date_time_zone', null);
+        $blueprint->add('nullable_string_default', 'not a default anymore');
     });
+
 
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
     $settings = resolve(DummySettings::class);
@@ -78,6 +80,7 @@ it('will handle loading settings correctly', function () {
         ->int->toEqual(42)
         ->array->toEqual(['John', 'Ringo', 'Paul', 'George'])
         ->nullable_string->toBeNull()
+        ->nullable_string_default->toBe('not a default anymore')
         ->dto->toEqual(DummyData::from(['name' => 'Freek']))
         ->dto_array->toEqual([
             DummyData::from(['name' => 'Seb']),

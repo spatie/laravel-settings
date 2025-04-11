@@ -256,17 +256,6 @@ You should migrate your database to add the properties:
 php artisan migrate
 ```
 
-Without the migration, if you try to load the `GeneralSettings` settings class, it will throw `MissingSettings` exception. To avoid this, you can define default values for each attribute. This can be useful if you have long-running migrations.
-
-```php
-    // Will throw an error
-    public ?string $site_name;
-    // Will return `null`
-    public ?string $site_description = null;
-    // Will return `false`
-    public bool $site_active = false;
-```
-
 Now, when you want to use the `site_name` property of the `GeneralSettings` settings class, you can inject it into your application:
 
 ```php
@@ -647,6 +636,30 @@ class DateSettings extends Settings
     }
 }
 ```
+
+### Default values
+
+As we've seen earlier, it is required to define migrations for each property of your setting classes otherwise a `MissingSettings` exception is thrown.
+
+Sometimes, certain setting classes are used in paths throughout your application which run before migrations, or sometimes it can take quite a while before the migrations are run. In these cases, it can be useful to define default values for your properties:
+
+```php
+class GeneralSettings extends Settings
+{
+    public string $site_name = 'Spatie';
+
+    public bool $site_active = true;
+    
+    public static function group(): string
+    {
+        return 'general';
+    }
+}
+```
+
+These default properties will then be used when no migrated value is found in the repository. This way, you can avoid the `MissingSettings` exception.
+
+In order to get no `MissingSettings` exception make sure to add default values to every property of your settings class, since property values are resolved in one go.
 
 ### Locking properties
 
