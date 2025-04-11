@@ -16,7 +16,7 @@ class SettingsConfig
     /** @var class-string<\Spatie\LaravelSettings\Settings> */
     private string $settingsClass;
 
-    /** @var array<string>  */
+    /** @var array<string> */
     private array $defaultValueLoadedProperties;
 
     /** @var Collection<string, ?\Spatie\LaravelSettings\SettingsCasts\SettingsCast> */

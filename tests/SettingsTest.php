@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
-use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithDefaultValue;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -35,6 +34,7 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyIntEnum;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithCast;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithDefaultValue;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
@@ -101,8 +101,7 @@ it('it will not fail loading settings when a default value is present', function
 });
 
 it('will fail loading settings when a default value and non default value is present', function () {
-    $settings = new class extends DummySettingsWithDefaultValue
-    {
+    $settings = new class extends DummySettingsWithDefaultValue {
         public string $name;
     };
 
@@ -200,7 +199,7 @@ it('cannot save settings that do not exist', function () {
     $settings->save();
 })->throws(MissingSettings::class);
 
-it('cannot save a settings class whose default values are not migrated', function (){
+it('cannot save a settings class whose default values are not migrated', function () {
     $settings = resolve(DummySettingsWithDefaultValue::class);
 
     $settings->site = 'flareapp.io';
@@ -208,7 +207,7 @@ it('cannot save a settings class whose default values are not migrated', functio
     $settings->save();
 })->throws(MissingSettings::class);
 
-it('can save settings with a default value when correctly migrated', function (){
+it('can save settings with a default value when correctly migrated', function () {
     $settings = resolve(DummySettingsWithDefaultValue::class);
 
     expect($settings->site)->toBe('spatie.be');
