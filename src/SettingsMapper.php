@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings;
 
 use Illuminate\Support\Collection;
+use ReflectionProperty;
 use Spatie\LaravelSettings\Events\LoadingSettings;
 use Spatie\LaravelSettings\Exceptions\MissingSettings;
 use Spatie\LaravelSettings\Support\Crypto;
@@ -40,6 +41,7 @@ class SettingsMapper
         event(new LoadingSettings($settingsClass, $properties));
 
         $properties = $this->fillMissingSettingsWithDefaultValues($config, $properties);
+
         $this->ensureNoMissingSettings($config, $properties, 'loading');
 
         return $properties;
@@ -110,18 +112,19 @@ class SettingsMapper
 
     private function fillMissingSettingsWithDefaultValues(SettingsConfig $config, Collection $properties): Collection
     {
-        $config->clearPropertiesWithDefaultValues();
+        $config->resetDefaultValueLoadedProperties();
 
         $config
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->each(function ($missingSetting) use ($config, &$properties) {
+            ->each(function (string $missingSetting) use ($config, &$properties) {
                 /** @var ReflectionProperty $reflectionProperty */
                 $reflectionProperty = $config->getReflectedProperties()[$missingSetting];
 
                 if ($reflectionProperty->hasDefaultValue()) {
-                    $config->addDefaultValueProperty($missingSetting);
+                    $config->markPropertyAsDefaultValueLoaded($missingSetting);
+
                     $properties->put($missingSetting, $reflectionProperty->getDefaultValue());
                 }
             });
@@ -138,7 +141,7 @@ class SettingsMapper
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->when($operation === 'saving', fn($collection) => $collection->concat($config->getPropertiesWithDefaultValues()))
+            ->when($operation === 'saving', fn(Collection $collection) => $collection->concat($config->getDefaultValueLoadedProperties()))
             ->toArray();
 
         if (! empty($missingSettings)) {

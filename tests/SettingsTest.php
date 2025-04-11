@@ -11,10 +11,12 @@ use ErrorException;
 use Illuminate\Database\Events\SchemaLoaded;
 use Illuminate\Support\Carbon as IlluminateCarbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySettingsWithDefaultValue;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -69,6 +71,7 @@ it('will handle loading settings correctly', function () {
         $blueprint->add('nullable_date_time_zone', null);
     });
 
+
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummySettings $settings */
     $settings = resolve(DummySettings::class);
 
@@ -78,7 +81,6 @@ it('will handle loading settings correctly', function () {
         ->int->toEqual(42)
         ->array->toEqual(['John', 'Ringo', 'Paul', 'George'])
         ->nullable_string->toBeNull()
-        ->nullable_string_default->toEqual('default')
         ->dto->toEqual(DummyData::from(['name' => 'Freek']))
         ->dto_array->toEqual([
             DummyData::from(['name' => 'Seb']),
@@ -86,21 +88,23 @@ it('will handle loading settings correctly', function () {
         ])
         ->date_time->toEqual($dateTime)
         ->carbon->toEqual($carbon);
-
-        // nullable_string_default should throw an error on save because no migration is present
-        expect(fn() => $settings->save())->toThrow(MissingSettings::class);
 });
 
 it('will fail loading when settings are missing', function () {
     resolve(DummySettings::class)->int;
 })->throws(MissingSettings::class);
 
-it('will fail loading when settings are missing and no default value is present', function () {
-    resolve(DummySettings::class)->nullable_string;
-})->throws(MissingSettings::class);
+it('it will not fail loading settings when a default value is present', function () {
+    expect(resolve(DummySettingsWithDefaultValue::class)->site)->toBe('spatie.be');
+});
 
-it('will return default when settings are missing and default value is present', function () {
-    expect(resolve(DummySettings::class))->nullable_string_default->toEqual('default');
+it('will fail loading settings when a default value and non default value is present', function () {
+    $settings = new class extends DummySettingsWithDefaultValue
+    {
+        public string $name;
+    };
+
+    resolve($settings::class)->site;
 })->throws(MissingSettings::class);
 
 it('cannot get settings that do not exist', function () {
@@ -121,7 +125,6 @@ it('can save settings', function () {
         $blueprint->add('int', 42);
         $blueprint->add('array', ['John', 'Ringo', 'Paul', 'George']);
         $blueprint->add('nullable_string', null);
-        $blueprint->add('nullable_string_default', 'default2');
         $blueprint->add('default_string', null);
         $blueprint->add('dto', ['name' => 'Freek']);
         $blueprint->add('dto_array', [
@@ -146,7 +149,6 @@ it('can save settings', function () {
         'int' => 69,
         'array' => ['Bono', 'Adam', 'The Edge'],
         'nullable_string' => null,
-        'nullable_string_default' => 'modified',
         'default_string' => 'another',
         'dto' => DummyData::from(['name' => 'Rias']),
         'dto_array' => [
@@ -163,7 +165,6 @@ it('can save settings', function () {
     $settings->save();
 
     $this->assertDatabaseHasSetting('dummy.string', 'Brent');
-    $this->assertDatabaseHasSetting('dummy.nullable_string_default', 'modified');
     $this->assertDatabaseHasSetting('dummy.bool', true);
     $this->assertDatabaseHasSetting('dummy.int', 69);
     $this->assertDatabaseHasSetting('dummy.array', ['Bono', 'Adam', 'The Edge']);
@@ -196,6 +197,36 @@ it('cannot save settings that do not exist', function () {
 
     $settings->save();
 })->throws(MissingSettings::class);
+
+it('cannot save a settings class whose default values are not migrated', function (){
+    $settings = resolve(DummySettingsWithDefaultValue::class);
+
+    $settings->site = 'flareapp.io';
+
+    $settings->save();
+})->throws(MissingSettings::class);
+
+it('can save settings with a default value when correctly migrated', function (){
+    $settings = resolve(DummySettingsWithDefaultValue::class);
+
+    expect($settings->site)->toBe('spatie.be');
+
+    resolve(SettingsMigrator::class)->inGroup(DummySettingsWithDefaultValue::group(), function (SettingsBlueprint $blueprint) {
+        $blueprint->add('site', 'flareapp.io');
+    });
+
+    App::forgetInstance($settings::class);
+
+    $settings = resolve(DummySettingsWithDefaultValue::class);
+
+    expect($settings->site)->toBe('flareapp.io');
+
+    $settings->site = 'mailcoach.app';
+
+    $settings->save();
+
+    $this->assertDatabaseHasSetting('dummy_settings_with_default_value.site', 'mailcoach.app');
+});
 
 it('can fake settings', function () {
     $this->migrateDummySimpleSettings();

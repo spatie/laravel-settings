@@ -16,7 +16,8 @@ class SettingsConfig
     /** @var class-string<\Spatie\LaravelSettings\Settings> */
     private string $settingsClass;
 
-    private Collection $propertiesWithDefaultValues;
+    /** @var array<string>  */
+    private array $defaultValueLoadedProperties;
 
     /** @var Collection<string, ?\Spatie\LaravelSettings\SettingsCasts\SettingsCast> */
     private Collection $casts;
@@ -125,21 +126,21 @@ class SettingsConfig
         );
     }
 
-    public function addDefaultValueProperty(string ...$names): self
+    public function markPropertyAsDefaultValueLoaded(string $name): self
     {
-        $this->propertiesWithDefaultValues = $this->getPropertiesWithDefaultValues()->push(...$names);
+        $this->defaultValueLoadedProperties[] = $name;
 
         return $this;
     }
 
-    public function getPropertiesWithDefaultValues(): Collection
+    public function getDefaultValueLoadedProperties(): array
     {
-        return $this->propertiesWithDefaultValues;
+        return $this->defaultValueLoadedProperties;
     }
 
-    public function clearPropertiesWithDefaultValues(): self
+    public function resetDefaultValueLoadedProperties(): self
     {
-        $this->propertiesWithDefaultValues = collect([]);
+        $this->defaultValueLoadedProperties = [];
 
         return $this;
     }
