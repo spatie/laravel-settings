@@ -141,7 +141,10 @@ class SettingsMapper
             ->getReflectedProperties()
             ->keys()
             ->diff($properties->keys())
-            ->when($operation === 'saving', fn (Collection $collection) => $collection->concat($config->getDefaultValueLoadedProperties()))
+            ->when(
+                $operation === 'saving' && config('settings.check_missing_default_values_when_saving_settings'),
+                fn (Collection $collection) => $collection->concat($config->getDefaultValueLoadedProperties()),
+            )
             ->toArray();
 
         if (! empty($missingSettings)) {

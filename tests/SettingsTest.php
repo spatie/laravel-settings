@@ -228,6 +228,18 @@ it('can save settings with a default value when correctly migrated', function ()
     $this->assertDatabaseHasSetting('dummy_settings_with_default_value.site', 'mailcoach.app');
 });
 
+it('can save a settings class whose default values are not migrated when checking is disabled', function () {
+    $settings = resolve(DummySettingsWithDefaultValue::class);
+
+    config()->set('settings.check_missing_default_values_when_saving_settings', false);
+
+    $settings->save();
+
+    config()->set('settings.check_missing_default_values_when_saving_settings', true);
+
+    $this->assertDatabaseHasSetting('dummy_settings_with_default_value.site', 'spatie.be');
+});
+
 it('can fake settings', function () {
     $this->migrateDummySimpleSettings();
 

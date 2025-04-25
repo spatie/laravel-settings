@@ -91,4 +91,12 @@ return [
      * need to be searched each time the application boots up.
      */
     'discovered_settings_cache_path' => base_path('bootstrap/cache'),
+
+    /*
+     * Whether to check and throw the {@see \Spatie\LaravelSettings\Exceptions\MissingSettings} exception when saving
+     * settings whose default values are not migrated yet.
+     *
+     * Set `false` to silently ignore any missing defaults and save settings.
+     */
+    'check_missing_default_values_when_saving_settings' => true,
 ];
