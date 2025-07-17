@@ -1014,9 +1014,9 @@ A good example here is the `DateTimeInterfaceCast` we've added by default in the
     ...
 ```
 
-Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime`, or `DateTimeImmutable` type as the type of one of a settings class's properties. It will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
+Whenever the package detects a `Carbon`, `CarbonImmutable`, `DateTime`, or `DateTimeImmutable` type as the type of one of a settings class's properties, it will use the `DateTimeInterfaceCast` as a caster. This because `Carbon`, `CarbonImmutable`, `DateTime` and `DateTimeImmutable` all implement `DateTimeInterface`. The key that was used in `settings.php` to represent the cast.
 
-The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime:class` as a type. 
+The type injected in the caster will be the type of the property. So let's say you have a property with the type `DateTime` within your settings class. When casting this property, the `DateTimeInterfaceCast` will receive `DateTime::class` as a type. 
 
 
 ### Repositories
