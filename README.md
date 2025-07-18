@@ -1025,7 +1025,7 @@ There are two types of repositories included in the package, the `redis` and `da
 
 #### Database repository
 
-The database repository has two optional configuration options:
+The database repository has three optional configuration options:
 
 - `model` the Eloquent model used to load/save properties to the database
 - `table` the table used in the database
