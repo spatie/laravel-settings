@@ -440,6 +440,17 @@ public function up(): void
 }
 ```
 
+#### Using different repositories
+
+You can use a different repository in migration:
+
+```php
+public function up(): void
+{
+    $this->migrator->repository('redis');
+}
+```
+
 ### Typing properties
 
 It is possible to create a settings class with regular PHP types:
