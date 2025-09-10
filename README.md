@@ -442,7 +442,7 @@ public function up(): void
 
 #### Using different repositories
 
-You can use a different repository in migration:
+You can specify a different repository for migration operations:
 
 ```php
 public function up(): void
