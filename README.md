@@ -448,6 +448,8 @@ You can use a different repository in migration:
 public function up(): void
 {
     $this->migrator->repository('redis');
+    
+    $this->migrator->add('general.site_active', true);
 }
 ```
 
