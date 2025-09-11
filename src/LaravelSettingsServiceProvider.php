@@ -27,10 +27,14 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ], 'config');
 
             if (! class_exists('CreateSettingsTable')) {
+                $timestamp = date('Y_m_d_His');
+                $destination = database_path("migrations/{$timestamp}_create_settings_table.php");
+            
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_settings_table.php.stub' => database_path('migrations/2022_12_14_083707_create_settings_table.php'),
+                    __DIR__ . '/../database/migrations/create_settings_table.php.stub' => $destination,
                 ], 'migrations');
             }
+
 
             $this->commands([
                 MakeSettingCommand::class,
