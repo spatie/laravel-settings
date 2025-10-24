@@ -39,6 +39,12 @@ class LaravelSettingsServiceProvider extends ServiceProvider
                 ClearDiscoveredSettingsCacheCommand::class,
                 ClearCachedSettingsCommand::class,
             ]);
+
+            $this->optimizes(
+                optimize: CacheDiscoveredSettingsCommand::class,
+                clear: ClearDiscoveredSettingsCacheCommand::class,
+                key: 'laravel-settings',
+            );
         }
 
         Event::subscribe(SettingsEventSubscriber::class);
