@@ -588,6 +588,17 @@ class DateSettings extends Settings
 
 The package will automatically find the cast and will use it to transform the types between the settings class and repository.
 
+#### Available casts
+
+The package comes with a few built-in casts:
+
+- `DateTimeInterfaceCast` for objects implementing `DateTimeInterface` (`DateTime`, `DateTimeImmutable`, `Carbon`, `CarbonImmutable`)
+- `DateTimeZoneCast` for `DateTimeZone` objects
+- `DataCast` for `Spatie\LaravelData\Data` objects
+- `DataArrayCast` for arrays of `Spatie\LaravelData\Data` objects
+- `EnumCast` for native PHP enums
+- `CollectionCast` for `Illuminate\Support\Collection` objects
+
 #### Typing properties
 
 There are quite a few options to type properties. You could type them in PHP:
