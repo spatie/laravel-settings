@@ -6,6 +6,16 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.5.0 - 2025-10-24
+
+### What's Changed
+
+* Register the auto discover cache and clear commands as optimize commands by @willrowe in https://github.com/spatie/laravel-settings/pull/327
+* Update migration file publishing with timestamp by @samuelterra22 in https://github.com/spatie/laravel-settings/pull/341
+* [Feature] Added ArrayDataCast to cast arrays of Laravel Data by @serious-angel in https://github.com/spatie/laravel-settings/pull/334
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.4.4...3.5.0
+
 ## 3.4.4 - 2025-04-11
 
 - Fix #319
