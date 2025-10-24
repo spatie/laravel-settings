@@ -2,20 +2,15 @@
 
 namespace Spatie\LaravelSettings\SettingsCasts;
 
-use Exception;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
 
 class ArrayDataCast implements SettingsCast
 {
-    protected string $type;
+    protected DataCast $cast;
 
-    protected bool $validate;
-
-    public function __construct(?string $type, string $validate = 'true')
+    public function __construct(?string $type, bool|string $validate = false)
     {
-        $this->type     = $this->ensureDataTypeExists($type);
-        $this->validate = !in_array($validate, ['false', '0'], true);
+        $this->cast = new DataCast($type, $validate);
     }
 
     /**
@@ -26,7 +21,7 @@ class ArrayDataCast implements SettingsCast
     public function get($payload): array
     {
         return array_map(
-            fn ($data) => $this->createData($data),
+            fn ($data) => $this->cast->get($data),
             $payload
         );
     }
@@ -39,33 +34,8 @@ class ArrayDataCast implements SettingsCast
     public function set($payload): array
     {
         return array_map(
-            fn ($data) => $this->createData($data)->toArray(),
+            fn ($data) => $this->cast->set($data),
             $payload
         );
-    }
-
-    /**
-     * @param array|Data $data
-     */
-    protected function createData($data): Data
-    {
-        return $this->validate ? $this->type::validateAndCreate($data) : $this->type::from($data);
-    }
-
-    protected function ensureDataTypeExists(?string $type): string
-    {
-        if ($type === null) {
-            throw new Exception('Cannot create a data cast because no data class was given');
-        }
-
-        if (!class_exists($type)) {
-            throw new Exception("Cannot create a data cast for `$type` because the data does not exist");
-        }
-
-        if (!class_implements($type, Data::class)) {
-            throw new Exception("Cannot create a data cast for `$type` because the class does not implement data");
-        }
-
-        return $type;
     }
 }
