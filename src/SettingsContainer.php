@@ -29,12 +29,18 @@ class SettingsContainer
             $this->container->scoped($settingClass, function () use ($cacheFactory, $settingClass) {
                 $cache = $cacheFactory->build($settingClass::repository());
 
-                if ($cache->isEnabled() && $cache->has($settingClass)) {
-                    try {
-                        return $cache->get($settingClass);
-                    } catch (CouldNotUnserializeSettings $exception) {
-                        Log::error("Could not unserialize settings class: `{$settingClass}` from cache");
+                if ($cache->isEnabled() === false) {
+                    return new $settingClass();
+                }
+
+                try {
+                    $settings = $cache->get($settingClass);
+
+                    if ($settings !== null) {
+                        return $settings;
                     }
+                } catch (CouldNotUnserializeSettings $exception) {
+                    Log::error("Could not unserialize settings class: `{$settingClass}` from cache");
                 }
 
                 return new $settingClass();
@@ -48,7 +54,7 @@ class SettingsContainer
             return self::$settingsClasses;
         }
 
-        $cachedDiscoveredSettings = config('settings.discovered_settings_cache_path') . '/settings.php';
+        $cachedDiscoveredSettings = config('settings.discovered_settings_cache_path').'/settings.php';
 
         if (file_exists($cachedDiscoveredSettings)) {
             $classes = require $cachedDiscoveredSettings;

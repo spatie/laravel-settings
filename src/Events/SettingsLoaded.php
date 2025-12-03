@@ -6,10 +6,7 @@ use Spatie\LaravelSettings\Settings;
 
 class SettingsLoaded
 {
-    public Settings $settings;
-
-    public function __construct(Settings $settings)
+    public function __construct(public Settings $settings, public bool $loadedFromCache)
     {
-        $this->settings = $settings;
     }
 }

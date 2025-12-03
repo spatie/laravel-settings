@@ -33,6 +33,8 @@ class SettingsConfig
 
     private SettingsRepository $repository;
 
+    private bool $loadedFromCache = false;
+
     public function __construct(string $settingsClass)
     {
         if (! is_subclass_of($settingsClass, Settings::class)) {
@@ -150,5 +152,17 @@ class SettingsConfig
         unset($this->locked);
 
         return $this;
+    }
+
+    public function markLoadedFromCache(bool $loadedFromCache): self
+    {
+        $this->loadedFromCache = $loadedFromCache;
+
+        return $this;
+    }
+
+    public function isLoadedFromCache(): bool
+    {
+        return $this->loadedFromCache;
     }
 }
