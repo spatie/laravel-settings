@@ -32,7 +32,7 @@ class SettingsCache
 
         $serialized = Cache::store($this->store)->get($this->resolveCacheKey($settingsClass));
 
-        if($serialized === null){
+        if ($serialized === null) {
             return null;
         }
 
