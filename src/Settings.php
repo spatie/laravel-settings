@@ -145,7 +145,8 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
         return array_merge(
             $encrypted->map(fn ($value) => Crypto::encrypt($value))->all(),
-            $nonEncrypted->all()
+            $nonEncrypted->all(),
+            ['_settingsLoadedFromCache' => $this->config->isLoadedFromCache()]
         );
     }
 
@@ -154,6 +155,10 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->loaded = false;
 
         $this->ensureConfigIsLoaded();
+
+        $settingsLoadedFromCache = $data['_settingsLoadedFromCache'] ?? null;
+        unset($data['_settingsLoadedFromCache']);
+        $this->config->markLoadedFromCache($settingsLoadedFromCache ?? false);
 
         /** @var Collection $encrypted */
         /** @var Collection $nonEncrypted */
@@ -273,6 +278,13 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         return $this;
     }
 
+    public function settingsConfig(): SettingsConfig
+    {
+        $this->ensureConfigIsLoaded();
+
+        return $this->config;
+    }
+
     private function loadValues(?array $values = null): self
     {
         if ($this->loaded) {
@@ -286,7 +298,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->fill($values);
         $this->originalValues = collect($values);
 
-        event(new SettingsLoaded($this));
+        event(new SettingsLoaded($this, $this->config->isLoadedFromCache()));
 
         return $this;
     }

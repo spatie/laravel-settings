@@ -16,7 +16,7 @@ class SettingsEventSubscriber
         $this->settingsCacheFactory = $settingsCacheFactory;
     }
 
-    public function subscribe(Dispatcher $dispatcher)
+    public function subscribe(Dispatcher $dispatcher): void
     {
         $dispatcher->listen(
             SettingsSaved::class,
@@ -34,11 +34,15 @@ class SettingsEventSubscriber
         $dispatcher->listen(
             SettingsLoaded::class,
             function (SettingsLoaded $event) {
+                if ($event->loadedFromCache) {
+                    return;
+                }
+
                 $cache = $this->settingsCacheFactory->build(
                     $event->settings::repository()
                 );
 
-                if ($cache->has(get_class($event->settings))) {
+                if ($cache->isEnabled() === false) {
                     return;
                 }
 
