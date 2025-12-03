@@ -857,6 +857,20 @@ You can always clear the cached settings with the following command:
 php artisan settings:clear-cache
 ```
 
+By default, each settings class will be stored into the cache as `prefix.Fully\Qualified\ClassName`. You can override this key by implementing the `cacheKey` method in your settings class:
+
+```php
+class GeneralSettings extends Settings
+{
+    // ...
+    
+    public function cacheKey(): string
+    {
+        return 'my_custom_cache_key';
+    }
+}
+```
+
 ### Auto discovering settings classes
 
 Each settings class you create should be added to the `settings` array within the `settings.php` config file. When you've got a lot of settings, this can be quickly forgotten.
