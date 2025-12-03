@@ -86,9 +86,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     final public function __construct(array $values = [])
     {
-        $this->ensureConfigIsLoaded();
-
-        foreach ($this->config->getReflectedProperties() as $name => $property) {
+        foreach ($this->settingsConfig()->getReflectedProperties() as $name => $property) {
             if (method_exists($property, 'isReadOnly') && $property->isReadOnly()) {
                 continue;
             }
@@ -140,13 +138,13 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         /** @var Collection $encrypted */
         /** @var Collection $nonEncrypted */
         [$encrypted, $nonEncrypted] = $this->toCollection()->partition(
-            fn ($value, string $name) => $this->config->isEncrypted($name)
+            fn ($value, string $name) => $this->settingsConfig()->isEncrypted($name)
         );
 
         return array_merge(
             $encrypted->map(fn ($value) => Crypto::encrypt($value))->all(),
             $nonEncrypted->all(),
-            ['_settingsLoadedFromCache' => $this->config->isLoadedFromCache()]
+            ['_settingsLoadedFromCache' => $this->settingsConfig()->isLoadedFromCache()]
         );
     }
 
@@ -154,16 +152,14 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
     {
         $this->loaded = false;
 
-        $this->ensureConfigIsLoaded();
-
         $settingsLoadedFromCache = $data['_settingsLoadedFromCache'] ?? null;
         unset($data['_settingsLoadedFromCache']);
-        $this->config->markLoadedFromCache($settingsLoadedFromCache ?? false);
+        $this->settingsConfig()->markLoadedFromCache($settingsLoadedFromCache ?? false);
 
         /** @var Collection $encrypted */
         /** @var Collection $nonEncrypted */
         [$encrypted, $nonEncrypted] = collect($data)->partition(
-            fn ($value, string $name) => $this->config->isEncrypted($name)
+            fn ($value, string $name) => $this->settingsConfig()->isEncrypted($name)
         );
 
         $data = array_merge(
@@ -206,16 +202,12 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function lock(string ...$properties)
     {
-        $this->ensureConfigIsLoaded();
-
-        $this->config->lock(...$properties);
+        $this->settingsConfig()->lock(...$properties);
     }
 
     public function unlock(string ...$properties)
     {
-        $this->ensureConfigIsLoaded();
-
-        $this->config->unlock(...$properties);
+        $this->settingsConfig()->unlock(...$properties);
     }
 
     public function isLocked(string $property): bool
@@ -230,16 +222,12 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function getLockedProperties(): array
     {
-        $this->ensureConfigIsLoaded();
-
-        return $this->config->getLocked()->toArray();
+        return $this->settingsConfig()->getLocked()->toArray();
     }
 
     public function toCollection(): Collection
     {
-        $this->ensureConfigIsLoaded();
-
-        return $this->config
+        return $this->settingsConfig()
             ->getReflectedProperties()
             ->mapWithKeys(fn (ReflectionProperty $property) => [
                 $property->getName() => $this->{$property->getName()},
@@ -263,14 +251,12 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
 
     public function getRepository(): SettingsRepository
     {
-        $this->ensureConfigIsLoaded();
-
-        return $this->config->getRepository();
+        return $this->settingsConfig()->getRepository();
     }
 
     public function refresh(): self
     {
-        $this->config->clearCachedLockedProperties();
+        $this->settingsConfig()->clearCachedLockedProperties();
 
         $this->loaded = false;
         $this->loadValues();
@@ -298,7 +284,7 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         $this->fill($values);
         $this->originalValues = collect($values);
 
-        event(new SettingsLoaded($this, $this->config->isLoadedFromCache()));
+        event(new SettingsLoaded($this, $this->settingsConfig()->isLoadedFromCache()));
 
         return $this;
     }
