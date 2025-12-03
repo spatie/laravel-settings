@@ -45,6 +45,11 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         return [];
     }
 
+    public static function cacheKey(): string
+    {
+        return static::class;
+    }
+
     /**
      * @param array $values
      *

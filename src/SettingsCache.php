@@ -88,6 +88,6 @@ class SettingsCache
     {
         $prefix = $this->prefix ? "{$this->prefix}." : '';
 
-        return "{$prefix}settings.{$settingsClass}";
+        return "{$prefix}settings.{$settingsClass::cacheKey()}";
     }
 }
