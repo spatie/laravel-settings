@@ -6,6 +6,15 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.5.1 - 2025-12-03
+
+### What's Changed
+
+* fix issue 343  Fixed: When multiple tenants have the same cache key, tenants cannot be distinguished by @Wsmallnews in https://github.com/spatie/laravel-settings/pull/344
+* Revert "Update migration file publishing with timestamp" by @rubenvanassche in https://github.com/spatie/laravel-settings/pull/349
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.5.0...3.5.1
+
 ## 3.5.0 - 2025-10-24
 
 ### What's Changed
