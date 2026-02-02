@@ -65,6 +65,14 @@ return [
         'store' => null,
         'prefix' => null,
         'ttl' => null,
+
+        /*
+         * When enabled, uses Laravel's memoized cache driver to store resolved
+         * cache values in memory during a single request or job execution.
+         * This prevents repeated cache hits within the same request.
+         * Requires Laravel 12.9 or higher.
+         */
+        'memo' => env('SETTINGS_CACHE_MEMO', false),
     ],
 
     /*
