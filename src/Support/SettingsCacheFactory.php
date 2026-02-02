@@ -59,6 +59,7 @@ class SettingsCacheFactory
             $config['store'] ?? null,
             $config['prefix'] ?? null,
             $config['ttl'] ?? null,
+            $config['memo'] ?? false,
         );
     }
 }
