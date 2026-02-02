@@ -33,7 +33,7 @@ class SettingsCache
 
     protected function cacheRepository(): Repository
     {
-        if ($this->memo && method_exists(Cache::class, 'memo')) {
+        if ($this->memo && method_exists(Cache::getFacadeRoot(), 'memo')) {
             return Cache::memo($this->store);
         }
 
