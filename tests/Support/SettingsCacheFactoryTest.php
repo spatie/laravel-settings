@@ -26,7 +26,7 @@ it('can get all caches', function () {
         ],
     ];
 
-    $factory = (new SettingsCacheFactory($config));
+    $factory = new SettingsCacheFactory($config);
 
     expect($factory->build('with_cache'))->toEqual(new SettingsCache(false, 'repository', null));
 
@@ -36,4 +36,35 @@ it('can get all caches', function () {
         'default' => new SettingsCache(false, 'default', null),
         'with_cache' => new SettingsCache(false, 'repository', null),
     ]);
+});
+
+it('can enable memo cache', function () {
+    $config = [
+        'repositories' => [
+            'with_memo' => [
+                'cache' => [
+                    'enabled' => true,
+                    'store' => 'redis',
+                    'prefix' => null,
+                    'ttl' => null,
+                    'memo' => true,
+                ],
+            ],
+        ],
+        'cache' => [
+            'enabled' => true,
+            'store' => 'default',
+            'prefix' => null,
+            'ttl' => null,
+            'memo' => false,
+        ],
+    ];
+
+    $factory = new SettingsCacheFactory($config);
+
+    expect($factory->build('with_memo'))->toEqual(new SettingsCache(true, 'redis', null, null, true));
+    expect($factory->build('with_memo')->isMemoEnabled())->toBeTrue();
+
+    expect($factory->build())->toEqual(new SettingsCache(true, 'default', null, null, false));
+    expect($factory->build()->isMemoEnabled())->toBeFalse();
 });
