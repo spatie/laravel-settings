@@ -18,7 +18,8 @@ class SettingsCache
         private ?string $prefix,
         private DateTimeInterface|DateInterval|int|null $ttl = null,
         private bool $memo = false,
-    ) {}
+    ) {
+    }
 
     public function isEnabled(): bool
     {
