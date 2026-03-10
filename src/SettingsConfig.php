@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionProperty;
+use Spatie\LaravelSettings\Attributes\ShouldBeEncrypted;
 use Spatie\LaravelSettings\Factories\SettingsCastFactory;
 use Spatie\LaravelSettings\Factories\SettingsRepositoryFactory;
 use Spatie\LaravelSettings\SettingsCasts\SettingsCast;
@@ -53,7 +54,9 @@ class SettingsConfig
                 $this->settingsClass::casts()
             ));
 
-        $this->encrypted = collect($this->settingsClass::encrypted());
+        $this->encrypted = collect($this->settingsClass::encrypted())->merge(
+            $this->reflectionProperties->filter(fn (ReflectionProperty $reflectionProperty) => !empty($reflectionProperty->getAttributes(ShouldBeEncrypted::class)))->keys()
+        );
 
         $this->repository = SettingsRepositoryFactory::create($this->settingsClass::repository());
     }

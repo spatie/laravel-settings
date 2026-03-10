@@ -438,6 +438,7 @@ it('can encrypt settings', function () {
         $blueprint->add('string', 'Hello', true);
         $blueprint->add('nullable', null, true);
         $blueprint->add('cast', $dateTime->format(DATE_ATOM), true);
+        $blueprint->add('uses_attribute', 'bar', true);
     });
 
     $stringProperty = SettingsProperty::get('dummy_encrypted.string');
@@ -457,19 +458,27 @@ it('can encrypt settings', function () {
         ->format(DATE_ATOM)
         ->toEqual(decrypt($castProperty));
 
+    $usesAttributeProperty = SettingsProperty::get('dummy_encrypted.uses_attribute');
+
+    expect('bar')
+        ->not->toEqual($usesAttributeProperty)
+        ->toEqual(decrypt($usesAttributeProperty));
+
     /** @var \Spatie\LaravelSettings\Tests\TestClasses\DummyEncryptedSettings $settings */
     $settings = resolve(DummyEncryptedSettings::class);
 
     expect($settings)
         ->string->toEqual('Hello')
         ->nullable->toBeNull()
-        ->cast->toEqual($dateTime);
+        ->cast->toEqual($dateTime)
+        ->uses_attribute->toEqual('bar');
 
     $updatedDateTime = new DateTime('16-05-2020 12:00:00');
 
     $settings->string = "Is is it me you're looking for";
     $settings->nullable = 'Not null anymore';
     $settings->cast = $updatedDateTime;
+    $settings->uses_attribute = "baz";
 
     $settings->save();
 
@@ -491,6 +500,12 @@ it('can encrypt settings', function () {
         ->not->toEqual($castProperty)
         ->format(DATE_ATOM)
         ->toEqual(decrypt($castProperty));
+
+    $usesAttributeProperty = SettingsProperty::get('dummy_encrypted.uses_attribute');
+
+    expect("baz")
+        ->not->toEqual($usesAttributeProperty)
+        ->toEqual(decrypt($usesAttributeProperty));
 });
 
 it('will remigrate when the schema was dumped', function () {
@@ -544,6 +559,7 @@ it('will cache encrypted setting', function () {
         'string' => 'Hello',
         'nullable' => null,
         'cast' => new DateTime('2020-05-16'),
+        'uses_attribute' => 'bar',
     ];
 
     $cache = resolve(SettingsCacheFactory::class)->build();
