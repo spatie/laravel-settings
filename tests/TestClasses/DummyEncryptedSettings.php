@@ -3,6 +3,7 @@
 namespace Spatie\LaravelSettings\Tests\TestClasses;
 
 use DateTime;
+use Spatie\LaravelSettings\Attributes\ShouldBeEncrypted;
 use Spatie\LaravelSettings\Settings;
 
 class DummyEncryptedSettings extends Settings
@@ -12,6 +13,9 @@ class DummyEncryptedSettings extends Settings
     public ?string $nullable;
 
     public DateTime $cast;
+
+    #[ShouldBeEncrypted()]
+    public string $uses_attribute;
 
     public static function group(): string
     {
