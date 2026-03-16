@@ -752,6 +752,25 @@ class GeneralSettings extends Settings
 }
 ```
 
+Alternatively, you may add the `ShouldBeEncrypted` attribute directly to the properties that should be encrypted:
+
+```php
+use Spatie\LaravelSettings\Attributes\ShouldBeEncrypted;
+
+class GeneralSettings extends Settings
+{
+    #[ShouldBeEncrypted()]
+    public string $site_name;
+    
+    public bool $site_active;
+    
+    public static function group(): string
+    {
+        return 'general';
+    }
+}
+```
+
 #### Using encryption in migrations
 
 Creating and updating encrypted properties in migrations works a bit differently than non-encrypted properties.
