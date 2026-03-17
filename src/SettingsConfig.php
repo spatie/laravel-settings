@@ -55,7 +55,7 @@ class SettingsConfig
             ));
 
         $this->encrypted = collect($this->settingsClass::encrypted())->merge(
-            $this->reflectionProperties->filter(fn (ReflectionProperty $reflectionProperty) => !empty($reflectionProperty->getAttributes(ShouldBeEncrypted::class)))->keys()
+            $this->reflectionProperties->filter(fn (ReflectionProperty $reflectionProperty) => ! empty($reflectionProperty->getAttributes(ShouldBeEncrypted::class)))->keys()
         );
 
         $this->repository = SettingsRepositoryFactory::create($this->settingsClass::repository());
