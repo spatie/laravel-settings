@@ -27,7 +27,7 @@
         "mockery/mockery": "^1.4",
         "orchestra/testbench": "^9.0|^10.0|^11.0",
         "pestphp/pest": "^2.0|^3.0",
-        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0|^4.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
