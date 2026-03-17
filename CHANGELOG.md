@@ -6,6 +6,14 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.7.2 - 2026-03-17
+
+### What's Changed
+
+* Add `ShouldBeEncrypted` attribute by @willrowe in https://github.com/spatie/laravel-settings/pull/353
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.7.1...3.7.2
+
 ## 3.7.1 - 2026-03-16
 
 ### What's Changed
@@ -31,6 +39,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 ```
