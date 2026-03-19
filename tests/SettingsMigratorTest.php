@@ -62,6 +62,34 @@ it('cannot rename a property to another existing property', function () {
     $this->settingsMigrator->rename('eduction.enabled', 'compliance.enabled');
 })->throws(SettingAlreadyExists::class);
 
+it('can rename a setting and preserve the locked state', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
+
+    $repository = new DatabaseSettingsRepository(config('settings.repositories.database'));
+    $repository->lockProperties('compliance', ['enabled']);
+
+    $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
+
+    $this->assertDatabaseHasSetting('eduction.enabled', true);
+    $this->assertDatabaseDoesNotHaveSetting('compliance.enabled');
+
+    $lockedProperties = $repository->getLockedProperties('eduction');
+    expect($lockedProperties)->toContain('enabled');
+});
+
+it('can rename a setting and preserve the unlocked state', function () {
+    $this->settingsMigrator->add('compliance.enabled', true);
+
+    $this->settingsMigrator->rename('compliance.enabled', 'eduction.enabled');
+
+    $this->assertDatabaseHasSetting('eduction.enabled', true);
+    $this->assertDatabaseDoesNotHaveSetting('compliance.enabled');
+
+    $repository = new DatabaseSettingsRepository(config('settings.repositories.database'));
+    $lockedProperties = $repository->getLockedProperties('eduction');
+    expect($lockedProperties)->not->toContain('enabled');
+});
+
 it('cannot rename from an invalid property', function () {
     $this->settingsMigrator->rename('eduction', 'compliance.enabled');
 })->throws(InvalidSettingName::class);
