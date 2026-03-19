@@ -51,13 +51,13 @@ class DatabaseSettingsRepository implements SettingsRepository
         return $this->decode($setting['payload']);
     }
 
-    public function createProperty(string $group, string $name, $payload): void
+    public function createProperty(string $group, string $name, $payload, bool $locked = false): void
     {
         $this->getBuilder()->create([
             'group' => $group,
             'name' => $name,
             'payload' => $this->encode($payload),
-            'locked' => false,
+            'locked' => $locked,
         ]);
     }
 
