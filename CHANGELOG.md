@@ -6,6 +6,20 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.8.0 - 2026-04-28
+
+### What's Changed
+
+* chore(deps): bump dependabot/fetch-metadata from 2.5.0 to 3.0.0 by @dependabot[bot] in https://github.com/spatie/laravel-settings/pull/359
+* chore(deps): bump dependabot/fetch-metadata from 3.0.0 to 3.1.0 by @dependabot[bot] in https://github.com/spatie/laravel-settings/pull/360
+* fix(settings): update settings migrator and repositories to deal with locked attribute on rename operation by @carlos-mora in https://github.com/spatie/laravel-settings/pull/358
+
+### New Contributors
+
+* @carlos-mora made their first contribution in https://github.com/spatie/laravel-settings/pull/358
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.7.2...3.8.0
+
 ## 3.7.2 - 2026-03-17
 
 ### What's Changed
@@ -39,6 +53,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 
