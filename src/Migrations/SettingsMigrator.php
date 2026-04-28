@@ -42,7 +42,8 @@ class SettingsMigrator
 
         $this->createProperty(
             $to,
-            $this->getPropertyPayload($from)
+            $this->getPropertyPayload($from),
+            $this->isPropertyLocked($from),
         );
 
         $this->deleteProperty($from);
@@ -142,6 +143,13 @@ class SettingsMigrator
         return $this->repository->checkIfPropertyExists($group, $name);
     }
 
+    protected function isPropertyLocked(string $property): bool
+    {
+        ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
+
+        return in_array($name, $this->repository->getLockedProperties($group), true);
+    }
+
     protected function getPropertyPayload(string $property)
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
@@ -151,7 +159,7 @@ class SettingsMigrator
         return $this->getCast($group, $name)?->get($payload) ?: $payload;
     }
 
-    protected function createProperty(string $property, $payload): void
+    protected function createProperty(string $property, $payload, bool $locked = false): void
     {
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
@@ -159,7 +167,7 @@ class SettingsMigrator
             $payload = $this->getCast($group, $name)?->set($payload) ?: $payload;
         }
 
-        $this->repository->createProperty($group, $name, $payload);
+        $this->repository->createProperty($group, $name, $payload, $locked);
     }
 
     protected function updatePropertyPayload(string $property, $payload): void

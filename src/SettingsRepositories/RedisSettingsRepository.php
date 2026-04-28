@@ -40,9 +40,13 @@ class RedisSettingsRepository implements SettingsRepository
         return json_decode($this->connection->hGet($this->prefix . $group, $name));
     }
 
-    public function createProperty(string $group, string $name, $payload): void
+    public function createProperty(string $group, string $name, $payload, bool $locked = false): void
     {
         $this->connection->hSet($this->prefix . $group, $name, json_encode($payload));
+
+        if ($locked) {
+            $this->lockProperties($group, [$name]);
+        }
     }
 
     public function updatePropertiesPayload(string $group, array $properties): void
@@ -57,6 +61,7 @@ class RedisSettingsRepository implements SettingsRepository
     public function deleteProperty(string $group, string $name): void
     {
         $this->connection->hDel($this->prefix . $group, $name);
+        $this->connection->sRem($this->getLocksSetKey($group), $name);
     }
 
     public function lockProperties(string $group, array $properties): void

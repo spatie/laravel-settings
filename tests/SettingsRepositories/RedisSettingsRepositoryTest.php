@@ -147,6 +147,22 @@ it('can delete a property', function () {
     expect($this->client->hExists('test', 'a'))->toBeFalse();
 });
 
+it('removes any lock entry when deleting a property', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha');
+    $this->repository->lockProperties('test', ['a']);
+
+    $this->repository->deleteProperty('test', 'a');
+
+    expect($this->client->hExists('test', 'a'))->toBeFalse();
+    expect($this->repository->getLockedProperties('test'))->toBeEmpty();
+});
+
+it('can create a property locked', function () {
+    $this->repository->createProperty('test', 'a', 'Alpha', locked: true);
+
+    expect($this->repository->getLockedProperties('test'))->toEqual(['a']);
+});
+
 it('can lock settings', function () {
     $this->repository->createProperty('test', 'a', 'Alpha');
     $this->repository->createProperty('test', 'b', 'Beta');
