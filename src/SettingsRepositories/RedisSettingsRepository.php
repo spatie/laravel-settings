@@ -61,6 +61,7 @@ class RedisSettingsRepository implements SettingsRepository
     public function deleteProperty(string $group, string $name): void
     {
         $this->connection->hDel($this->prefix . $group, $name);
+        $this->connection->sRem($this->getLocksSetKey($group), $name);
     }
 
     public function lockProperties(string $group, array $properties): void

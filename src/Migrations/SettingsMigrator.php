@@ -40,13 +40,10 @@ class SettingsMigrator
             throw SettingAlreadyExists::whenRenaming($from, $to);
         }
 
-        ['group' => $fromGroup, 'name' => $fromName] = $this->getPropertyParts($from);
-        $locked = in_array($fromName, $this->repository->getLockedProperties($fromGroup));
-
         $this->createProperty(
             $to,
             $this->getPropertyPayload($from),
-            $locked,
+            $this->isPropertyLocked($from),
         );
 
         $this->deleteProperty($from);
@@ -144,6 +141,13 @@ class SettingsMigrator
         ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
 
         return $this->repository->checkIfPropertyExists($group, $name);
+    }
+
+    protected function isPropertyLocked(string $property): bool
+    {
+        ['group' => $group, 'name' => $name] = $this->getPropertyParts($property);
+
+        return in_array($name, $this->repository->getLockedProperties($group), true);
     }
 
     protected function getPropertyPayload(string $property)
