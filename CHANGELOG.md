@@ -6,6 +6,18 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.8.1 - 2026-05-22
+
+### What's Changed
+
+* cast env('SETTINGS_CACHE_ENABLED') to boolean by @ismaail in https://github.com/spatie/laravel-settings/pull/361
+
+### New Contributors
+
+* @ismaail made their first contribution in https://github.com/spatie/laravel-settings/pull/361
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.8.0...3.8.1
+
 ## 3.8.0 - 2026-04-28
 
 ### What's Changed
@@ -53,6 +65,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 
