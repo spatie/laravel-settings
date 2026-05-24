@@ -27,6 +27,7 @@ use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\Models\SettingsProperty;
 use Spatie\LaravelSettings\Settings;
+use Spatie\LaravelSettings\SettingsCache;
 use Spatie\LaravelSettings\Support\SettingsCacheFactory;
 use Spatie\LaravelSettings\Tests\Fakes\FakeSettingsContainer;
 use Spatie\LaravelSettings\Tests\TestClasses\DummyData;
@@ -815,6 +816,32 @@ it('will use specific repository cache settings when supplied', function () {
     expect($log)->toHaveCount(0);
 });
 
+
+it('uses the resolved prefix when reading and writing to cache', function () {
+    useEnabledCache($this->app);
+
+    SettingsCache::resolvePrefixUsing(fn () => 'context-a');
+
+    resolve(SettingsCacheFactory::class)->build()->put(
+        new DummySimpleSettings(['name' => 'Context A', 'description' => 'desc'])
+    );
+
+    $this->setRegisteredSettings([DummySimpleSettings::class]);
+
+    // context-a prefix → cache hit, no DB query
+    expect(resolve(DummySimpleSettings::class)->name)->toEqual('Context A');
+
+    // switching to a different prefix → cache miss for context-b
+    SettingsCache::resolvePrefixUsing(fn () => 'context-b');
+
+    $this->migrateDummySimpleSettings(name: 'Context B');
+
+    app()->forgetScopedInstances();
+
+    expect(resolve(DummySimpleSettings::class)->name)->toEqual('Context B');
+
+    SettingsCache::resolvePrefixUsing(null);
+});
 
 it('it can use enums which are null', function () {
     $this->skipIfPHPLowerThen('8.1');
