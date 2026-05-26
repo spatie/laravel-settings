@@ -6,6 +6,18 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.9.0 - 2026-05-26
+
+### What's Changed
+
+* Adds a cache prefix resolver by @leobeal in https://github.com/spatie/laravel-settings/pull/362
+
+### New Contributors
+
+* @leobeal made their first contribution in https://github.com/spatie/laravel-settings/pull/362
+
+**Full Changelog**: https://github.com/spatie/laravel-settings/compare/3.8.1...3.9.0
+
 ## 3.8.1 - 2026-05-22
 
 ### What's Changed
@@ -65,6 +77,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 
