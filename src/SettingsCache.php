@@ -2,6 +2,7 @@
 
 namespace Spatie\LaravelSettings;
 
+use Closure;
 use DateInterval;
 use DateTimeInterface;
 use Illuminate\Contracts\Cache\Repository;
@@ -12,6 +13,8 @@ use Spatie\LaravelSettings\Exceptions\SettingsCacheDisabled;
 
 class SettingsCache
 {
+    private static ?Closure $prefixResolver = null;
+
     public function __construct(
         private bool $enabled,
         private ?string $store,
@@ -19,6 +22,17 @@ class SettingsCache
         private DateTimeInterface|DateInterval|int|null $ttl = null,
         private bool $memo = false,
     ) {
+    }
+
+    /**
+     * Register a callback that returns a dynamic prefix appended after the
+     * static config prefix. Call with null to remove the resolver.
+     */
+    public static function resolvePrefixUsing(?callable $resolver): void
+    {
+        static::$prefixResolver = $resolver !== null
+            ? Closure::fromCallable($resolver)
+            : null;
     }
 
     public function isEnabled(): bool
@@ -91,6 +105,13 @@ class SettingsCache
     private function resolveCacheKey(string $settingsClass): string
     {
         $prefix = $this->prefix ? "{$this->prefix}." : '';
+
+        if (static::$prefixResolver !== null) {
+            $resolvedPrefix = (string)(static::$prefixResolver)();
+            if ($resolvedPrefix !== '') {
+                $prefix .= "{$resolvedPrefix}.";
+            }
+        }
 
         return "{$prefix}settings.{$settingsClass::cacheKey()}";
     }
