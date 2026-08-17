@@ -215,6 +215,14 @@ You can generate a new settings class using this artisan command. Before you do,
     php artisan make:setting SettingName --group=groupName 
 ```
 
+If you want to create a settings migration alongside the settings class, you can use the `--migration` (or `-m`) option:
+
+```bash
+    php artisan make:setting SettingName --group=groupName --migration
+```
+
+This will also create a new settings migration file in the first path configured in `settings.migrations_paths`, which you can fill in with the properties and their default values.
+
 Now, you will have to add this settings class to the `settings.php` config file in the `settings` array, so it can be loaded by Laravel:
 
 ```php
