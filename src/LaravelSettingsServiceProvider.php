@@ -81,12 +81,11 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ->map(function (SplFileInfo $file) {
                 $contents = file_get_contents($file->getRealPath());
 
-                if (
-                    str_contains($contents, 'return new class extends '.SettingsMigration::class)
-                    || str_contains($contents, 'return new class extends SettingsMigration')
-                    || str_contains($contents, 'return new class() extends '.SettingsMigration::class)
-                    || str_contains($contents, 'return new class() extends SettingsMigration')
-                ) {
+                $settingsMigration = preg_quote(SettingsMigration::class, '/');
+
+                // `return new class extends SettingsMigration`, with optional `()` after `class`, any whitespace
+                // between tokens, and the short or fully qualified class name.
+                if (preg_match('/return\s+new\s+class\s*(\(\s*\))?\s*extends\s+(SettingsMigration|'.$settingsMigration.')/', $contents)) {
                     return $file->getBasename('.php');
                 }
 

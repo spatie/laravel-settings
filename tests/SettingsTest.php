@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -531,6 +532,47 @@ it('will remigrate when the schema was dumped', function () {
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_table']);
 })->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+
+it('will remigrate anonymous settings migrations regardless of their formatting', function (string $classDeclaration, string $parentClass) {
+    // Written at runtime, because the code style fixer would normalize the declaration of a fixture file.
+    $directory = sys_get_temp_dir().'/'.Str::random();
+
+    File::ensureDirectoryExists($directory);
+    File::put("{$directory}/2018_11_21_091111_create_fake_formatted_settings.php", <<<PHP
+        <?php
+
+        use Spatie\LaravelSettings\Migrations\SettingsMigration;
+
+        return new {$classDeclaration} extends {$parentClass} {
+            public function up(): void
+            {
+                \$this->migrator->add('formatted.name', 'laravel-settings');
+            }
+        };
+        PHP);
+
+    config()->set('settings.migrations_paths', [$directory]);
+
+    $this->loadMigrationsFrom($directory);
+
+    assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
+
+    event(new SchemaLoaded(
+        DB::connection(),
+        'fake-path'
+    ));
+
+    assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
+
+    File::deleteDirectory($directory);
+})->with([
+    'class',
+    'class()',
+    'class ()',
+])->with([
+    'SettingsMigration',
+    'Spatie\LaravelSettings\Migrations\SettingsMigration',
+]);
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
