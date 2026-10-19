@@ -63,13 +63,15 @@ class MakeSettingCommand extends Command
         );
 
         if ($this->option('migration')) {
-            $this->createMigration($name);
+            return $this->createMigration($name);
         }
+
+        return self::SUCCESS;
     }
 
-    protected function createMigration(string $name): void
+    protected function createMigration(string $name): int
     {
-        $this->call('make:settings-migration', [
+        return $this->call('make:settings-migration', [
             'name' => 'create_' . Str::snake($name) . '_settings',
         ]);
     }
