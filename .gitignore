@@ -9,3 +9,4 @@ coverage
 .php-cs-fixer.cache
 .phpunit.cache
 /.claude/
+/.amp/portals/
