@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Spatie\LaravelSettings\Events\LoadingSettings;
@@ -43,6 +42,7 @@ use Spatie\LaravelSettings\Tests\TestClasses\DummyStringEnum;
 
 use Spatie\LaravelSettings\Tests\TestClasses\DummyUnitEnum;
 use Spatie\Snapshots\MatchesSnapshots;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 uses(MatchesSnapshots::class);
 
@@ -531,19 +531,18 @@ it('will remigrate when the schema was dumped', function () {
     assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_with_parentheses_settings']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_table']);
     assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_anonymous_class_table']);
-})->skip(fn () => Str::startsWith(app()->version(), '7'), 'No support for dumping migrations in Laravel 7');
+});
 
 it('will remigrate anonymous settings migrations regardless of their formatting', function (string $classDeclaration, string $parentClass) {
-    // Written at runtime, because the code style fixer would normalize the declaration of a fixture file.
-    $directory = sys_get_temp_dir().'/'.Str::random();
+    $directory = (new TemporaryDirectory())->create();
 
-    File::ensureDirectoryExists($directory);
-    File::put("{$directory}/2018_11_21_091111_create_fake_formatted_settings.php", <<<PHP
+    File::put($directory->path('2018_11_21_091111_create_fake_formatted_settings.php'), <<<PHP
         <?php
 
         use Spatie\LaravelSettings\Migrations\SettingsMigration;
 
-        return new {$classDeclaration} extends {$parentClass} {
+        return
+        new {$classDeclaration} extends {$parentClass} {
             public function up(): void
             {
                 \$this->migrator->add('formatted.name', 'laravel-settings');
@@ -551,28 +550,64 @@ it('will remigrate anonymous settings migrations regardless of their formatting'
         };
         PHP);
 
-    config()->set('settings.migrations_paths', [$directory]);
+    try {
+        config()->set('settings.migrations_paths', [$directory->path()]);
 
-    $this->loadMigrationsFrom($directory);
+        $this->loadMigrationsFrom($directory->path());
 
-    assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
+        assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
 
-    event(new SchemaLoaded(
-        DB::connection(),
-        'fake-path'
-    ));
+        event(new SchemaLoaded(DB::connection(), 'fake-path'));
 
-    assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
+        assertDatabaseMissing('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
 
-    File::deleteDirectory($directory);
+        DB::table('settings')->where('group', 'formatted')->delete();
+
+        $this->artisan('migrate', ['--path' => $directory->path(), '--realpath' => true])->assertSuccessful();
+
+        $this->assertDatabaseHasSetting('formatted.name', 'laravel-settings');
+        assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_formatted_settings']);
+    } finally {
+        $directory->delete();
+    }
 })->with([
     'class',
     'class()',
     'class ()',
+    "class\n(\n\t)",
 ])->with([
     'SettingsMigration',
     'Spatie\LaravelSettings\Migrations\SettingsMigration',
+    '\\Spatie\LaravelSettings\Migrations\SettingsMigration',
 ]);
+
+it('will preserve unrelated anonymous migrations whose parent starts with SettingsMigration', function () {
+    $directory = (new TemporaryDirectory())->create();
+
+    File::put($directory->path('2018_11_21_091111_create_fake_unrelated_settings.php'), <<<'PHP'
+        <?php
+
+        use Illuminate\Database\Migrations\Migration as SettingsMigrationBackup;
+
+        return new class () extends SettingsMigrationBackup {
+            public function up(): void
+            {
+            }
+        };
+        PHP);
+
+    try {
+        config()->set('settings.migrations_paths', [$directory->path()]);
+
+        $this->loadMigrationsFrom($directory->path());
+
+        event(new SchemaLoaded(DB::connection(), 'fake-path'));
+
+        assertDatabaseHas('migrations', ['migration' => '2018_11_21_091111_create_fake_unrelated_settings']);
+    } finally {
+        $directory->delete();
+    }
+});
 
 it('will not contact the repository when loading cached settings', function () {
     useEnabledCache($this->app);
