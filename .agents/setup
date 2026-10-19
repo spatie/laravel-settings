@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+packages=(php8.2-cli php8.2-curl php8.2-mbstring php8.2-xml php8.2-sqlite3 php8.2-zip php8.2-redis composer redis-server)
+missing=()
+
+for package in "${packages[@]}"; do
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q '^install ok installed$'; then
+        missing+=("$package")
+    fi
+done
+
+if ((${#missing[@]})); then
+    sudo apt-get update -qq
+    sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
+
+composer install --prefer-dist --no-interaction
