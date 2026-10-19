@@ -6,6 +6,28 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.9.1 - 2026-10-19
+
+### Fixes
+
+- Correctly rerun anonymous settings migrations after loading a schema dump, including PSR-12 spacing, multiline declarations, and fully qualified parent names.
+- Preserve unrelated migration records when their parent class name starts with `SettingsMigration`.
+- Access the private cache prefix resolver through its declaring class.
+
+### Maintenance
+
+- Update test tooling for PHP 8.5, Pest 5, PHPUnit 13, and PHPStan 2, while retaining compatible Pest versions for older supported environments.
+- Test all seven supported PHP 8.2–8.5 and Laravel 12–13 combinations; run PHPStan on pull requests.
+- Drop support for end-of-life Laravel 11. PHP 8.2 remains supported.
+
+Thanks to @pindab0ter for the original fix in #367.
+
+**Validation:** All seven test matrix jobs and PHPStan passed before merging. Each local matrix run passed 153 tests with 466 assertions; repository-wide formatting and Composer validation also passed.
+
+No breaking application API changes. The end-of-life Laravel 11 support removal is not classified as breaking under this release policy.
+
+**Full Changelog:** https://github.com/spatie/laravel-settings/compare/3.9.0...3.9.1
+
 ## 3.9.0 - 2026-05-26
 
 ### What's Changed
@@ -77,6 +99,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 

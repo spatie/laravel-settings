@@ -30,7 +30,7 @@ class SettingsCache
      */
     public static function resolvePrefixUsing(?callable $resolver): void
     {
-        static::$prefixResolver = $resolver !== null
+        self::$prefixResolver = $resolver !== null
             ? Closure::fromCallable($resolver)
             : null;
     }
@@ -106,8 +106,8 @@ class SettingsCache
     {
         $prefix = $this->prefix ? "{$this->prefix}." : '';
 
-        if (static::$prefixResolver !== null) {
-            $resolvedPrefix = (string)(static::$prefixResolver)();
+        if (self::$prefixResolver !== null) {
+            $resolvedPrefix = (string)(self::$prefixResolver)();
             if ($resolvedPrefix !== '') {
                 $prefix .= "{$resolvedPrefix}.";
             }
