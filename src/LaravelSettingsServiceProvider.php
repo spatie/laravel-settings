@@ -69,7 +69,7 @@ class LaravelSettingsServiceProvider extends ServiceProvider
         $settingsContainer->registerBindings();
     }
 
-    private function removeMigrationsWhenSchemaLoaded(SchemaLoaded $event)
+    private function removeMigrationsWhenSchemaLoaded(SchemaLoaded $event): void
     {
         $files = Finder::create()
             ->files()
@@ -81,12 +81,9 @@ class LaravelSettingsServiceProvider extends ServiceProvider
             ->map(function (SplFileInfo $file) {
                 $contents = file_get_contents($file->getRealPath());
 
-                if (
-                    str_contains($contents, 'return new class extends '.SettingsMigration::class)
-                    || str_contains($contents, 'return new class extends SettingsMigration')
-                    || str_contains($contents, 'return new class() extends '.SettingsMigration::class)
-                    || str_contains($contents, 'return new class() extends SettingsMigration')
-                ) {
+                $settingsMigration = preg_quote(SettingsMigration::class, '/');
+
+                if (preg_match('/\breturn\s+new\s+class\s*(?:\(\s*\))?\s*extends\s+(?:SettingsMigration|\\\\?'.$settingsMigration.')(?=\s|\{)/', $contents)) {
                     return $file->getBasename('.php');
                 }
 

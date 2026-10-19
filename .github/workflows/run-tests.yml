@@ -14,23 +14,19 @@ jobs:
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
         php: [8.5, 8.4, 8.3, 8.2]
-        laravel: [13.*, 12.*, 11.*]
+        laravel: [13.*, 12.*]
         dependency-version: [ prefer-stable ]
         include:
           - laravel: 13.*
             testbench: ^11.0
           - laravel: 12.*
             testbench: ^10.0
-          - laravel: 11.*
-            testbench: ^9.0
         exclude:
           - php: 8.2
-            laravel: 13.*
-          - php: 8.3
             laravel: 13.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
@@ -50,6 +46,7 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+          composer show pestphp/pest
 
       - name: Execute tests
         run: vendor/bin/pest
