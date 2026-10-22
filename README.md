@@ -59,7 +59,7 @@ Let's take a look at how to create your own settings classes.
 
 ## Support us
 
-[![Image](https://github-ads.s3.eu-central-1.amazonaws.com/laravel-settings.jpg)](https://spatie.be/github-ad-click/laravel-settings)
+[![Image](https://spatie.be/github-ad-image/laravel-settings.jpg)](https://spatie.be/github-ad-click/laravel-settings)
 
 We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
 
