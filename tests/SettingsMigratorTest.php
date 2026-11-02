@@ -211,12 +211,16 @@ it('can migrate when a registered settings class no longer exists', function () 
     $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
 
     $this->settingsMigrator->rename('removed.enabled', 'renamed.enabled');
-    $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal) {
-        expect($savedTimezone)->toEqual($timezoneMontreal);
 
-        return $savedTimezone;
+    $timezoneBrussels = new DateTimeZone('Europe/Brussels');
+
+    $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal, $timezoneBrussels) {
+        $this->assertEquals($timezoneMontreal, $savedTimezone);
+
+        return $timezoneBrussels;
     });
 
     $this->assertDatabaseHasSetting('renamed.enabled', true);
     $this->assertDatabaseDoesNotHaveSetting('removed.enabled');
+    $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
 });
