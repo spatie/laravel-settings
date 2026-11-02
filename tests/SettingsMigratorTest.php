@@ -197,3 +197,26 @@ it('can cast on migration', function () {
 
     $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
 });
+
+it('can migrate when a registered settings class no longer exists', function () {
+    // e.g. a stale discovered settings cache after a settings class was removed
+    $this->setRegisteredSettings([
+        'App\Settings\RemovedSettings',
+        DummySettings::class,
+    ]);
+
+    $timezoneMontreal = new DateTimeZone('America/Montreal');
+
+    $this->settingsMigrator->add('removed.enabled', true);
+    $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
+
+    $this->settingsMigrator->rename('removed.enabled', 'renamed.enabled');
+    $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) use ($timezoneMontreal) {
+        expect($savedTimezone)->toEqual($timezoneMontreal);
+
+        return $savedTimezone;
+    });
+
+    $this->assertDatabaseHasSetting('renamed.enabled', true);
+    $this->assertDatabaseDoesNotHaveSetting('removed.enabled');
+});
