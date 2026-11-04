@@ -6,6 +6,24 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.10.1 - 2026-11-04
+
+### Fixes
+
+- Fix settings migrations failing with `Class not found` when the discovered settings cache references a removed or renamed settings class (#369, fixes #368).
+- Preserve migration casts for settings classes that still exist, without changing the discovered class list or its cache file.
+- Add regressions for stale on-disk discovery, false/zero payloads, surviving-class casts, and the case where no registered classes remain.
+
+### Deployment notes
+
+This fix does not rebuild discovery or discover newly added classes. When deploying added, renamed, or removed settings classes, run `php artisan settings:clear-discovered` followed by `php artisan settings:discover`. Running discovery alone reuses an existing cache. If a migration needs casts from a new or renamed class, rebuild discovery before running migrations. Discovery caching is separate from cached settings values.
+
+This is a non-breaking patch release. PHP and Laravel requirements are unchanged. All seven supported PHP/Laravel test-matrix jobs and PHPStan passed on the reviewed PR head. Local full suites passed on PHP 8.5/Laravel 13 and PHP 8.2/Laravel 12 (160 tests, 500 assertions each), with formatting and Composer validation passing.
+
+Thanks to @MohannadElemary for the fix.
+
+**Full Changelog:** https://github.com/spatie/laravel-settings/compare/3.10.0...3.10.1
+
 ## 3.10.0 - 2026-10-19
 
 ### New feature
@@ -120,6 +138,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 
