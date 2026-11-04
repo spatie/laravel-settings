@@ -197,6 +197,7 @@ class SettingsMigrator
     {
         return app(SettingsContainer::class)
             ->getSettingClasses()
+            ->filter(fn (string $settingsClass) => class_exists($settingsClass))
             ->mapWithKeys(fn (string $settingsClass) => [
                 $settingsClass::group() => new SettingsConfig($settingsClass),
             ]);

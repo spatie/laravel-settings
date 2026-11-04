@@ -9,8 +9,11 @@ use Spatie\LaravelSettings\Exceptions\SettingDoesNotExist;
 use Spatie\LaravelSettings\Migrations\SettingsBlueprint;
 use Spatie\LaravelSettings\Migrations\SettingsMigrator;
 use Spatie\LaravelSettings\SettingsCasts\DateTimeZoneCast;
+use Spatie\LaravelSettings\SettingsContainer;
 use Spatie\LaravelSettings\SettingsRepositories\DatabaseSettingsRepository;
 use Spatie\LaravelSettings\Tests\TestClasses\DummySettings;
+use Spatie\LaravelSettings\Tests\TestClasses\DummySimpleSettings;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 beforeEach(function () {
     $this->settingsMigrator = new SettingsMigrator(
@@ -196,4 +199,63 @@ it('can cast on migration', function () {
     });
 
     $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', (new DateTimeZoneCast(null))->set($timezoneBrussels));
+});
+
+it('can migrate with a stale discovered settings cache without changing discovery', function () {
+    $directory = (new TemporaryDirectory())->create();
+    $cachedClasses = [
+        'App\Settings\RemovedSettings',
+        DummySettings::class,
+    ];
+    $cachedContents = '<?php return '.var_export($cachedClasses, true).';';
+    $cachePath = $directory->path('settings.php');
+
+    file_put_contents($cachePath, $cachedContents);
+
+    config()->set('settings.discovered_settings_cache_path', $directory->path());
+    config()->set('settings.settings', [DummySimpleSettings::class]);
+
+    $container = app(SettingsContainer::class)->clearCache();
+
+    try {
+        $container->registerBindings();
+        $registeredClasses = $container->getSettingClasses();
+
+        $this->settingsMigrator->add('removed.enabled', false);
+        $this->settingsMigrator->rename('removed.enabled', 'renamed.enabled');
+
+        $timezoneMontreal = new DateTimeZone('America/Montreal');
+        $this->settingsMigrator->add('dummy.nullable_date_time_zone', $timezoneMontreal);
+
+        $this->settingsMigrator->update('dummy.nullable_date_time_zone', function (DateTimeZone $savedTimezone) {
+            expect($savedTimezone->getName())->toBe('America/Montreal');
+
+            return new DateTimeZone('Europe/Brussels');
+        });
+
+        $this->assertDatabaseHasSetting('renamed.enabled', false);
+        $this->assertDatabaseDoesNotHaveSetting('removed.enabled');
+        $this->assertDatabaseHasSetting('dummy.nullable_date_time_zone', 'Europe/Brussels');
+
+        expect($container->getSettingClasses())->toBe($registeredClasses);
+        expect($registeredClasses->all())->toBe($cachedClasses);
+        expect(file_get_contents($cachePath))->toBe($cachedContents);
+    } finally {
+        $directory->delete();
+        $container->clearCache();
+    }
+});
+
+it('can update raw settings when all registered settings classes were removed', function () {
+    $this->setRegisteredSettings(['App\Settings\RemovedSettings']);
+
+    $this->settingsMigrator->add('removed.attempts', 0);
+
+    $this->settingsMigrator->update('removed.attempts', function (int $attempts) {
+        expect($attempts)->toBe(0);
+
+        return 3;
+    });
+
+    $this->assertDatabaseHasSetting('removed.attempts', 3);
 });
