@@ -916,6 +916,10 @@ You can clear this cache by running:
 php artisan settings:clear-discovered
 ```
 
+When deploying added, renamed, or removed settings classes, clear this cache and run `settings:discover` again. Running `settings:discover` alone does not replace an existing discovery cache with a fresh scan.
+
+Settings migrations skip missing classes in the cached list when resolving casts, so a removed class will not prevent a migration from running. This does not refresh discovery or register newly added classes. Casts are only available for classes that still exist in the registered list; if a migration needs casts from a new or renamed class, clear and rebuild discovery before running migrations. This discovery cache is separate from cached settings values cleared by `settings:clear-cache`.
+
 ### Writing your own casters
 
 A caster is a class implementing the `SettingsCast` interface:
