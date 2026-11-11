@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Carbon as IlluminateCarbon;
+use Illuminate\Support\Facades\Date;
 
 class DateTimeInterfaceCast implements SettingsCast
 {
@@ -43,6 +44,11 @@ class DateTimeInterfaceCast implements SettingsCast
 
         if ($this->type === DateTime::class) {
             return new DateTime($payload);
+        }
+
+        // An interface such as DateTimeInterface or CarbonInterface leaves the class to the app, as Eloquent's date casts do.
+        if (interface_exists($this->type) && is_a(IlluminateCarbon::class, $this->type, true)) {
+            return Date::parse($payload);
         }
 
         throw new Exception("Could not cast DateTime type `{$this->type}`");
