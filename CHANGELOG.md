@@ -6,6 +6,24 @@ All notable changes to `laravel-settings` will be documented in this file
 
 - Make `spatie/data-transfer-object` dependency optional. (#160)
 
+## 3.10.2 - 2026-11-13
+
+### Fixes
+
+- Fix loading settings properties typed as `DateTimeInterface` or `CarbonInterface` (#371). These properties now use Laravel's date factory and respect `Date::use()`, including immutable Carbon dates.
+- Preserve the existing behavior of concrete `DateTime`, `DateTimeImmutable`, Carbon, CarbonImmutable, and Laravel Carbon properties.
+- Add regression coverage for save/reload, nullable properties, timezone offsets, and date factory overrides.
+
+### Maintenance
+
+- Add PHP 8.6 to the test matrix (#370).
+
+This is a non-breaking patch release. PHP and Laravel requirements are unchanged. All nine PHP/Laravel test-matrix jobs and PHPStan passed on the reviewed PR head. Local full suites passed on Laravel 12/Pest 3 and Laravel 13/Pest 5, with 169 tests and 563 assertions each, including all 13 Redis repository tests. Formatting passed for the changed PHP files.
+
+Thanks to @skybleak333 for the fix.
+
+**Full Changelog:** https://github.com/spatie/laravel-settings/compare/3.10.1...3.10.2
+
 ## 3.10.1 - 2026-11-04
 
 ### Fixes
@@ -138,6 +156,7 @@ When enabled, settings cache values are stored in memory during a single request
     'enabled' => true,
     'memo' => true, // or env('SETTINGS_CACHE_MEMO', false)
 ],
+
 
 
 
