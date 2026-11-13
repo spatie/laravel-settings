@@ -4,6 +4,7 @@ namespace Spatie\LaravelSettings\SettingsCasts;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -46,8 +47,7 @@ class DateTimeInterfaceCast implements SettingsCast
             return new DateTime($payload);
         }
 
-        // An interface such as DateTimeInterface or CarbonInterface leaves the class to the app, as Eloquent's date casts do.
-        if (interface_exists($this->type) && is_a(IlluminateCarbon::class, $this->type, true)) {
+        if (in_array($this->type, [DateTimeInterface::class, CarbonInterface::class], true)) {
             return Date::parse($payload);
         }
 
