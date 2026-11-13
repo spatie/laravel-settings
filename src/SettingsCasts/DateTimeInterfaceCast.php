@@ -4,11 +4,13 @@ namespace Spatie\LaravelSettings\SettingsCasts;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Carbon as IlluminateCarbon;
+use Illuminate\Support\Facades\Date;
 
 class DateTimeInterfaceCast implements SettingsCast
 {
@@ -43,6 +45,10 @@ class DateTimeInterfaceCast implements SettingsCast
 
         if ($this->type === DateTime::class) {
             return new DateTime($payload);
+        }
+
+        if (in_array($this->type, [DateTimeInterface::class, CarbonInterface::class], true)) {
+            return Date::parse($payload);
         }
 
         throw new Exception("Could not cast DateTime type `{$this->type}`");
