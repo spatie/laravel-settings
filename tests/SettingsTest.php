@@ -637,7 +637,7 @@ it('will cache settings values instead of a settings instance', function () {
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
-    $cached = unserialize(Cache::get('settings.' . DummySimpleSettings::class));
+    $cached = unserialize(Cache::get('settings.v1.' . DummySimpleSettings::class));
 
     expect($cached)->toBeArray();
     expect($cached['values'])->toBeArray();
@@ -656,7 +656,7 @@ it('will cache repository properties unknown to the current settings class', fun
         ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
     ));
 
-    $cached = unserialize(Cache::get('settings.' . DummySimpleSettings::class));
+    $cached = unserialize(Cache::get('settings.v1.' . DummySimpleSettings::class));
 
     expect($cached['values']['new_value'])->toEqual('Loaded from repository');
 
@@ -689,7 +689,7 @@ it('will load settings from the repository when cached values lack a newer setti
 
     $settingsClass = $settings::class;
 
-    Cache::put('settings.' . $settingsClass, serialize([
+    Cache::put('settings.v1.' . $settingsClass, serialize([
         '__settings_cache_format' => 1,
         'values' => [
             'name' => 'Cached name',
@@ -705,7 +705,7 @@ it('will load settings from the repository when cached values lack a newer setti
     expect(resolve($settingsClass)->new_value)->toEqual('Loaded from repository');
     expect(DB::getQueryLog())->not->toBeEmpty();
 
-    $cached = unserialize(Cache::get('settings.' . $settingsClass));
+    $cached = unserialize(Cache::get('settings.v1.' . $settingsClass));
 
     expect($cached['values']['new_value'])->toEqual('Loaded from repository');
 });
@@ -721,7 +721,7 @@ it('will reload legacy serialized settings cache entries from the repository', f
         'description' => 'Legacy cache entry',
     ]);
 
-    Cache::put('settings.' . DummySimpleSettings::class, serialize($legacySettings));
+    Cache::put('settings.v1.' . DummySimpleSettings::class, serialize($legacySettings));
 
     DB::enableQueryLog();
 
@@ -743,7 +743,7 @@ it('will cache encrypted setting', function () {
 
     $cache->put(new DummyEncryptedSettings($data));
 
-    $serialized = Cache::get('settings.' . DummyEncryptedSettings::class);
+    $serialized = Cache::get('settings.v1.' . DummyEncryptedSettings::class);
 
     expect($serialized)->not()->toContain($data['string']);
 
@@ -769,18 +769,18 @@ it('can clear a settings cache', function () {
 
     cache()->put('other_cache_entry', 'do-not-delete-this');
 
-    expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeTrue();
+    expect(cache()->has('settings.v1.' . DummySimpleSettings::class))->toBeTrue();
 
     resolve(SettingsCacheFactory::class)->build()->clear();
 
     expect(cache()->has('other_cache_entry'))->toBeTrue();
-    expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeFalse();
+    expect(cache()->has('settings.v1.' . DummySimpleSettings::class))->toBeFalse();
 });
 
 it('will load settings from the repository when a serialized setting cannot be loaded', function () {
     $this->migrateDummySimpleSettings();
 
-    Cache::put('settings.' . DummySimpleSettings::class, 'not-a-settings-class');
+    Cache::put('settings.v1.' . DummySimpleSettings::class, 'not-a-settings-class');
 
     $this->setRegisteredSettings([
         DummySimpleSettings::class,

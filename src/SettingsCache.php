@@ -139,6 +139,6 @@ class SettingsCache
             }
         }
 
-        return "{$prefix}settings.{$settingsClass::cacheKey()}";
+        return "{$prefix}settings.v".self::CACHE_FORMAT_VERSION.".{$settingsClass::cacheKey()}";
     }
 }
