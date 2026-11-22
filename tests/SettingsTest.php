@@ -630,6 +630,105 @@ it('will not contact the repository when loading cached settings', function () {
     expect($log)->toHaveCount(0);
 });
 
+it('will cache settings values instead of a settings instance', function () {
+    useEnabledCache($this->app);
+
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
+        ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+    ));
+
+    $cached = unserialize(Cache::get('settings.v1.' . DummySimpleSettings::class));
+
+    expect($cached)->toBeArray();
+    expect($cached['values'])->toBeArray();
+    expect(array_keys($cached['values']))->toContain('name')->toContain('description');
+});
+
+it('will cache repository properties unknown to the current settings class', function () {
+    useEnabledCache($this->app);
+
+    $this->migrateDummySimpleSettings();
+    $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('new_value', 'Loaded from repository');
+    });
+
+    resolve(SettingsCacheFactory::class)->build()->put(new DummySimpleSettings(
+        ['name' => 'Louis Armstrong', 'description' => 'Hello dolly']
+    ));
+
+    $cached = unserialize(Cache::get('settings.v1.' . DummySimpleSettings::class));
+
+    expect($cached['values']['new_value'])->toEqual('Loaded from repository');
+
+    $settings = new class extends DummySimpleSettings
+    {
+        public string $new_value;
+    };
+
+    $settingsClass = $settings::class;
+    $this->setRegisteredSettings([$settingsClass]);
+
+    DB::enableQueryLog();
+
+    expect(resolve($settingsClass)->new_value)->toEqual('Loaded from repository');
+    expect(DB::getQueryLog())->toBeEmpty();
+});
+
+it('will load settings from the repository when cached values lack a newer setting', function () {
+    useEnabledCache($this->app);
+
+    $this->migrateDummySimpleSettings();
+    $this->migrator->inGroup('dummy_simple', function (SettingsBlueprint $blueprint): void {
+        $blueprint->add('new_value', 'Loaded from repository');
+    });
+
+    $settings = new class extends DummySimpleSettings
+    {
+        public string $new_value;
+    };
+
+    $settingsClass = $settings::class;
+
+    Cache::put('settings.v1.' . $settingsClass, serialize([
+        '__settings_cache_format' => 1,
+        'values' => [
+            'name' => 'Cached name',
+            'description' => 'Cached description',
+            '_settingsLoadedFromCache' => true,
+        ],
+    ]));
+
+    $this->setRegisteredSettings([$settingsClass]);
+
+    DB::enableQueryLog();
+
+    expect(resolve($settingsClass)->new_value)->toEqual('Loaded from repository');
+    expect(DB::getQueryLog())->not->toBeEmpty();
+
+    $cached = unserialize(Cache::get('settings.v1.' . $settingsClass));
+
+    expect($cached['values']['new_value'])->toEqual('Loaded from repository');
+});
+
+it('will reload legacy serialized settings cache entries from the repository', function () {
+    useEnabledCache($this->app);
+
+    $this->migrateDummySimpleSettings(name: 'Current repository value');
+    $this->setRegisteredSettings([DummySimpleSettings::class]);
+
+    $legacySettings = new DummySimpleSettings([
+        'name' => 'Legacy cached value',
+        'description' => 'Legacy cache entry',
+    ]);
+
+    Cache::put('settings.v1.' . DummySimpleSettings::class, serialize($legacySettings));
+
+    DB::enableQueryLog();
+
+    expect(resolve(DummySimpleSettings::class)->name)->toEqual('Current repository value');
+    expect(DB::getQueryLog())->not->toBeEmpty();
+});
+
 it('will cache encrypted setting', function () {
     useEnabledCache($this->app);
 
@@ -644,7 +743,7 @@ it('will cache encrypted setting', function () {
 
     $cache->put(new DummyEncryptedSettings($data));
 
-    $serialized = Cache::get('settings.' . DummyEncryptedSettings::class);
+    $serialized = Cache::get('settings.v1.' . DummyEncryptedSettings::class);
 
     expect($serialized)->not()->toContain($data['string']);
 
@@ -670,18 +769,18 @@ it('can clear a settings cache', function () {
 
     cache()->put('other_cache_entry', 'do-not-delete-this');
 
-    expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeTrue();
+    expect(cache()->has('settings.v1.' . DummySimpleSettings::class))->toBeTrue();
 
     resolve(SettingsCacheFactory::class)->build()->clear();
 
     expect(cache()->has('other_cache_entry'))->toBeTrue();
-    expect(cache()->has('settings.' . DummySimpleSettings::class))->toBeFalse();
+    expect(cache()->has('settings.v1.' . DummySimpleSettings::class))->toBeFalse();
 });
 
 it('will load settings from the repository when a serialized setting cannot be loaded', function () {
     $this->migrateDummySimpleSettings();
 
-    Cache::put('settings.' . DummySimpleSettings::class, 'not-a-settings-class');
+    Cache::put('settings.v1.' . DummySimpleSettings::class, 'not-a-settings-class');
 
     $this->setRegisteredSettings([
         DummySimpleSettings::class,

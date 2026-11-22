@@ -84,6 +84,19 @@ abstract class Settings implements Arrayable, Jsonable, Responsable
         ));
     }
 
+    public static function fromCache(array $values): self
+    {
+        $settings = new static();
+        $settings->loaded = true;
+        $settings->settingsConfig()->markLoadedFromCache(true);
+        $settings->fill($values);
+        $settings->originalValues = collect($values);
+
+        event(new SettingsLoaded($settings, true));
+
+        return $settings;
+    }
+
     final public function __construct(array $values = [])
     {
         foreach ($this->settingsConfig()->getReflectedProperties() as $name => $property) {
