@@ -878,6 +878,9 @@ We suggest you enable caching in production by adding `SETTINGS_CACHE_ENABLED=tr
 
 That's it. The package is now smart enough to cache the settings the first time they're loaded. Whenever the settings are edited, the package will refresh the settings.
 
+Cached values are read from the configured repository for the whole settings group, rather than storing a serialized settings class. This lets an older application version refresh the cache without dropping repository properties introduced by a newer version.
+If a cached value is missing a property required by the current settings class, the package loads the settings from the repository instead. These behaviors also make existing serialized settings cache entries safe to encounter during a rolling deployment.
+
 You can always clear the cached settings with the following command:
 
 ```bash
@@ -1235,4 +1238,3 @@ If you've found a bug regarding security please mail [security@spatie.be](mailto
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-

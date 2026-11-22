@@ -13,6 +13,8 @@ use Spatie\LaravelSettings\Exceptions\SettingsCacheDisabled;
 
 class SettingsCache
 {
+    private const CACHE_FORMAT_VERSION = 1;
+
     private static ?Closure $prefixResolver = null;
 
     public function __construct(
@@ -59,13 +61,25 @@ class SettingsCache
 
         $settings = unserialize($serialized);
 
-        if (! $settings instanceof Settings) {
+        if ($settings instanceof Settings) {
+            return null;
+        }
+
+        if (
+            ! is_array($settings)
+            || ($settings['__settings_cache_format'] ?? null) !== self::CACHE_FORMAT_VERSION
+            || ! is_array($settings['values'] ?? null)
+        ) {
             throw new CouldNotUnserializeSettings();
         }
 
-        $settings->settingsConfig()->markLoadedFromCache(true);
+        $values = app(SettingsMapper::class)->loadCachedProperties($settingsClass, $settings['values']);
 
-        return $settings;
+        if ($values === null) {
+            return null;
+        }
+
+        return $settingsClass::fromCache($values->all());
     }
 
     public function put(Settings $settings): void
@@ -76,7 +90,19 @@ class SettingsCache
 
         $settings->settingsConfig()->markLoadedFromCache(true);
 
-        $serialized = serialize($settings);
+        $settingsConfig = $settings->settingsConfig();
+        $values = array_merge(
+            $settingsConfig->getRepository()->getPropertiesInGroup($settingsConfig->getGroup()),
+            app(SettingsMapper::class)->serializeProperties(
+                get_class($settings),
+                $settings->toCollection()
+            )
+        );
+
+        $serialized = serialize([
+            '__settings_cache_format' => self::CACHE_FORMAT_VERSION,
+            'values' => $values,
+        ]);
 
         $this->cacheRepository()->put(
             $this->resolveCacheKey(get_class($settings)),

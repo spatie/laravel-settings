@@ -58,7 +58,23 @@ class SettingsMapper
         $notRejectedProperties = $properties
             ->reject(fn ($payload, string $name) => $config->isLocked($name));
 
-        $changedProperties = $notRejectedProperties
+        $changedProperties = $this->serializeProperties($settingsClass, $notRejectedProperties);
+
+        $config->getRepository()->updatePropertiesPayload(
+            $config->getGroup(),
+            $changedProperties
+        );
+
+        return $this
+            ->fetchProperties($settingsClass, $config->getLocked())
+            ->merge($notRejectedProperties);
+    }
+
+    public function serializeProperties(string $settingsClass, Collection $properties): array
+    {
+        $config = $this->getConfig($settingsClass);
+
+        return $properties
             ->map(function ($payload, string $name) use ($config) {
                 if ($cast = $config->getCast($name)) {
                     $payload = $cast->set($payload);
@@ -71,23 +87,44 @@ class SettingsMapper
                 return $payload;
             })
             ->toArray();
-
-        $config->getRepository()->updatePropertiesPayload(
-            $config->getGroup(),
-            $changedProperties
-        );
-
-        return $this
-            ->fetchProperties($settingsClass, $config->getLocked())
-            ->merge($notRejectedProperties);
     }
 
     public function fetchProperties(string $settingsClass, Collection $names): Collection
     {
         $config = $this->getConfig($settingsClass);
 
-        return collect($config->getRepository()->getPropertiesInGroup($config->getGroup()))
-            ->filter(fn ($payload, string $name) => $names->contains($name))
+        return $this->mapProperties(
+            $settingsClass,
+            $config->getRepository()->getPropertiesInGroup($config->getGroup()),
+            $names
+        );
+    }
+
+    public function loadCachedProperties(string $settingsClass, array $properties): ?Collection
+    {
+        $config = $this->getConfig($settingsClass);
+        $mappedProperties = $this->fillMissingSettingsWithDefaultValues(
+            $config,
+            $this->mapProperties($settingsClass, $properties)
+        );
+
+        if ($config->getReflectedProperties()->keys()->diff($mappedProperties->keys())->isNotEmpty()) {
+            return null;
+        }
+
+        return $mappedProperties;
+    }
+
+    private function mapProperties(
+        string $settingsClass,
+        array $properties,
+        ?Collection $names = null
+    ): Collection {
+        $config = $this->getConfig($settingsClass);
+
+        return collect($properties)
+            ->filter(fn ($payload, string $name) => $config->getReflectedProperties()->has($name)
+                && ($names === null || $names->contains($name)))
             ->map(function ($payload, string $name) use ($config) {
                 if ($config->isEncrypted($name)) {
                     $payload = Crypto::decrypt($payload);
